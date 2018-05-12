@@ -18,8 +18,9 @@ int moduleidstart = 0x1CC;
 char mes[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 
-uint16_t voltage[14];
-int sent =0;
+uint16_t voltage[30][14];
+int modulespresent = 0;
+int sent = 0;
 
 int debug = 1;
 
@@ -55,13 +56,19 @@ void loop()
   if (millis() > looptime + 500)
   {
     looptime = millis();
-    Serial.println();
-    Serial.print("Voltages : ");
-    for (int i = 1; i < 13; i++)
+    for (int y = 0; y < modulespresent; y++)
     {
-      Serial.print(voltage[i]);
-      Serial.print("mV ");
+      Serial.println();
+      Serial.print("Module ");
+      Serial.print(y+1);
+      Serial.print(" Voltages : ");
+      for (int i = 1; i < 13; i++)
+      {
+        Serial.print(voltage[y][i]);
+        Serial.print("mV ");
+      }
     }
+
     Serial.println();
     sendcommand();
   }
@@ -114,34 +121,39 @@ void candecode()
   if (sent == 1)
   {
     moduleidstart = rxId;
+    modulespresent = 0;
     sent = 0;
   }
-  int ID = rxId - moduleidstart;
-  switch (ID)
+  if (rxId > 1024)
   {
-    case 0:
-      voltage[1] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
-      voltage[3] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
+    int ID = rxId - moduleidstart;
+    switch (ID)
+    {
+      case 0:
+        voltage[modulespresent][1] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
+        voltage[modulespresent][3] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
 
-      voltage[2] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
-      voltage[4] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
-      break;
-    case 1:
-      voltage[5] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
-      voltage[7] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
+        voltage[modulespresent][2] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
+        voltage[modulespresent][4] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
+        break;
+      case 1:
+        voltage[modulespresent][5] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
+        voltage[modulespresent][7] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
 
-      voltage[6] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
-      voltage[8] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
-      break;
+        voltage[modulespresent][6] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
+        voltage[modulespresent][8] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
+        break;
 
-    case 2:
-      voltage[9] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
-      voltage[11] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
+      case 2:
+        voltage[modulespresent][9] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
+        voltage[modulespresent][11] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
 
-      voltage[10] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
-      voltage[12] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
-      break;
-
+        voltage[modulespresent][10] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
+        voltage[modulespresent][12] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
+        modulespresent++;
+        sent =1;
+        break;
+    }
   }
   if (debug == 1)                        // If CAN0_INT pin is low, read receive buffer
   {
