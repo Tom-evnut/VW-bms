@@ -22,7 +22,7 @@ uint16_t voltage[30][14];
 int modulespresent = 0;
 int sent = 0;
 
-int debug = 1;
+int debug = 0;
 
 void setup()
 {
@@ -112,7 +112,10 @@ void sendcommand()
   sent = 1;
   Serial.println();
   Serial.print("Command Sent");
+  Serial.print(" Present Modules: ");
+  Serial.print(modulespresent);
   Serial.println();
+  modulespresent = 0;
 }
 
 void candecode()
@@ -121,11 +124,11 @@ void candecode()
   if (sent == 1)
   {
     moduleidstart = rxId;
-    modulespresent = 0;
     sent = 0;
   }
-  if (rxId > 1024)
+  if (rxId < 1024)
   {
+    Serial.print("   ");
     int ID = rxId - moduleidstart;
     switch (ID)
     {
