@@ -133,26 +133,26 @@ void candecode()
     switch (ID)
     {
       case 0:
-        voltage[modulespresent][1] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
-        voltage[modulespresent][3] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
+        voltage[modulespresent][1] = uint16_t(rxBuf[1] >> 4) + uint16_t(rxBuf[2] << 4) + 1000;
+        voltage[modulespresent][3] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[4] >> 4) + 1000;
 
-        voltage[modulespresent][2] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
-        voltage[modulespresent][4] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
+        voltage[modulespresent][2] = rxBuf[3] + uint16_t((rxBuf[4] & 0x0F) << 8) + 1000;
+        voltage[modulespresent][4] = rxBuf[6] + uint16_t((rxBuf[7] & 0x0F) << 8) + 1000;
         break;
       case 1:
-        voltage[modulespresent][5] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
-        voltage[modulespresent][7] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
+        voltage[modulespresent][5] = uint16_t(rxBuf[1] >> 4) + uint16_t(rxBuf[2] << 4) + 1000;
+        voltage[modulespresent][7] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[4] >> 4) + 1000;
 
-        voltage[modulespresent][6] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
-        voltage[modulespresent][8] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
+        voltage[modulespresent][6] = rxBuf[3] + uint16_t((rxBuf[4] & 0x0F) << 8) + 1000;
+        voltage[modulespresent][8] = rxBuf[6] + uint16_t((rxBuf[7] & 0x0F) << 8) + 1000;
         break;
 
       case 2:
-        voltage[modulespresent][9] = uint16_t(rxBuf[2] << 4) + uint16_t(rxBuf[3] >> 4) + 1000;
-        voltage[modulespresent][11] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[6] >> 4) + 1000;
+        voltage[modulespresent][9] = uint16_t(rxBuf[1] >> 4) + uint16_t(rxBuf[2] << 4) + 1000;
+        voltage[modulespresent][11] = uint16_t(rxBuf[5] << 4) + uint16_t(rxBuf[4] >> 4) + 1000;
 
-        voltage[modulespresent][10] = (rxBuf[3] & 0x0F) + uint16_t((rxBuf[4] & 0x0F) << 8) + (rxBuf[4]  & 0xF0) + 1000;
-        voltage[modulespresent][12] = (rxBuf[6] & 0x0F) + uint16_t((rxBuf[7] & 0x0F) << 8) + (rxBuf[7]  & 0xF0) + 1000;
+        voltage[modulespresent][10] = rxBuf[3] + uint16_t((rxBuf[4] & 0x0F) << 8) + 1000;
+        voltage[modulespresent][12] = rxBuf[6] + uint16_t((rxBuf[7] & 0x0F) << 8) + 1000;
         modulespresent++;
         sent =1;
         break;
