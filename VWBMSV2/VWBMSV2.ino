@@ -494,7 +494,7 @@ void printbmsstat()
   }
   if (balancecells == 1)
   {
-    SERIALCONSOLE.print("|Balancing Active");
+    //SERIALCONSOLE.print("|Balancing Active"); //No balancing on Vw modules
   }
 }
 
