@@ -36,54 +36,54 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
   int CMU,Id = 0;
   switch (msg.id)
   {
-    case (0x1B8):
+    case (0x1B4):
       CMU = 0;
+      Id = 0;
+      break;
+    case (0x1B5):
+      CMU = 0;
+      Id = 1;
+      break;
+    case (0x1B6):
+      CMU = 0;
+      Id = 2;
+      break;
+
+    case (0x1B8):
+      CMU = 1;
       Id = 0;
       break;
     case (0x1B9):
-      CMU = 0;
+      CMU = 1;
       Id = 1;
       break;
     case (0x1BA):
-      CMU = 0;
+      CMU = 1;
       Id = 2;
       break;
 
-    case (0x1BB):
-      CMU = 1;
-      Id = 0;
-      break;
     case (0x1BC):
-      CMU = 1;
-      Id = 1;
+      CMU = 2;
+      Id = 0;
       break;
     case (0x1BD):
-      CMU = 1;
-      Id = 2;
-      break;
-
-    case (0x1BE):
-      CMU = 2;
-      Id = 0;
-      break;
-    case (0x1BF):
       CMU = 2;
       Id = 1;
       break;
-    case (0x1C0):
+    case (0xBE):
       CMU = 2;
       Id = 2;
       break;
 
+    case (0x1C0):
+      CMU = 3;
+      Id = 0;
+      break;
     case (0x1C1):
       CMU = 3;
-      Id = 0;
-      break;
-    case (0x1C2):
-      CMU = 3;
       Id = 1;
       break;
-    case (0x1C3):
+    case (0x1C2):
       CMU = 3;
       Id = 2;
       break;
