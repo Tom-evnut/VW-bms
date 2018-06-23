@@ -39,6 +39,7 @@ int candebug = 1; //view can frames
 int debugCur = 0;
 int menuload = 0;
 
+char msgString[128];
 
 ADC *adc = new ADC(); // adc object
 
@@ -47,6 +48,7 @@ CAN_message_t inMsg;
 
 uint32_t lastUpdate;
 
+int controlid = 0x0BA;
 
 void setup()
 {
