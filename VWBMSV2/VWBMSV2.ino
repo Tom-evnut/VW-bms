@@ -1458,7 +1458,7 @@ void sendcommand()
   msg.buf[6] = 0x00;
   msg.buf[7] = 0x00;
   Can0.write(msg);
-
+  delay(1);
   msg.id  = controlid;
   msg.len = 8;
   msg.buf[0] = 0x45;
