@@ -205,85 +205,13 @@ void BMSModuleManager::balanceCells()
 */
 void BMSModuleManager::setupBoards()
 {
-  /*
-    uint8_t payload[3];
-    uint8_t buff[10];
-    int retLen;
-
-    payload[0] = 0;
-    payload[1] = 0;
-    payload[2] = 1;
-
-    while (1 == 1)
-    {
-        payload[0] = 0;
-        payload[1] = 0;
-        payload[2] = 1;
-        retLen = BMSUtil::sendDataWithReply(payload, 3, false, buff, 4);
-        if (retLen == 4)
-        {
-            if (buff[0] == 0x80 && buff[1] == 0 && buff[2] == 1)
-            {
-                Logger::debug("00 found");
-                //look for a free address to use
-                for (int y = 1; y < 63; y++)
-                {
-                    if (!modules[y].isExisting())
-                    {
-                        payload[0] = 0;
-                        payload[1] = REG_ADDR_CTRL;
-                        payload[2] = y | 0x80;
-                        BMSUtil::sendData(payload, 3, true);
-                        delay(3);
-                        if (BMSUtil::getReply(buff, 10) > 2)
-                        {
-                            if (buff[0] == (0x81) && buff[1] == REG_ADDR_CTRL && buff[2] == (y + 0x80))
-                            {
-                                modules[y].setExists(true);
-                                numFoundModules++;
-                                Logger::debug("Address assigned");
-                            }
-                        }
-                        break; //quit the for loop
-                    }
-                }
-            }
-            else break; //nobody responded properly to the zero address so our work here is done.
-        }
-        else break;
-    }
-  */
+  
 }
 /*
    Iterate through all 62 possible board addresses (1-62) to see if they respond
 */
 void BMSModuleManager::findBoards()
 {
-  /*
-    uint8_t payload[3];
-    uint8_t buff[8];
-
-    numFoundModules = 0;
-    payload[0] = 0;
-    payload[1] = 0; //read registers starting at 0
-    payload[2] = 1; //read one byte
-    for (int x = 1; x <= MAX_MODULE_ADDR; x++)
-    {
-        modules[x].setExists(false);
-        payload[0] = x << 1;
-        BMSUtil::sendData(payload, 3, false);
-        delay(20);
-        if (BMSUtil::getReply(buff, 8) > 4)
-        {
-            if (buff[0] == (x << 1) && buff[1] == 0 && buff[2] == 1 && buff[4] > 0) {
-                modules[x].setExists(true);
-                numFoundModules++;
-                Logger::debug("Found module with address: %X", x);
-            }
-        }
-        delay(5);
-    }
-  */
 }
 
 
@@ -293,31 +221,7 @@ void BMSModuleManager::findBoards()
 */
 void BMSModuleManager::renumberBoardIDs()
 {
-  /*
-    uint8_t payload[3];
-    uint8_t buff[8];
-    int attempts = 1;
-
-    for (int y = 1; y < 63; y++)
-    {
-        modules[y].setExists(false);
-        numFoundModules = 0;
-    }
-
-    while (attempts < 3)
-    {
-        payload[0] = 0x3F << 1; //broadcast the reset command
-        payload[1] = 0x3C;//reset
-        payload[2] = 0xA5;//data to cause a reset
-        BMSUtil::sendData(payload, 3, true);
-        delay(100);
-        BMSUtil::getReply(buff, 8);
-        if (buff[0] == 0x7F && buff[1] == 0x3C && buff[2] == 0xA5 && buff[3] == 0x57) break;
-        attempts++;
-    }
-
-    setupBoards();
-  */
+  
 }
 
 /*
@@ -325,29 +229,6 @@ void BMSModuleManager::renumberBoardIDs()
 */
 void BMSModuleManager::clearFaults()
 {
-  /*
-    uint8_t payload[3];
-    uint8_t buff[8];
-    payload[0] = 0x7F; //broadcast
-    payload[1] = REG_ALERT_STATUS;//Alert Status
-    payload[2] = 0xFF;//data to cause a reset
-    BMSUtil::sendDataWithReply(payload, 3, true, buff, 4);
-
-    payload[0] = 0x7F; //broadcast
-    payload[2] = 0x00;//data to clear
-    BMSUtil::sendDataWithReply(payload, 3, true, buff, 4);
-
-    payload[0] = 0x7F; //broadcast
-    payload[1] = REG_FAULT_STATUS;//Fault Status
-    payload[2] = 0xFF;//data to cause a reset
-    BMSUtil::sendDataWithReply(payload, 3, true, buff, 4);
-
-    payload[0] = 0x7F; //broadcast
-    payload[2] = 0x00;//data to clear
-    BMSUtil::sendDataWithReply(payload, 3, true, buff, 4);
-
-    isFaulted = false;
-  */
 }
 
 /*
@@ -357,16 +238,6 @@ void BMSModuleManager::clearFaults()
 
 void BMSModuleManager::sleepBoards()
 {
-  /*
-    uint8_t payload[3];
-    uint8_t buff[8];
-    payload[0] = 0x7F; //broadcast
-    payload[1] = REG_IO_CTRL;//IO ctrl start
-    payload[2] = 0x04;//write sleep bit
-    BMSUtil::sendData(payload, 3, true);
-    delay(2);
-    BMSUtil::getReply(buff, 8);
-  */
 }
 
 /*
@@ -375,28 +246,6 @@ void BMSModuleManager::sleepBoards()
 
 void BMSModuleManager::wakeBoards()
 {
-  /*
-    uint8_t payload[3];
-    uint8_t buff[8];
-    payload[0] = 0x7F; //broadcast
-    payload[1] = REG_IO_CTRL;//IO ctrl start
-    payload[2] = 0x00;//write sleep bit
-    BMSUtil::sendData(payload, 3, true);
-    delay(2);
-    BMSUtil::getReply(buff, 8);
-
-    payload[0] = 0x7F; //broadcast
-    payload[1] = REG_ALERT_STATUS;//Fault Status
-    payload[2] = 0x04;//data to cause a reset
-    BMSUtil::sendData(payload, 3, true);
-    delay(2);
-    BMSUtil::getReply(buff, 8);
-    payload[0] = 0x7F; //broadcast
-    payload[2] = 0x00;//data to clear
-    BMSUtil::sendData(payload, 3, true);
-    delay(2);
-    BMSUtil::getReply(buff, 8);
-  */
 }
 
 void BMSModuleManager::getAllVoltTemp()
