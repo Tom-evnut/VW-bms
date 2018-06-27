@@ -28,27 +28,27 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
 {
   switch (Id)
   {
-    case 0:
-      cellVolt[0] = (uint16_t(msg.buf[2] << 4) + uint16_t(msg.buf[3] >> 4) + 1000) * 0.001;
-      cellVolt[2] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[6] >> 4) + 1000) * 0.001;
+          case 0:
+        cellVolt[0] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000)*0.001;
+        cellVolt[2] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000)*0.001;
 
-      cellVolt[1] = ((msg.buf[3] & 0x0F) + uint16_t((msg.buf[4] & 0x0F) << 8) + (msg.buf[4]  & 0xF0) + 1000) * 0.001;
-      cellVolt[3] = ((msg.buf[6] & 0x0F) + uint16_t((msg.buf[7] & 0x0F) << 8) + (msg.buf[7]  & 0xF0) + 1000) * 0.001;
-      break;
-    case 1:
-      cellVolt[4] = (uint16_t(msg.buf[2] << 4) + uint16_t(msg.buf[3] >> 4) + 1000) * 0.001;
-      cellVolt[6] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[6] >> 4) + 1000) * 0.001;
+        cellVolt[1] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000)*0.001;
+        cellVolt[3] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000)*0.001;
+        break;
+      case 1:
+        cellVolt[4] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000)*0.001;
+        cellVolt[6] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000)*0.001;
 
-      cellVolt[5] = ((msg.buf[3] & 0x0F) + uint16_t((msg.buf[4] & 0x0F) << 8) + (msg.buf[4]  & 0xF0) + 1000) * 0.001;
-      cellVolt[7] = ((msg.buf[6] & 0x0F) + uint16_t((msg.buf[7] & 0x0F) << 8) + (msg.buf[7]  & 0xF0) + 1000) * 0.001;
-      break;
+        cellVolt[5] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000)*0.001;
+        cellVolt[7] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000)*0.001;
+        break;
 
-    case 2:
-      cellVolt[8] = ( uint16_t(msg.buf[2] << 4) + uint16_t(msg.buf[3] >> 4) + 1000) * 0.001;
-      cellVolt[10] = ( uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[6] >> 4) + 1000) * 0.001;
+      case 2:
+        cellVolt[8] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000)*0.001;
+        cellVolt[10] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000)*0.001;
 
-      cellVolt[9] = ((msg.buf[3] & 0x0F) + uint16_t((msg.buf[4] & 0x0F) << 8) + (msg.buf[4]  & 0xF0) + 1000) * 0.001;
-      cellVolt[11] = ((msg.buf[6] & 0x0F) + uint16_t((msg.buf[7] & 0x0F) << 8) + (msg.buf[7]  & 0xF0) + 1000) * 0.001;
+        cellVolt[9] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000)*0.001;
+        cellVolt[11] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000)*0.001;
       break;
 
     default:
