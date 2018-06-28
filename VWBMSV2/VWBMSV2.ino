@@ -18,6 +18,7 @@ EEPROMSettings settings;
 int CAP = 100; //battery size in Ah
 int Pstrings = 1; // strings in parallel used to divide voltage of pack
 int ESSmode = 1; //turn on ESS mode, does not respond to key switching
+float storagedelta = 0.3; //in ESS mode in 1 high changes charge and discharge limits by this amount
 
 //Simple BMS V2 wiring//
 const int ACUR1 = A0; // current 1
@@ -120,6 +121,7 @@ uint16_t socvolt[4] = {3100, 10, 4100, 90};
 //variables
 int outputstate = 0;
 int incomingByte = 0;
+int storagemode = 0;
 int x = 0;
 int balancecells;
 
@@ -141,18 +143,20 @@ ADC *adc = new ADC(); // adc object
 void loadSettings()
 {
   Logger::console("Resetting to factory defaults");
-  settings.version = 0;
-  settings.checksum = 0;
+  settings.version = 20;
+  settings.checksum = 2;
   settings.canSpeed = 500000;
   settings.batteryID = 0x01; //in the future should be 0xFF to force it to ask for an address
   settings.OverVSetpoint = 4.1f;
   settings.UnderVSetpoint = 3.0f;
+  settings.ChargeVsetpoint = 4.1f;
+  settings.DischVsetpoint = 3.2f;
   settings.OverTSetpoint = 65.0f;
   settings.UnderTSetpoint = -10.0f;
   settings.ChargeTSetpoint = 0.0f;
   settings.DisTSetpoint = 40.0f;
   settings.IgnoreTemp = 0; // 0 - use both sensors, 1 or 2 only use that sensor
-  settings.IgnoreVolt = 2.2;//
+  settings.IgnoreVolt = 0.5;//
   settings.balanceVoltage = 3.9f;
   settings.balanceHyst = 0.04f;
   settings.logLevel = 2;
@@ -236,6 +240,24 @@ void loop()
   //contcon();
   if (ESSmode == 1)
   {
+    if (digitalRead(IN1) == LOW)//Key OFF
+    {
+      if (storagemode == 1)
+      {
+        settings.ChargeVsetpoint += storagedelta;
+        settings.DischVsetpoint -= storagedelta;
+        storagemode = 0;
+      }
+    }
+    else
+    {
+      if (storagemode == 0)
+      {
+        settings.ChargeVsetpoint -= storagedelta;
+        settings.DischVsetpoint += storagedelta;
+        storagemode = 1;
+      }
+    }
     if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
     {
       bms.balanceCells();
@@ -816,14 +838,14 @@ void VEcan() //communication with Victron system over CAN
 {
   msg.id  = 0x351;
   msg.len = 8;
-  msg.buf[0] = lowByte(uint16_t((settings.OverVSetpoint * bms.seriescells() / Pstrings) * 10));
-  msg.buf[1] = highByte(uint16_t((settings.OverVSetpoint * bms.seriescells() / Pstrings) * 10));
+  msg.buf[0] = lowByte(uint16_t((settings.ChargeVsetpoint * bms.seriescells() / Pstrings) * 10));
+  msg.buf[1] = highByte(uint16_t((settings.ChargeVsetpoint * bms.seriescells() / Pstrings) * 10));
   msg.buf[2] = lowByte(chargecurrent);
   msg.buf[3] = highByte(chargecurrent);
   msg.buf[4] = lowByte(discurrent );
   msg.buf[5] = highByte(discurrent);
-  msg.buf[6] = lowByte(uint16_t((settings.UnderVSetpoint * bms.seriescells() / Pstrings) * 10));
-  msg.buf[7] = highByte(uint16_t((settings.UnderVSetpoint * bms.seriescells() / Pstrings) * 10));
+  msg.buf[6] = lowByte(uint16_t((settings.DischVsetpoint * bms.seriescells() / Pstrings) * 10));
+  msg.buf[7] = highByte(uint16_t((settings.DischVsetpoint * bms.seriescells() / Pstrings) * 10));
   Can0.write(msg);
 
   msg.id  = 0x355;
@@ -1102,11 +1124,37 @@ void menu()
         SERIALCONSOLE.print(discurrentmax * 0.1);
         SERIALCONSOLE.print("A max Discharge - 9 ");
         SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print(settings.ChargeVsetpoint * 1000, 0);
+        SERIALCONSOLE.print("mV Charge Voltage Limit Setpoint - a ");
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print(settings.DischVsetpoint * 1000, 0);
+        SERIALCONSOLE.print("mV Discharge Voltage Limit Setpoint - b");
+        SERIALCONSOLE.println("  ");
         break;
       case 101: //e dispaly settings
         SERIALCONSOLE.println("  ");
         SERIALCONSOLE.println("Enter Variable Number and New value ");
         SERIALCONSOLE.println("  ");
+        break;
+
+      case 'a': //a Charge Voltage Setpoint
+        if (Serial.available() > 0)
+        {
+          settings.ChargeVsetpoint = Serial.parseInt();
+          settings.ChargeVsetpoint = settings.ChargeVsetpoint / 1000;
+          SERIALCONSOLE.print(settings.ChargeVsetpoint  * 1000, 0);
+          SERIALCONSOLE.print("mV Charge Voltage Limit Setpoint");
+        }
+        break;
+
+      case 'b': //Discharge Voltage Setpoint
+        if (Serial.available() > 0)
+        {
+          settings.DischVsetpoint = Serial.parseInt();
+          settings.DischVsetpoint = settings.DischVsetpoint / 1000;
+          SERIALCONSOLE.print(settings.DischVsetpoint * 1000, 0);
+          SERIALCONSOLE.print("mV Discharge Voltage Limit Setpoint");
+        }
         break;
 
       case 49: //1 Over Voltage Setpoint
