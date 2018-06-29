@@ -83,7 +83,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
       CMU = 4;
       Id = 1;
       break;
-    case (0xBE):
+    case (0x1BE):
       CMU = 4;
       Id = 2;
       break;
