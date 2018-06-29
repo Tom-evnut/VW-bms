@@ -31,12 +31,12 @@ int BMSModuleManager::seriescells()
   return spack;
 }
 
-void BMSModuleManager::decodecan(CAN_message_t &msg)
+void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
 {
   int CMU, Id = 0;
   switch (msg.id)
   {
-        ///////////////// Two extender increment//////////
+    ///////////////// Two extender increment//////////
     case (0x100):
       CMU = 31;
       Id = 0;
@@ -139,8 +139,8 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
       Id = 2;
       break;
 
-    
-        ///////////////// Two extender increment//////////
+
+    ///////////////// Two extender increment//////////
     case (0x130):
       CMU = 21;
       Id = 0;
@@ -459,11 +459,14 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
   }
   if (CMU > 0 && CMU < 64)
   {
-    Serial.println();
-    Serial.print(CMU);
-    Serial.print(",");
-    Serial.print(Id);
-    Serial.println();
+    if (debug == 1)
+    {
+      Serial.println();
+      Serial.print(CMU);
+      Serial.print(",");
+      Serial.print(Id);
+      Serial.println();
+    }
     modules[CMU].setExists(true);
     modules[CMU].decodecan(Id, msg);
   }

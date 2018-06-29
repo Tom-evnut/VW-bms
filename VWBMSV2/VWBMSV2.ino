@@ -1332,7 +1332,14 @@ void canread()
 
   if (inMsg.id < 0x300)//do VW BMS magic if ids are ones identified to be modules
   {
-    bms.decodecan(inMsg);//do VW BMS if ids are ones identified to be modules
+    if (candebug == 1)
+    {
+      bms.decodecan(inMsg, 1); //do VW BMS if ids are ones identified to be modules
+    }
+    else
+    {
+      bms.decodecan(inMsg, 0); //do VW BMS if ids are ones identified to be modules
+    }
   }
 
   if (candebug == 1)
