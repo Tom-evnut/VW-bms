@@ -141,8 +141,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
       break;
 
     default:
-      // if nothing else matches, do the default
-      // default is optional
+      return;
       break;
   }
   if (CMU > 0 && CMU < 64)

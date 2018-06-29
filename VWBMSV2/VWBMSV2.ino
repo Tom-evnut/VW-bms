@@ -1309,14 +1309,9 @@ void canread()
 {
   Can0.read(inMsg);
   // Read data: len = data length, buf = data byte(s)
-  switch (inMsg.id)
+  if (inMsg.id == 0x3c)
   {
-    case 0x3c2:
-      CAB300();
-      break;
-
-    default:
-      break;
+    CAB300();
   }
 
   if (inMsg.id < 0x300)//do VW BMS magic if ids are ones identified to be modules
