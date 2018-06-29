@@ -37,6 +37,110 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
   switch (msg.id)
   {
         ///////////////// Two extender increment//////////
+    case (0x100):
+      CMU = 31;
+      Id = 0;
+      break;
+    case (0x101):
+      CMU = 31;
+      Id = 1;
+      break;
+    case (0x102):
+      CMU = 31;
+      Id = 2;
+      break;
+
+    case (0x104):
+      CMU = 32;
+      Id = 0;
+      break;
+    case (0x105):
+      CMU = 32;
+      Id = 1;
+      break;
+    case (0x106):
+      CMU = 32;
+      Id = 2;
+      break;
+    case (0x108):
+      CMU = 33;
+      Id = 0;
+      break;
+    case (0x109):
+      CMU = 33;
+      Id = 1;
+      break;
+    case (0x10A):
+      CMU = 33;
+      Id = 2;
+      break;
+    case (0x10C):
+      CMU = 34;
+      Id = 0;
+      break;
+    case (0x10D):
+      CMU = 34;
+      Id = 1;
+      break;
+    case (0x10E):
+      CMU = 34;
+      Id = 2;
+      break;
+
+    case (0x110):
+      CMU = 35;
+      Id = 0;
+      break;
+    case (0x111):
+      CMU = 35;
+      Id = 1;
+      break;
+    case (0x112):
+      CMU = 35;
+      Id = 2;
+      break;
+
+    case (0x114):
+      CMU = 36;
+      Id = 0;
+      break;
+    case (0x115):
+      CMU = 36;
+      Id = 1;
+      break;
+    case (0x116):
+      CMU = 36;
+      Id = 2;
+      break;
+
+    case (0x118):
+      CMU = 37;
+      Id = 0;
+      break;
+    case (0x119):
+      CMU = 37;
+      Id = 1;
+      break;
+    case (0x11A):
+      CMU = 37;
+      Id = 2;
+      break;
+
+    case (0x11C):
+      CMU = 38;
+      Id = 0;
+      break;
+    case (0x11D):
+      CMU = 38;
+      Id = 1;
+      break;
+    case (0x11E):
+      CMU = 38;
+      Id = 2;
+      break;
+
+    
+        ///////////////// Two extender increment//////////
     case (0x130):
       CMU = 21;
       Id = 0;
