@@ -164,6 +164,7 @@ void loadSettings()
 
 CAN_message_t msg;
 CAN_message_t inMsg;
+CAN_filter_t filter;
 
 uint32_t lastUpdate;
 
@@ -188,6 +189,21 @@ void setup()
   pinMode(led, OUTPUT);
 
   Can0.begin(500000);
+
+  //set filters for standard
+  for (int i = 0; i < 8; i++)
+  {
+    Can0.getFilter(filter, i);
+    filter.flags.extended = 0;
+    Can0.setFilter(filter, i);
+  }
+  //set filters for extended
+  for (int i = 9; i < 13; i++)
+  {
+    Can0.getFilter(filter, i);
+    filter.flags.extended = 1;
+    Can0.setFilter(filter, i);
+  }
 
   //if using enable pins on a transceiver they need to be set on
 
