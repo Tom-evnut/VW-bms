@@ -48,7 +48,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
       CMU = 1;
       Id = 2;
       break;
-      
+
     case (0x1B4):
       CMU = 2;
       Id = 0;
@@ -145,14 +145,16 @@ void BMSModuleManager::decodecan(CAN_message_t &msg)
       // default is optional
       break;
   }
-
-  Serial.println();
-  Serial.print(CMU);
-  Serial.print(",");
-  Serial.print(Id);
-  Serial.println();
-  modules[CMU].setExists(true);
-  modules[CMU].decodecan(Id, msg);
+  if (CMU > 0 && CMU < 64)
+  {
+    Serial.println();
+    Serial.print(CMU);
+    Serial.print(",");
+    Serial.print(Id);
+    Serial.println();
+    modules[CMU].setExists(true);
+    modules[CMU].decodecan(Id, msg);
+  }
 }
 
 void BMSModuleManager::balanceCells()
