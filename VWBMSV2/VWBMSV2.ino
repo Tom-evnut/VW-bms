@@ -735,13 +735,10 @@ void updateSOC()
     }
   }
   SOC = ((ampsecond * 0.27777777777778) / (CAP * 1000)) * 100;
-  if (bms.getAvgCellVolt() > settings.OverVSetpoint)
+  if (SOC >= 100)
   {
     ampsecond = (CAP * 1000) / 0.27777777777778 ; //reset to full, dependant on given capacity. Need to improve with auto correction for capcity.
-    if (SOC >= 100)
-    {
-      SOC = 100;
-    }
+    SOC = 100;
   }
 
 
