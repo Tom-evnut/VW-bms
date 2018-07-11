@@ -31,6 +31,19 @@ int BMSModuleManager::seriescells()
   return spack;
 }
 
+void BMSModuleManager::clearmodules()
+{
+  for (int y = 1; y < 63; y++)
+  {
+    if (modules[y].isExisting())
+    {
+      modules[y].clearmodule();
+      modules[y].setExists(false);
+      modules[y].setAddress(y);
+    }
+  }
+}
+
 void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
 {
   int CMU, Id = 0;

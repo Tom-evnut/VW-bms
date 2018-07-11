@@ -104,7 +104,7 @@ int highconv = 285;
 float currentact, RawCur;
 float ampsecond;
 unsigned long lasttime;
-unsigned long looptime = 0; //ms
+unsigned long looptime, cleartime = 0; //ms
 int currentsense = 14;
 int sensor = 1;
 
@@ -125,6 +125,7 @@ int incomingByte = 0;
 int storagemode = 0;
 int x = 0;
 int balancecells;
+int cellspresent = 0;
 
 //VW BMS CAN variables////////////
 int controlid = 0x0BA;
@@ -435,9 +436,12 @@ void loop()
         {
           bmsstatus = Charge;
         }
-        if (bms.getLowCellVolt() >= settings.UnderVSetpoint)
+        if (cellspresent == bms.seriescells()) //detect a fault in cells detected
         {
-          bmsstatus = Ready;
+          if (bms.getLowCellVolt() >= settings.UnderVSetpoint)
+          {
+            bmsstatus = Ready;
+          }
         }
 
         break;
@@ -479,7 +483,24 @@ void loop()
     currentlimit();
     VEcan();
     sendcommand();
+
+    if (cellspresent == 0)
+    {
+      cellspresent = bms.seriescells();//set amount of connected cells, might need delay
+    }
+    else
+    {
+      if (cellspresent != bms.seriescells()) //detect a fault in cells detected
+      {
+        bmsstatus = Error;
+      }
+    }
+
     resetwdog();
+  }
+  if (millis() - cleartime > 5000)
+  {
+    bms.clearmodules();
   }
 }
 
@@ -538,8 +559,14 @@ void printbmsstat()
     if (bms.getLowCellVolt() > settings.UnderVSetpoint && bms.getHighCellVolt() < settings.OverVSetpoint)
     {
 
-      SERIALCONSOLE.print(": Happy ");
-
+      if ( bmsstatus == Error)
+      {
+        SERIALCONSOLE.print(": UNhappy:");
+      }
+      else
+      {
+        SERIALCONSOLE.print(": Happy ");
+      }
     }
   }
   else
@@ -910,6 +937,13 @@ void VEcan() //communication with Victron system over CAN
   msg.buf[5] = highByte(discurrent);
   msg.buf[6] = lowByte(uint16_t((settings.DischVsetpoint * bms.seriescells() / Pstrings) * 10));
   msg.buf[7] = highByte(uint16_t((settings.DischVsetpoint * bms.seriescells() / Pstrings) * 10));
+  if (bmsstatus == Error)
+  {
+    msg.buf[2] = 0x00;
+    msg.buf[3] = 0x00;
+    msg.buf[4] = 0x00;
+    msg.buf[5] = 0x00;
+  }
   Can0.write(msg);
 
   msg.id  = 0x355;
@@ -1126,6 +1160,11 @@ void menu()
         incomingByte = 'd';
         break;
 
+      case '6':
+        menuload = 1;
+        cellspresent = bms.seriescells();
+        incomingByte = 'd';
+        break;
 
       case 113: //q for quite menu
 
@@ -1246,6 +1285,10 @@ void menu()
         SERIALCONSOLE.print(settings.DischVsetpoint * 1000, 0);
         SERIALCONSOLE.print("mV Discharge Voltage Limit Setpoint - b");
         SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print(Pstrings, 0);
+        SERIALCONSOLE.print(" Slave strings in parallel - c");
+        SERIALCONSOLE.println("  ");
+
         break;
       case 101: //e dispaly settings
         SERIALCONSOLE.println("  ");
@@ -1280,6 +1323,15 @@ void menu()
           settings.DischVsetpoint = settings.DischVsetpoint / 1000;
           SERIALCONSOLE.print(settings.DischVsetpoint * 1000, 0);
           SERIALCONSOLE.print("mV Discharge Voltage Limit Setpoint");
+        }
+        break;
+
+      case 'c': //c Pstrings
+        if (Serial.available() > 0)
+        {
+          Pstrings = Serial.parseInt();
+          SERIALCONSOLE.print(Pstrings, 0);
+          SERIALCONSOLE.print("Slave strings in parallel");
         }
         break;
 
@@ -1390,6 +1442,8 @@ void menu()
         SERIALCONSOLE.println(inputcheck);
         SERIALCONSOLE.print("5 - ESS mode :");
         SERIALCONSOLE.println(ESSmode);
+        SERIALCONSOLE.print("6 - Cells Present Reset :");
+        SERIALCONSOLE.println(cellspresent);
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 4;
         break;
@@ -1664,8 +1718,8 @@ void sendcommand()
 
 void resetwdog()
 {
-          noInterrupts();                                     //   No - reset WDT
-        WDOG_REFRESH = 0xA602;
-        WDOG_REFRESH = 0xB480;
-        interrupts();
+  noInterrupts();                                     //   No - reset WDT
+  WDOG_REFRESH = 0xA602;
+  WDOG_REFRESH = 0xB480;
+  interrupts();
 }

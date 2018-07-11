@@ -8,6 +8,7 @@ class BMSModuleManager
 public:
     BMSModuleManager();
     int seriescells();
+    void clearmodules();
     void decodecan(CAN_message_t &msg,int debug);
     void balanceCells();
     void setupBoards();

@@ -6,6 +6,7 @@ class BMSModule
   public:
     BMSModule();
     void decodecan(int Id,CAN_message_t &msg);
+    void clearmodule();
     void readStatus();
      int getscells();
     bool readModuleValues();
