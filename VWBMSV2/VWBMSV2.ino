@@ -929,14 +929,14 @@ void VEcan() //communication with Victron system over CAN
 {
   msg.id  = 0x351;
   msg.len = 8;
-  msg.buf[0] = lowByte(uint16_t((settings.ChargeVsetpoint * bms.seriescells() / Pstrings) * 10));
-  msg.buf[1] = highByte(uint16_t((settings.ChargeVsetpoint * bms.seriescells() / Pstrings) * 10));
+  msg.buf[0] = lowByte(uint16_t((settings.ChargeVsetpoint * cellspresent / Pstrings) * 10));
+  msg.buf[1] = highByte(uint16_t((settings.ChargeVsetpoint * cellspresent / Pstrings) * 10));
   msg.buf[2] = lowByte(chargecurrent);
   msg.buf[3] = highByte(chargecurrent);
   msg.buf[4] = lowByte(discurrent );
   msg.buf[5] = highByte(discurrent);
-  msg.buf[6] = lowByte(uint16_t((settings.DischVsetpoint * bms.seriescells() / Pstrings) * 10));
-  msg.buf[7] = highByte(uint16_t((settings.DischVsetpoint * bms.seriescells() / Pstrings) * 10));
+  msg.buf[6] = lowByte(uint16_t((settings.DischVsetpoint * cellspresent / Pstrings) * 10));
+  msg.buf[7] = highByte(uint16_t((settings.DischVsetpoint * cellspresent / Pstrings) * 10));
   if (bmsstatus == Error)
   {
     msg.buf[2] = 0x00;
@@ -1290,7 +1290,7 @@ void menu()
         SERIALCONSOLE.print(settings.DischVsetpoint * 1000, 0);
         SERIALCONSOLE.print("mV Discharge Voltage Limit Setpoint - b");
         SERIALCONSOLE.println("  ");
-        SERIALCONSOLE.print(Pstrings, 0);
+        SERIALCONSOLE.print(Pstrings);
         SERIALCONSOLE.print(" Slave strings in parallel - c");
         SERIALCONSOLE.println("  ");
 
@@ -1335,7 +1335,7 @@ void menu()
         if (Serial.available() > 0)
         {
           Pstrings = Serial.parseInt();
-          SERIALCONSOLE.print(Pstrings, 0);
+          SERIALCONSOLE.print(Pstrings);
           SERIALCONSOLE.print("Slave strings in parallel");
         }
         break;
