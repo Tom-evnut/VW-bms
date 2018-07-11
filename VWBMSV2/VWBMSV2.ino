@@ -943,6 +943,11 @@ void VEcan() //communication with Victron system over CAN
     msg.buf[3] = 0x00;
     msg.buf[4] = 0x00;
     msg.buf[5] = 0x00;
+    alarm[2] = 0xFF;
+  }
+  else
+  {
+    alarm[2] = 0x00;
   }
   Can0.write(msg);
 
