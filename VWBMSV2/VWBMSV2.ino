@@ -500,7 +500,7 @@ void loop()
   }
   if (millis() - cleartime > 5000)
   {
-    bms.clearmodules();
+    //bms.clearmodules();
   }
 }
 
