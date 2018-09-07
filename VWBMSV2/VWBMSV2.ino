@@ -1910,11 +1910,11 @@ void pwmcomms()
   int p = 0;
   p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 0, 255);
   analogWrite(OUT8, p);
-
+/*
   Serial.println();
     Serial.print(p*100/255);
     Serial.print(" OUT8 ");
-  
+  */
   if (bms.getLowCellVolt() < settings.UnderVSetpoint)
   {
     analogWrite(OUT7, 38); //12V to 10V converter 1.5V
@@ -1924,9 +1924,10 @@ void pwmcomms()
     p=map(SOC,0,100,55,255);
     analogWrite(OUT7,p); //2V to 10V converter 1.5-10V
   }
-
+/*
     Serial.println();
     Serial.print(p*100/255);
     Serial.print(" OUT7 ");
+    */
 }
 
