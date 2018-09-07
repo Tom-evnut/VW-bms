@@ -1908,7 +1908,7 @@ void resetwdog()
 void pwmcomms()
 {
   int p = 0;
-  p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 213, 0);
+  p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 256, 43);
   analogWrite(OUT8, p);
 /*
   Serial.println();
@@ -1917,11 +1917,11 @@ void pwmcomms()
   */
   if (bms.getLowCellVolt() < settings.UnderVSetpoint)
   {
-    analogWrite(OUT7, 38); //12V to 10V converter 1.5V
+    analogWrite(OUT7, 224); //12V to 10V converter 1.5V
   }
   else
   {
-    p=map(SOC,100,0,55,213);
+    p=map(SOC,0,100,212,50);
     analogWrite(OUT7,p); //2V to 10V converter 1.5-10V
   }
 /*
