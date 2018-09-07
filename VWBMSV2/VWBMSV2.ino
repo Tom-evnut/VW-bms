@@ -1334,9 +1334,9 @@ void menu()
         break;
 
       case 114: //r for reset
-        ampsecond = 0;
+        SOCset = 0;
         SERIALCONSOLE.println("  ");
-        SERIALCONSOLE.print(" mAh Zeroed ");
+        SERIALCONSOLE.print(" mAh Reset ");
         SERIALCONSOLE.println("  ");
         break;
 
@@ -1921,7 +1921,7 @@ void pwmcomms()
   }
   else
   {
-    p=map(SOC,0,100,38,255);
+    p=map(SOC,0,100,55,255);
     analogWrite(OUT7,p); //2V to 10V converter 1.5-10V
   }
 
