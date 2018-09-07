@@ -1908,7 +1908,7 @@ void resetwdog()
 void pwmcomms()
 {
   int p = 0;
-  p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 0, 213);
+  p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 213, 0);
   analogWrite(OUT8, p);
 /*
   Serial.println();
@@ -1921,7 +1921,7 @@ void pwmcomms()
   }
   else
   {
-    p=map(SOC,0,100,55,213);
+    p=map(SOC,100,0,55,213);
     analogWrite(OUT7,p); //2V to 10V converter 1.5-10V
   }
 /*
