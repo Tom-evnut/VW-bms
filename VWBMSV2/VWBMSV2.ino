@@ -64,6 +64,11 @@ uint16_t pwmfreq = 10000;//pwm frequency
 int gaugelow = 255; //empty fuel gauge pwm
 int gaugehigh = 70; //full fuel gauge pwm
 
+int pwmcurmax = 200;//Max current to be shown with pwm
+int pwmcurmid = 50;//Mid point for pwm dutycycle based on current
+int16_t pwmcurmin = 0;//DONOT fill in, calculated later based on other values
+
+
 //variables for VE driect bus comms
 char* myStrings[] = {"V", "14674", "I", "0", "CE", "-1", "SOC", "800", "TTG", "-1", "Alarm", "OFF", "Relay", "OFF", "AR", "0", "BMV", "600S", "FW", "212", "H1", "-3", "H2", "-3", "H3", "0", "H4", "0", "H5", "0", "H6", "-7", "H7", "13180", "H8", "14774", "H9", "137", "H10", "0", "H11", "0", "H12", "0"};
 
@@ -293,6 +298,10 @@ void setup()
   digitalWrite(led, HIGH);
   bms.setPstrings(settings.Pstrings);
   bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+
+  ////Calculate fixed numbers
+  pwmcurmin = (pwmcurmid / 50 * pwmcurmax * -1);
+  ////
 }
 
 void loop()
@@ -344,22 +353,25 @@ void loop()
     if (bms.getLowCellVolt() < settings.UnderVSetpoint)
     {
       digitalWrite(OUT1, LOW);//turn off discharge
-      contctrl = 0;
+      contctrl = contctrl & 2;
     }
     else
     {
       digitalWrite(OUT1, HIGH);//turn on discharge
-      contctrl = 1;
+      contctrl = contctrl | 1;
     }
 
     if (bms.getHighCellVolt() > settings.OverVSetpoint)
     {
       digitalWrite(OUT3, LOW);//turn off charger
+      contctrl = contctrl & 1;
     }
     else
     {
       digitalWrite(OUT3, HIGH);//turn on charger
+      contctrl = contctrl | 2;
     }
+    pwmcomms();
   }
   else
   {
@@ -1892,3 +1904,29 @@ void resetwdog()
   WDOG_REFRESH = 0xB480;
   interrupts();
 }
+
+void pwmcomms()
+{
+  int p = 0;
+  p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 0, 255);
+  analogWrite(OUT8, p);
+
+  Serial.println();
+    Serial.print(p*100/255);
+    Serial.print(" OUT8 ");
+  
+  if (bms.getLowCellVolt() < settings.UnderVSetpoint)
+  {
+    analogWrite(OUT7, 38); //12V to 10V converter 1.5V
+  }
+  else
+  {
+    p=map(SOC,0,100,38,255);
+    analogWrite(OUT7,p); //2V to 10V converter 1.5-10V
+  }
+
+    Serial.println();
+    Serial.print(p*100/255);
+    Serial.print(" OUT7 ");
+}
+
