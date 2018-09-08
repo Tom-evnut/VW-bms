@@ -58,8 +58,8 @@ int Discharge;
 //variables for output control
 int pulltime = 1000;
 int contctrl, contstat = 0; //1 = out 5 high 2 = out 6 high 3 = both high
-unsigned long conttimer, Pretimer = 0;
-uint16_t pwmfreq = 10000;//pwm frequency
+unsigned long conttimer1,conttimer2, Pretimer = 0;
+uint16_t pwmfreq = 18000;//pwm frequency
 
 int gaugelow = 255; //empty fuel gauge pwm
 int gaugehigh = 70; //full fuel gauge pwm
@@ -876,31 +876,31 @@ void contcon()
 
     if ((contctrl & 1) == 1)
     {
-      if (conttimer == 0)
+      if (conttimer1 == 0)
       {
         analogWrite(OUT5, 255);
-        conttimer = millis() + pulltime ;
+        conttimer1 = millis() + pulltime ;
       }
-      if (conttimer < millis())
+      if (conttimer1 < millis())
       {
         analogWrite(OUT5, settings.conthold);
         contstat = contstat | 1;
-        conttimer = 0;
+        conttimer1 = 0;
       }
     }
 
     if ((contctrl & 2) == 2)
     {
-      if (conttimer == 0)
+      if (conttimer2 == 0)
       {
         analogWrite(OUT6, 255);
-        conttimer = millis() + pulltime ;
+        conttimer2 = millis() + pulltime ;
       }
-      if (conttimer < millis())
+      if (conttimer2 < millis())
       {
         analogWrite(OUT6, settings.conthold);
         contstat = contstat | 2;
-        conttimer = 0;
+        conttimer2 = 0;
       }
     }
     /*
@@ -1908,8 +1908,8 @@ void resetwdog()
 void pwmcomms()
 {
   int p = 0;
-  p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 256, 43);
-  analogWrite(OUT8, p);
+  p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 50 , 255);
+  analogWrite(OUT7, p);
 /*
   Serial.println();
     Serial.print(p*100/255);
@@ -1917,12 +1917,12 @@ void pwmcomms()
   */
   if (bms.getLowCellVolt() < settings.UnderVSetpoint)
   {
-    analogWrite(OUT7, 224); //12V to 10V converter 1.5V
+    analogWrite(OUT8, 224); //12V to 10V converter 1.5V
   }
   else
   {
-    p=map(SOC,0,100,212,50);
-    analogWrite(OUT7,p); //2V to 10V converter 1.5-10V
+    p=map(SOC, 0, 100, 220, 50);
+    analogWrite(OUT8,p); //2V to 10V converter 1.5-10V
   }
 /*
     Serial.println();
