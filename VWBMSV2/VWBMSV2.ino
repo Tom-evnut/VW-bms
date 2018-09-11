@@ -59,7 +59,7 @@ int Discharge;
 int pulltime = 1000;
 int contctrl, contstat = 0; //1 = out 5 high 2 = out 6 high 3 = both high
 unsigned long conttimer1,conttimer2, Pretimer = 0;
-uint16_t pwmfreq = 18000;//pwm frequency
+uint16_t pwmfreq = 15000;//pwm frequency
 
 int gaugelow = 255; //empty fuel gauge pwm
 int gaugehigh = 70; //full fuel gauge pwm
@@ -132,7 +132,7 @@ int moduleidstart = 0x1CC;
 int debug = 1;
 int inputcheck = 0; //read digital inputs
 int outputcheck = 0; //check outputs
-int candebug = 1; //view can frames
+int candebug = 0; //view can frames
 int debugCur = 0;
 int menuload = 0;
 
@@ -1671,7 +1671,7 @@ void menu()
     SERIALCONSOLE.println("Debugging Paused");
     SERIALCONSOLE.println("b - Battery Settings");
     SERIALCONSOLE.println("c - Current Sensor Calibration");
-    SERIALCONSOLE.println("k - Current Sensor Calibration");
+    SERIALCONSOLE.println("k - Contactor Settings");
     SERIALCONSOLE.println("d - Debug Settings");
     SERIALCONSOLE.println("R - Restart BMS");
     SERIALCONSOLE.println("q - exit menu");
