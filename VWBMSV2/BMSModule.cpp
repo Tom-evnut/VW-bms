@@ -38,6 +38,11 @@ void BMSModule::clearmodule()
   moduleAddress = 0;
 }
 
+void BMSModule::decodetemp(CAN_message_t &msg)
+{
+  temperatures[0]=(msg.buf[0]-80)*0.5;
+}
+
 void BMSModule::decodecan(int Id, CAN_message_t &msg)
 {
   switch (Id)

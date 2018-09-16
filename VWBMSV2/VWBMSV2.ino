@@ -58,7 +58,7 @@ int Discharge;
 //variables for output control
 int pulltime = 1000;
 int contctrl, contstat = 0; //1 = out 5 high 2 = out 6 high 3 = both high
-unsigned long conttimer1,conttimer2, Pretimer = 0;
+unsigned long conttimer1, conttimer2, Pretimer = 0;
 uint16_t pwmfreq = 15000;//pwm frequency
 
 int gaugelow = 255; //empty fuel gauge pwm
@@ -1700,6 +1700,13 @@ void canread()
       bms.decodecan(inMsg, 0); //do VW BMS if ids are ones identified to be modules
     }
   }
+  if ((inMsg.id & 0x80000000) == 0x80000000)    // Determine if ID is standard (11 bits) or extended (29 bits)
+  {
+    if ((inMsg.id & 0x1FFFFFFF) < 0x1A555450)
+    {
+      bms.decodetemp(inMsg, 1);
+    }
+  }
 
   if (candebug == 1)
   {
@@ -1910,10 +1917,10 @@ void pwmcomms()
   int p = 0;
   p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 50 , 255);
   analogWrite(OUT7, p);
-/*
-  Serial.println();
-    Serial.print(p*100/255);
-    Serial.print(" OUT8 ");
+  /*
+    Serial.println();
+      Serial.print(p*100/255);
+      Serial.print(" OUT8 ");
   */
   if (bms.getLowCellVolt() < settings.UnderVSetpoint)
   {
@@ -1921,13 +1928,13 @@ void pwmcomms()
   }
   else
   {
-    p=map(SOC, 0, 100, 220, 50);
-    analogWrite(OUT8,p); //2V to 10V converter 1.5-10V
+    p = map(SOC, 0, 100, 220, 50);
+    analogWrite(OUT8, p); //2V to 10V converter 1.5-10V
   }
-/*
-    Serial.println();
-    Serial.print(p*100/255);
-    Serial.print(" OUT7 ");
-    */
+  /*
+      Serial.println();
+      Serial.print(p*100/255);
+      Serial.print(" OUT7 ");
+  */
 }
 

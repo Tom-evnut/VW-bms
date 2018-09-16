@@ -10,6 +10,7 @@ public:
     int seriescells();
     void clearmodules();
     void decodecan(CAN_message_t &msg,int debug);
+    void decodetemp(CAN_message_t &msg, int debug);
     void balanceCells();
     void setupBoards();
     void findBoards();
