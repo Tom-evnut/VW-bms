@@ -40,7 +40,9 @@ void BMSModule::clearmodule()
 
 void BMSModule::decodetemp(CAN_message_t &msg)
 {
-  temperatures[0]=(msg.buf[0]-80)*0.5;
+  temperatures[0]=(msg.buf[0]*0.5)-43;
+  temperatures[1]=(msg.buf[4]*0.5)-43;
+  temperatures[2]=(msg.buf[5]*0.5)-43;
 }
 
 void BMSModule::decodecan(int Id, CAN_message_t &msg)

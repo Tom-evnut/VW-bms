@@ -46,37 +46,7 @@ void BMSModuleManager::clearmodules()
 
 void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
 {
-  msg.id = (msg.id & 0x1FFFFFFF);
-  int CMU = 0;
-  switch (msg.id)
-  {
-    case (0x1A555401):
-      CMU = 1;
-      break;
-    case (0x1A555402):
-      CMU = 2;
-      break;
-    case (0x1A555403):
-      CMU = 3;
-      break;
-    case (0x1A555404):
-      CMU = 4;
-      break;
-    case (0x1A555405):
-      CMU = 5;
-      break;
-    case (0x1A555406):
-      CMU = 6;
-      break;
-    case (0x1A555407):
-      CMU = 7;
-      break;
-    case (0x1A555408):
-      CMU = 8;
-      break;
-    default:
-      break;
-  }
+  int CMU =(msg.id & 0xFF);
   modules[CMU].decodetemp(msg);
   if (debug == 1 && CMU > 0)
   {
