@@ -1700,13 +1700,13 @@ void canread()
       bms.decodecan(inMsg, 0); //do VW BMS if ids are ones identified to be modules
     }
   }
-  if ((inMsg.id & 0x80000000) == 0x80000000)    // Determine if ID is standard (11 bits) or extended (29 bits)
+
+  if ((inMsg.id & 0x1FFFFFFF) < 0x1A555430)    // Determine if ID is standard (11 bits) or extended (29 bits)
   {
     if (candebug == 1)
     {
       bms.decodetemp(inMsg, 1);
-      Serial.println();
-      Serial.print((inMsg.id & 0x1FFFFFFF));
+
     }
     else
     {
