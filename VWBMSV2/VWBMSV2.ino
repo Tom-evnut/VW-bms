@@ -1702,9 +1702,14 @@ void canread()
   }
   if ((inMsg.id & 0x80000000) == 0x80000000)    // Determine if ID is standard (11 bits) or extended (29 bits)
   {
-    if ((inMsg.id & 0x1FFFFFFF) < 0x1A555450)
+
+    if (candebug == 1)
     {
       bms.decodetemp(inMsg, 1);
+    }
+    else
+    {
+      bms.decodetemp(inMsg, 0);
     }
   }
 

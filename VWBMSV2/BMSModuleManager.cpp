@@ -47,7 +47,7 @@ void BMSModuleManager::clearmodules()
 void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
 {
   msg.id = (msg.id & 0x1FFFFFFF);
-  int CMU=0;
+  int CMU = 0;
   switch (msg.id)
   {
     case (0x1A555401):
@@ -74,8 +74,16 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
     case (0x1A555408):
       CMU = 8;
       break;
+    default:
+      break;
   }
   modules[CMU].decodetemp(msg);
+  if (debug == 1 && CMU > 0)
+  {
+    Serial.println();
+    Serial.print(CMU);
+    Serial.print(" Temp Found");
+  }
 }
 
 void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
