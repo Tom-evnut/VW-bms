@@ -7,15 +7,13 @@
 #include <EEPROM.h>
 #include <FlexCAN.h>
 #include <SPI.h>
+#include "BMSUtil.h"
 
 #define CPU_REBOOT (_reboot_Teensyduino_());
 
 BMSModuleManager bms;
 SerialConsole console;
 EEPROMSettings settings;
-
-//Simple BMS Settings//
-int ESSmode = 0; //turn on ESS mode, does not respond to key switching
 
 
 //Simple BMS V2 wiring//
@@ -60,9 +58,6 @@ int pulltime = 1000;
 int contctrl, contstat = 0; //1 = out 5 high 2 = out 6 high 3 = both high
 unsigned long conttimer1, conttimer2, Pretimer = 0;
 uint16_t pwmfreq = 15000;//pwm frequency
-
-int gaugelow = 255; //empty fuel gauge pwm
-int gaugehigh = 70; //full fuel gauge pwm
 
 int pwmcurmax = 200;//Max current to be shown with pwm
 int pwmcurmid = 50;//Mid point for pwm dutycycle based on current
@@ -114,7 +109,7 @@ int NextRunningAverage;
 //Variables for SOC calc
 int SOC = 100; //State of Charge
 int SOCset = 0;
-
+int SOCtest = 0;
 
 //variables
 int outputstate = 0;
@@ -128,8 +123,14 @@ int cellspresent = 0;
 int controlid = 0x0BA;
 int moduleidstart = 0x1CC;
 
+//Serial Expansion Variables///
+int SerialID = 0; //ID assigned over serialbus
+int SerialSlaves = 0; //number of slaves present
+
+
 //Debugging modes//////////////////
 int debug = 1;
+int gaugedebug = 0;
 int inputcheck = 0; //read digital inputs
 int outputcheck = 0; //check outputs
 int candebug = 0; //view can frames
@@ -162,7 +163,6 @@ void loadSettings()
   settings.CAP = 100; //battery size in Ah
   settings.Pstrings = 2; // strings in parallel used to divide voltage of pack
   settings.Scells = 14;//Cells in series
-  settings.storagedelta = 0.3; //in ESS mode in 1 high changes charge and discharge limits by this amount
   settings.discurrentmax = 300; // max discharge current in 0.1A
   settings.chargecurrentmax = 300; //max charge current in 0.1A
   settings.socvolt[0] = 3100; //Voltage and SOC curve for voltage based SOC calc
@@ -175,6 +175,10 @@ void loadSettings()
   settings.Pretime = 5000; //ms of precharge time
   settings.conthold = 50; //holding duty cycle for contactor 0-255
   settings.Precurrent = 1000; //ma before closing main contator
+  settings.Serialexp = 0; //0 standalone - 1 Serial Master - 2 Serial Slave
+  settings.gaugelow = 50; //empty fuel gauge pwm
+  settings.gaugehigh = 255; //full fuel gauge pwm
+  settings.ESSmode = 0; //activate ESS mode
 }
 
 CAN_message_t msg;
@@ -271,9 +275,8 @@ void setup()
                   WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_CLKSRC;
   interrupts();
   /////////////////
-
-
-  SERIALBMS.begin(612500); //Tesla serial bus
+  SERIALBMS.begin(115200);
+  //SERIALBMS.begin(612500); //Tesla serial bus
   //VE.begin(19200); //Victron VE direct bus
 #if defined (__arm__) && defined (__SAM3X8E__)
   serialSpecialInit(USART0, 612500); //required for Due based boards as the stock core files don't support 612500 baud.
@@ -302,6 +305,11 @@ void setup()
   ////Calculate fixed numbers
   pwmcurmin = (pwmcurmid / 50 * pwmcurmax * -1);
   ////
+  if (settings.Serialexp == 1)
+  {
+    delay(300);//wait for all other boards to boot
+    Serialslaveinit();
+  }
 }
 
 void loop()
@@ -314,21 +322,27 @@ void loop()
   {
     menu();
   }
+  if (settings.Serialexp != 0)
+  {
+    if (SERIALBMS.available() > 0)
+    {
+      Serialexp();
+    }
+  }
+
 
   if (outputcheck != 1)
   {
     contcon();
   }
 
-  if (ESSmode == 1)
+  if (settings.ESSmode == 1)
   {
     bmsstatus = Boot;
     if (digitalRead(IN1) == LOW)//Key OFF
     {
       if (storagemode == 1)
       {
-        settings.ChargeVsetpoint += settings.storagedelta;
-        settings.DischVsetpoint -= settings.storagedelta;
         storagemode = 0;
       }
     }
@@ -336,21 +350,50 @@ void loop()
     {
       if (storagemode == 0)
       {
-        settings.ChargeVsetpoint -= settings.storagedelta;
-        settings.DischVsetpoint += settings.storagedelta;
         storagemode = 1;
       }
     }
     if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
     {
-      bms.balanceCells();
       balancecells = 1;
     }
     else
     {
       balancecells = 0;
     }
-    if (bms.getLowCellVolt() < settings.UnderVSetpoint)
+    if (storagemode == 1)
+    {
+      if (bms.getHighCellVolt() > settings.StoreVsetpoint)
+      {
+        digitalWrite(OUT3, LOW);//turn off charger
+        contctrl = contctrl & 1;
+      }
+      else
+      {
+        if (bms.getLowCellVolt() < (settings.StoreVsetpoint - settings.ChargeHys))
+        {
+          digitalWrite(OUT3, HIGH);//turn on charger
+          contctrl = contctrl | 2;
+        }
+      }
+    }
+    else
+    {
+      if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
+      {
+        digitalWrite(OUT3, LOW);//turn off charger
+        contctrl = contctrl & 1;
+      }
+      else
+      {
+        if (bms.getLowCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
+        {
+          digitalWrite(OUT3, HIGH);//turn on charger
+          contctrl = contctrl | 2;
+        }
+      }
+    }
+    if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
     {
       digitalWrite(OUT1, LOW);//turn off discharge
       contctrl = contctrl & 2;
@@ -361,16 +404,6 @@ void loop()
       contctrl = contctrl | 1;
     }
 
-    if (bms.getHighCellVolt() > settings.OverVSetpoint)
-    {
-      digitalWrite(OUT3, LOW);//turn off charger
-      contctrl = contctrl & 1;
-    }
-    else
-    {
-      digitalWrite(OUT3, HIGH);//turn on charger
-      contctrl = contctrl | 2;
-    }
     pwmcomms();
   }
   else
@@ -506,6 +539,11 @@ void loop()
     VEcan();
     sendcommand();
 
+    if (settings.ESSmode != 1)
+    {
+      gaugeupdate();
+    }
+
     if (cellspresent == 0)
     {
       cellspresent = bms.seriescells();//set amount of connected cells, might need delay
@@ -515,6 +553,13 @@ void loop()
       if (cellspresent != bms.seriescells()) //detect a fault in cells detected
       {
         bmsstatus = Error;
+      }
+    }
+    if (settings.Serialexp != 0)
+    {
+      if (settings.Serialexp == 1)
+      {
+        SerialReqData();
       }
     }
 
@@ -550,13 +595,25 @@ void alarmupdate()
 
 void gaugeupdate()
 {
-  analogWrite(OUT8, map(SOC, 0, 100, gaugelow, gaugehigh));
-  if (debug != 0)
+  if (gaugedebug != 0)
   {
+    SOCtest = SOCtest + 5;
+    if (SOCtest > 1000)
+    {
+      SOCtest = 0;
+    }
+    analogWrite(OUT8, map(SOCtest * 0.1, 0, 100, settings.gaugelow, settings.gaugehigh));
+
     SERIALCONSOLE.println("  ");
-    SERIALCONSOLE.print("fuel pwm : ");
-    SERIALCONSOLE.print(map(SOC, 0, 100, gaugelow, gaugehigh));
+    SERIALCONSOLE.print("SOC : ");
+    SERIALCONSOLE.print(SOCtest * 0.1);
+    SERIALCONSOLE.print("  fuel pwm : ");
+    SERIALCONSOLE.print(map(SOCtest * 0.1, 0, 100, settings.gaugelow, settings.gaugehigh));
     SERIALCONSOLE.println("  ");
+  }
+  else
+  {
+    analogWrite(OUT8, map(SOC, 0, 100, settings.gaugelow, settings.gaugehigh));
   }
 }
 
@@ -565,8 +622,9 @@ void printbmsstat()
   SERIALCONSOLE.println();
   SERIALCONSOLE.println();
   SERIALCONSOLE.println();
-  SERIALCONSOLE.print("BMS Status : ");
-  if (ESSmode == 1)
+  SERIALCONSOLE.print(millis());
+  SERIALCONSOLE.print(" BMS Status : ");
+  if (settings.ESSmode == 1)
   {
     SERIALCONSOLE.print("ESS Mode ");
 
@@ -1189,13 +1247,19 @@ void menu()
 
       case '5':
         menuload = 1;
-        ESSmode = !ESSmode;
+        settings.ESSmode = !settings.ESSmode;
         incomingByte = 'd';
         break;
 
       case '6':
         menuload = 1;
         cellspresent = bms.seriescells();
+        incomingByte = 'd';
+        break;
+
+      case '7':
+        menuload = 1;
+        gaugedebug = !gaugedebug;
         incomingByte = 'd';
         break;
 
@@ -1265,6 +1329,34 @@ void menu()
         break;
     }
   }
+  if (menuload == 6)
+  {
+    switch (incomingByte)
+    {
+      case 101: //e dispaly settings
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.println("Enter Variable Number and New value ");
+        SERIALCONSOLE.println("  ");
+        break;
+
+      case '1':
+        if (Serial.available() > 0)
+        {
+          settings.Serialexp = Serial.parseInt();
+          SERIALCONSOLE.print(settings.Serialexp);
+          SERIALCONSOLE.print(" Serial Role");
+          menuload = 1;
+          incomingByte = 's';
+        }
+        break;
+
+      case 113: //q to go back to main menu
+
+        menuload = 0;
+        incomingByte = 115;
+        break;
+    }
+  }
 
   if (menuload == 5)
   {
@@ -1304,6 +1396,28 @@ void menu()
           settings.conthold = Serial.parseInt();
           SERIALCONSOLE.print(settings.conthold );
           SERIALCONSOLE.print(" Contactor Hold PWM");
+          menuload = 1;
+          incomingByte = 'k';
+        }
+        break;
+
+      case '4':
+        if (Serial.available() > 0)
+        {
+          settings.gaugelow = Serial.parseInt();
+          SERIALCONSOLE.print(settings.gaugelow );
+          SERIALCONSOLE.print(" PWM for Gauge Low");
+          menuload = 1;
+          incomingByte = 'k';
+        }
+        break;
+
+      case '5':
+        if (Serial.available() > 0)
+        {
+          settings.gaugehigh = Serial.parseInt();
+          SERIALCONSOLE.print(settings.gaugehigh );
+          SERIALCONSOLE.print(" PWM for Gauge High");
           menuload = 1;
           incomingByte = 'k';
         }
@@ -1394,6 +1508,15 @@ void menu()
         SERIALCONSOLE.print(settings.socvolt[3] );
         SERIALCONSOLE.print(" SOC setpoint 2 - j");
         SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print(settings.StoreVsetpoint * 1000, 0 );
+        SERIALCONSOLE.print(" mV Storage Setpoint- k");
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print(settings.ChargeHys * 1000, 0 );
+        SERIALCONSOLE.print(" mV Charge Hystersis - l");
+        SERIALCONSOLE.println("  ");
+
+
+
         break;
       case 101: //e dispaly settings
         SERIALCONSOLE.println("  ");
@@ -1401,6 +1524,17 @@ void menu()
         SERIALCONSOLE.println("  ");
         break;
 
+
+      case 'l': //1 Over Voltage Setpoint
+        if (Serial.available() > 0)
+        {
+          settings.ChargeHys = Serial.parseInt();
+          settings.ChargeHys = settings.ChargeHys / 1000;
+          SERIALCONSOLE.print(settings.ChargeHys * 1000, 0);
+          SERIALCONSOLE.print("mV Charge Hystersis");
+        }
+        break;
+        
       case 49: //1 Over Voltage Setpoint
         if (Serial.available() > 0)
         {
@@ -1577,18 +1711,23 @@ void menu()
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
-        SERIALCONSOLE.println("Contactor Settings Menu");
+        SERIALCONSOLE.println("Contactor and Gauge Settings Menu");
         SERIALCONSOLE.print("1 - PreCharge Timer :");
         SERIALCONSOLE.println(settings.Pretime);
         SERIALCONSOLE.print("2 - PreCharge Finish Current :");
         SERIALCONSOLE.println(settings.Precurrent);
         SERIALCONSOLE.print("3 - PWM contactor Hold 0-255 :");
         SERIALCONSOLE.println(settings.conthold);
+        SERIALCONSOLE.print("4 - PWM for Gauge Low 0-255 :");
+        SERIALCONSOLE.println(settings.gaugelow);
+        SERIALCONSOLE.print("5 - PWM for Gauge High 0-255 :");
+        SERIALCONSOLE.println(settings.gaugehigh);
+
         /*
           SERIALCONSOLE.print("4 - Input Check :");
           SERIALCONSOLE.println(inputcheck);
           SERIALCONSOLE.print("5 - ESS mode :");
-          SERIALCONSOLE.println(ESSmode);
+          SERIALCONSOLE.println(settings.ESSmode);
           SERIALCONSOLE.print("6 - Cells Present Reset :");
           SERIALCONSOLE.println(cellspresent);
           SERIALCONSOLE.println("q - Go back to menu");
@@ -1618,9 +1757,11 @@ void menu()
         SERIALCONSOLE.print("4 - Input Check :");
         SERIALCONSOLE.println(inputcheck);
         SERIALCONSOLE.print("5 - ESS mode :");
-        SERIALCONSOLE.println(ESSmode);
+        SERIALCONSOLE.println(settings.ESSmode);
         SERIALCONSOLE.print("6 - Cells Present Reset :");
         SERIALCONSOLE.println(cellspresent);
+        SERIALCONSOLE.print("7 - Gauge Debug :");
+        SERIALCONSOLE.println(gaugedebug);
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 4;
         break;
@@ -1671,7 +1812,8 @@ void menu()
     SERIALCONSOLE.println("Debugging Paused");
     SERIALCONSOLE.println("b - Battery Settings");
     SERIALCONSOLE.println("c - Current Sensor Calibration");
-    SERIALCONSOLE.println("k - Contactor Settings");
+    SERIALCONSOLE.println("k - Contactor and Gauge Settings");
+    SERIALCONSOLE.println("s - Serial Settings");
     SERIALCONSOLE.println("d - Debug Settings");
     SERIALCONSOLE.println("R - Restart BMS");
     SERIALCONSOLE.println("q - exit menu");
@@ -1812,6 +1954,20 @@ void currentlimit()
       }
     }
   }
+  ///voltage influence on current///
+  if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
+  {
+    chargecurrent = map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentmax, 0);
+  }
+
+  if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
+  {
+    chargecurrent = 0;
+  }
+  if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
+  {
+    discurrent = 0;
+  }
 }
 
 void inputdebug()
@@ -1943,6 +2099,106 @@ void pwmcomms()
       Serial.println();
       Serial.print(p*100/255);
       Serial.print(" OUT7 ");
+  */
+}
+
+void Serialexp()
+{
+  /*
+    incomingByte = SERIALBMS.read(); // read the incoming byte:
+    Serial.println();
+    Serial.print(incomingByte);
+    Serial.print("|");
+
+    incomingByte = SERIALBMS.read(); // read the incoming byte:
+    if (incomingByte == 0xFF)
+    {
+    Serial.println();
+    Serial.print(incomingByte);
+    incomingByte = SERIALBMS.read(); // read the incoming byte:
+    Serial.print("|");
+    Serial.print(incomingByte);
+    Serial.print("|");
+    Serial.print(incomingByte);
+    if (settings.Serialexp == 1) //Do Serial Master Things
+    {
+    Serial.print(SERIALBMS.read(), HEX);
+    Serial.print("|");
+    Serial.print(SERIALBMS.read(), HEX);
+    }
+    if (settings.Serialexp == 2) //Do Serial Slave Things
+    {
+    switch (incomingByte)
+    {
+    case 0x00: //q to go back to main menu
+    if (SerialID == 0)
+    {
+      SerialID = SERIALBMS.read();
+      SERIALBMS.write(0x01); //response is 1 higher than sent id
+      SERIALBMS.write(SerialID);
+
+      Serial.print("New ID : ");
+      Serial.print(SerialID);
+    }
+    else
+    {
+      SERIALBMS.write(0xFF);
+      SERIALBMS.write(0x00);
+      SERIALBMS.write(SERIALBMS.read());
+    }
+    break;
+    }
+    }
+    }
+  */
+}
+
+void SerialReqData()
+{
+  /*
+    SERIALBMS.write(0x12);
+  */
+}
+
+void Serialslaveinit()
+{
+  /*
+    int buff[8];
+    while (1 == 1)
+    {
+    for (int I = 1; I < 51; I++)
+    {
+      SERIALBMS.write(0xFF);
+      SERIALBMS.write(0x00);
+      SERIALBMS.write(I);
+      Serial.write(" | ");
+      delay(2);
+      if (SERIALBMS.available() > 0)
+      {
+        for (int x = 0; x < 4; x++)
+        {
+          buff[x] = SERIALBMS.read();
+          Serial.write(buff[0]);
+          Serial.write(buff[1]);
+          Serial.write(buff[2]);
+        }
+        if (buff[0] = 0xFF)
+        {
+          if (buff[1] == I)
+          {
+            break;
+          }
+        }
+      }
+      else
+      {
+        Serial.write("No Serial Slaves Found");
+        break;
+      }
+
+    }
+    break;
+    }
   */
 }
 

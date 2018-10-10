@@ -616,7 +616,6 @@ void BMSModuleManager::getAllVoltTemp()
     {
       Logger::debug("");
       Logger::debug("Module %i exists. Reading voltage and temperature values", x);
-      modules[x].readModuleValues();
       Logger::debug("Module voltage: %f", modules[x].getModuleVoltage());
       Logger::debug("Lowest Cell V: %f     Highest Cell V: %f", modules[x].getLowCellV(), modules[x].getHighCellV());
       Logger::debug("Temp1: %f       Temp2: %f", modules[x].getTemperature(0), modules[x].getTemperature(1));
