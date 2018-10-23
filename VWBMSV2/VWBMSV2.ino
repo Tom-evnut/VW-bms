@@ -3,9 +3,9 @@
 #include "config.h"
 #include "SerialConsole.h"
 #include "Logger.h"
-#include <ADC.h>
+#include <ADC.h> //https://github.com/pedvide/ADC
 #include <EEPROM.h>
-#include <FlexCAN.h>
+#include <FlexCAN.h> //https://github.com/teachop/FlexCAN_Library 
 #include <SPI.h>
 #include "BMSUtil.h"
 
@@ -168,6 +168,7 @@ void loadSettings()
   settings.Scells = 14;//Cells in series
   settings.discurrentmax = 300; // max discharge current in 0.1A
   settings.chargecurrentmax = 300; //max charge current in 0.1A
+  settings.chargecurrentend = 50; //end charge current in 0.1A
   settings.socvolt[0] = 3100; //Voltage and SOC curve for voltage based SOC calc
   settings.socvolt[1] = 10; //Voltage and SOC curve for voltage based SOC calc
   settings.socvolt[2] = 4100; //Voltage and SOC curve for voltage based SOC calc
@@ -1512,7 +1513,7 @@ void menu()
     }
   }
 
-  if (menuload == 3)
+    if (menuload == 3)
   {
     switch (incomingByte)
     {
@@ -1526,6 +1527,11 @@ void menu()
         loadSettings();
         SERIALCONSOLE.println("  ");
         SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.println(" Coded Settings Loaded ");
+        SERIALCONSOLE.println("  ");
+        menuload = 3;
+        incomingByte = 'd';
         break;
 
       case 114: //r for reset
@@ -1561,6 +1567,9 @@ void menu()
         SERIALCONSOLE.println("  ");
         SERIALCONSOLE.print(settings.chargecurrentmax * 0.1);
         SERIALCONSOLE.print("A max Charge - 8 ");
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print(settings.chargecurrentend * 0.1);
+        SERIALCONSOLE.print("A end Charge - m ");
         SERIALCONSOLE.println("  ");
         SERIALCONSOLE.print(settings.discurrentmax * 0.1);
         SERIALCONSOLE.print("A max Discharge - 9 ");
@@ -1625,6 +1634,15 @@ void menu()
           SERIALCONSOLE.print("mV Over Voltage Setpoint");
         }
         break;
+
+      case 'k':
+        if (Serial.available() > 0)
+        {
+          settings.StoreVsetpoint = Serial.parseInt();
+          settings.StoreVsetpoint = settings.StoreVsetpoint / 1000;
+          SERIALCONSOLE.print(settings.StoreVsetpoint * 1000, 0);
+          SERIALCONSOLE.print(" mV Storage Setpoint");
+        }
 
       case 'g':
         if (Serial.available() > 0)
@@ -1758,12 +1776,20 @@ void menu()
           SERIALCONSOLE.print("Ah Battery Capacity");
         }
         break;
+      case 'm'://8 chargecurrent A
+        if (Serial.available() > 0)
+        {
+          settings.chargecurrentend = Serial.parseInt() * 10;
+          SERIALCONSOLE.print(settings.chargecurrentend * 0.1);
+          SERIALCONSOLE.print(" A end Charge");
+        }
+        break;
       case 56://8 chargecurrent A
         if (Serial.available() > 0)
         {
           settings.chargecurrentmax = Serial.parseInt() * 10;
           SERIALCONSOLE.print(settings.chargecurrentmax * 0.1);
-          SERIALCONSOLE.print("A max Charge");
+          SERIALCONSOLE.print(" A max Charge");
         }
         break;
       case 57://9 discurrent in A
@@ -1900,6 +1926,7 @@ void menu()
         SERIALCONSOLE.println("r - Reset AH counter");
         SERIALCONSOLE.println("d - Display settings");
         SERIALCONSOLE.println("e - Edit settings");
+        SERIALCONSOLE.println("f - Reset to Coded Settings");
         SERIALCONSOLE.println("q - Go back to menu");
         SERIALCONSOLE.println();
         menuload = 3;
@@ -2063,18 +2090,33 @@ void currentlimit()
     }
   }
   ///voltage influence on current///
-  if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
+  if (storagemode == 1)
   {
-    chargecurrent = map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentmax, 0);
+    if (bms.getHighCellVolt() > (settings.StoreVsetpoint - settings.ChargeHys))
+    {
+      chargecurrent = map(bms.getHighCellVolt(), (settings.StoreVsetpoint - settings.ChargeHys), settings.StoreVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
+    }
+    if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.StoreVsetpoint)
+    {
+      chargecurrent = 0;
+    }
+  }
+  else
+  {
+    if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
+    {
+      chargecurrent = map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
+    }
+    if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
+    {
+      chargecurrent = 0;
+    }
   }
 
-  if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
-  {
-    chargecurrent = 0;
-  }
   if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
   {
     discurrent = 0;
+
   }
 }
 
