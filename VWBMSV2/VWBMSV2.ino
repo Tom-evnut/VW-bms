@@ -97,7 +97,7 @@ int highconv = 285;
 float currentact, RawCur;
 float ampsecond;
 unsigned long lasttime;
-unsigned long looptime, cleartime = 0; //ms
+unsigned long looptime, cleartime, chargertimer = 0; //ms
 int currentsense = 14;
 int sensor = 1;
 
@@ -117,6 +117,7 @@ int maxac2 = 10; //Generator Charging
 int chargerid1 = 0x618; //bulk chargers
 int chargerid2 = 0x638; //finishing charger
 float chargerend = 10.0; //turning off the bulk charger before end voltage
+int chargerspd = 100; //ms between charger CAN messages
 
 //variables
 int outputstate = 0;
@@ -416,7 +417,11 @@ void loop()
     }
 
     pwmcomms();
-    chargercomms();
+
+    if (millis() - chargertimer > chargerspd)
+    {
+      chargercomms();
+    }
   }
   else
   {
@@ -1521,7 +1526,7 @@ void menu()
     }
   }
 
-    if (menuload == 3)
+  if (menuload == 3)
   {
     switch (incomingByte)
     {
@@ -2375,8 +2380,8 @@ void chargercomms()
     msg.buf[1] = lowByte(maxac2 * 10);
     msg.buf[1] = highByte(maxac2 * 10);
   }
-  msg.buf[3] = lowByte(chargecurrent/3);
-  msg.buf[4] = highByte(chargecurrent/3);
+  msg.buf[3] = lowByte(chargecurrent / 3);
+  msg.buf[4] = highByte(chargecurrent / 3);
   msg.buf[5] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
   msg.buf[6] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend)  * 10));
   Can0.write(msg);
@@ -2396,8 +2401,8 @@ void chargercomms()
     msg.buf[1] = lowByte(maxac2 * 10);
     msg.buf[1] = highByte(maxac2 * 10);
   }
-  msg.buf[3] = lowByte(chargecurrent/3);
-  msg.buf[4] = highByte(chargecurrent/3);
+  msg.buf[3] = lowByte(chargecurrent / 3);
+  msg.buf[4] = highByte(chargecurrent / 3);
   msg.buf[5] = lowByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
   msg.buf[6] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
   Can0.write(msg);
