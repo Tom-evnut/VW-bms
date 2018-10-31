@@ -111,6 +111,13 @@ int SOC = 100; //State of Charge
 int SOCset = 0;
 int SOCtest = 0;
 
+///charger variables
+int maxac1 = 16; //Shore power 16A per charger
+int maxac2 = 10; //Generator Charging
+int chargerid1 = 0x618; //bulk chargers
+int chargerid2 = 0x638; //finishing charger
+float chargerend = 10.0; //turning off the bulk charger before end voltage
+
 //variables
 int outputstate = 0;
 int incomingByte = 0;
@@ -409,6 +416,7 @@ void loop()
     }
 
     pwmcomms();
+    chargercomms();
   }
   else
   {
@@ -433,7 +441,7 @@ void loop()
         {
           balancecells = 0;
         }
-        if (digitalRead(IN2) == HIGH && (settings.balanceVoltage + settings.balanceHyst) > bms.getHighCellVolt()) //detect AC present for charging and check not balancing
+        if (digitalRead(IN3) == HIGH && (settings.balanceVoltage + settings.balanceHyst) > bms.getHighCellVolt()) //detect AC present for charging and check not balancing
         {
           bmsstatus = Charge;
         }
@@ -481,7 +489,7 @@ void loop()
           digitalWrite(OUT3, LOW);//turn off charger
           bmsstatus = Ready;
         }
-        if (digitalRead(IN2) == LOW)//detect AC not present for charging
+        if (digitalRead(IN3) == LOW)//detect AC not present for charging
         {
           digitalWrite(OUT3, LOW);//turn off charger
           bmsstatus = Ready;
@@ -491,7 +499,7 @@ void loop()
       case (Error):
         Discharge = 0;
 
-        if (digitalRead(IN2) == HIGH) //detect AC present for charging
+        if (digitalRead(IN3) == HIGH) //detect AC present for charging
         {
           bmsstatus = Charge;
         }
@@ -711,7 +719,7 @@ void printbmsstat()
     }
   }
   SERIALCONSOLE.print("  ");
-  if (digitalRead(IN2) == HIGH)
+  if (digitalRead(IN3) == HIGH)
   {
     SERIALCONSOLE.print("| AC Present |");
   }
@@ -2132,7 +2140,7 @@ void inputdebug()
   {
     Serial.print("1 OFF ");
   }
-  if (digitalRead(IN2))
+  if (digitalRead(IN3))
   {
     Serial.print("2 ON  ");
   }
@@ -2352,3 +2360,47 @@ void Serialslaveinit()
   */
 }
 
+void chargercomms()
+{
+  msg.id  = chargerid1;
+  msg.len = 7;
+  msg.buf[0] = 0x20;
+  if (digitalRead(IN2) == LOW)//Gen OFF
+  {
+    msg.buf[1] = lowByte(maxac1 * 10);
+    msg.buf[2] = highByte(maxac1 * 10);
+  }
+  else
+  {
+    msg.buf[1] = lowByte(maxac2 * 10);
+    msg.buf[1] = highByte(maxac2 * 10);
+  }
+  msg.buf[3] = lowByte(chargecurrent/3);
+  msg.buf[4] = highByte(chargecurrent/3);
+  msg.buf[5] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
+  msg.buf[6] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend)  * 10));
+  Can0.write(msg);
+
+  delay(2);
+
+  msg.id  = chargerid2;
+  msg.len = 7;
+  msg.buf[0] = 0x20;
+  if (digitalRead(IN2) == LOW)//Gen OFF
+  {
+    msg.buf[1] = lowByte(maxac1 * 10);
+    msg.buf[2] = highByte(maxac1 * 10);
+  }
+  else
+  {
+    msg.buf[1] = lowByte(maxac2 * 10);
+    msg.buf[1] = highByte(maxac2 * 10);
+  }
+  msg.buf[3] = lowByte(chargecurrent/3);
+  msg.buf[4] = highByte(chargecurrent/3);
+  msg.buf[5] = lowByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+  msg.buf[6] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+  Can0.write(msg);
+
+
+}
