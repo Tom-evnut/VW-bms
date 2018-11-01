@@ -1991,7 +1991,7 @@ void canread()
     }
   }
 
-  if ((inMsg.id & 0x1FFFFFFF) < 0x1A555430)    // Determine if ID is standard (11 bits) or extended (29 bits)
+  if ((inMsg.id & 0x1FFFFFFF) < 0x1A555430 &&(inMsg.id & 0x1FFFFFFF) > 0x1A555400)    // Determine if ID is standard (11 bits) or extended (29 bits)
   {
     if (candebug == 1)
     {
