@@ -1343,6 +1343,15 @@ void menu()
         incomingByte = 'c';
         break;
 
+      case '3':
+        menuload = 1;
+        if (Serial.available() > 0)
+        {
+          settings.ncur = Serial.parseInt();
+        }
+        incomingByte = 'c';
+        break;
+
       case 113: //q for quite menu
 
         menuload = 0;
@@ -1401,6 +1410,47 @@ void menu()
         break;
     }
   }
+  if (menuload == 8)
+  {
+    switch (incomingByte)
+    {
+      case '1': //e dispaly settings
+        if (Serial.available() > 0)
+        {
+          settings.IgnoreTemp = Serial.parseInt();
+        }
+        if (settings.IgnoreTemp > 2)
+        {
+          settings.IgnoreTemp = 0;
+        }
+        SERIALCONSOLE.print(settings.IgnoreTemp);
+        SERIALCONSOLE.print(" Temp Sensor Setting");
+        bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+        menuload = 1;
+        incomingByte = 'i';
+        break;
+
+      case '2':
+        if (Serial.available() > 0)
+        {
+          settings.IgnoreVolt = Serial.parseInt();
+          settings.IgnoreVolt = settings.IgnoreVolt * 0.001;
+          SERIALCONSOLE.print(settings.IgnoreVolt);
+          SERIALCONSOLE.print(" mV Voltage Cell Ignore");
+          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+          menuload = 1;
+          incomingByte = 'i';
+        }
+        break;
+
+      case 113: //q to go back to main menu
+
+        menuload = 0;
+        incomingByte = 115;
+        break;
+    }
+  }
+
   if (menuload == 7)
   {
     switch (incomingByte)
@@ -1825,6 +1875,20 @@ void menu()
         CPU_REBOOT ;
         break;
 
+      case 'i': //Ignore Value Settings
+        SERIALCONSOLE.println();
+        SERIALCONSOLE.println();
+        SERIALCONSOLE.println();
+        SERIALCONSOLE.println();
+        SERIALCONSOLE.println();
+        SERIALCONSOLE.println("Ignore Value Settings");
+        SERIALCONSOLE.print("1 - Temp Sensor Setting:");
+        SERIALCONSOLE.println(settings.IgnoreTemp);
+        SERIALCONSOLE.print("2 - Voltage Under Which To Ignore Cells mV:");
+        SERIALCONSOLE.println(settings.IgnoreVolt * 1000, 0);
+        menuload = 8;
+        break;
+
       case 'a': //Alarm and Warning settings
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -1925,6 +1989,8 @@ void menu()
         SERIALCONSOLE.println(settings.invertcur);
         SERIALCONSOLE.print("2 - Pure Voltage based SOC :");
         SERIALCONSOLE.println(settings.voltsoc);
+        SERIALCONSOLE.print("3 - Current Multiplication :");
+        SERIALCONSOLE.println(settings.ncur);
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 2;
         break;
@@ -1961,6 +2027,7 @@ void menu()
     SERIALCONSOLE.println("a - Alarm and Warning Settings");
     SERIALCONSOLE.println("c - Current Sensor Calibration");
     SERIALCONSOLE.println("k - Contactor and Gauge Settings");
+    SERIALCONSOLE.println("i - Ignore Value Settings");
     SERIALCONSOLE.println("s - Serial Settings");
     SERIALCONSOLE.println("d - Debug Settings");
     SERIALCONSOLE.println("R - Restart BMS");
@@ -1991,7 +2058,7 @@ void canread()
     }
   }
 
-  if ((inMsg.id & 0x1FFFFFFF) < 0x1A5554F0 &&(inMsg.id & 0x1FFFFFFF) > 0x1A555400)    // Determine if ID is Temperature CAN-ID
+  if ((inMsg.id & 0x1FFFFFFF) < 0x1A5554F0 && (inMsg.id & 0x1FFFFFFF) > 0x1A555400)   // Determine if ID is Temperature CAN-ID
   {
     if (candebug == 1)
     {
