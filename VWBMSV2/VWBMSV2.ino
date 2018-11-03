@@ -56,7 +56,7 @@ int Discharge;
 //variables for output control
 int pulltime = 1000;
 int contctrl, contstat = 0; //1 = out 5 high 2 = out 6 high 3 = both high
-unsigned long conttimer1, conttimer2, Pretimer = 0;
+unsigned long conttimer1, conttimer2, Pretimer,Pretimer1 = 0;
 uint16_t pwmfreq = 15000;//pwm frequency
 
 int pwmcurmax = 200;//Max current to be shown with pwm
@@ -351,6 +351,9 @@ void loop()
   if (settings.ESSmode == 1)
   {
     bmsstatus = Boot;
+    contctrl = contctrl | 4; //turn on negative contactor
+
+
     if (digitalRead(IN1) == LOW)//Key OFF
     {
       if (storagemode == 1)
@@ -373,19 +376,27 @@ void loop()
     {
       balancecells = 0;
     }
+
+    //Pretimer + settings.Pretime > millis();
+
     if (storagemode == 1)
     {
       if (bms.getHighCellVolt() > settings.StoreVsetpoint)
       {
         digitalWrite(OUT3, LOW);//turn off charger
-        contctrl = contctrl & 1;
+        contctrl = contctrl & 253;
+        Pretimer = millis();
       }
       else
       {
-        if (bms.getLowCellVolt() < (settings.StoreVsetpoint - settings.ChargeHys))
+        if (bms.getHighCellVolt() < (settings.StoreVsetpoint - settings.ChargeHys))
         {
           digitalWrite(OUT3, HIGH);//turn on charger
-          contctrl = contctrl | 2;
+          if (Pretimer + settings.Pretime > millis())
+          {
+            contctrl = contctrl | 2;
+            Pretimer = 0;
+          }
         }
       }
     }
@@ -394,34 +405,39 @@ void loop()
       if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
       {
         digitalWrite(OUT3, LOW);//turn off charger
-        contctrl = contctrl & 1;
+        contctrl = contctrl & 253;
+        Pretimer = millis();
       }
       else
       {
-        if (bms.getLowCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
+        if (bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
         {
           digitalWrite(OUT3, HIGH);//turn on charger
-          contctrl = contctrl | 2;
+          if (Pretimer + settings.Pretime > millis())
+          {
+            // Serial.println();
+            //Serial.print(Pretimer);
+            contctrl = contctrl | 2;
+          }
         }
       }
     }
     if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
     {
       digitalWrite(OUT1, LOW);//turn off discharge
-      contctrl = contctrl & 2;
+      contctrl = contctrl & 254;
+      Pretimer1 = millis();
     }
     else
     {
       digitalWrite(OUT1, HIGH);//turn on discharge
-      contctrl = contctrl | 1;
+      if (Pretimer1 + settings.Pretime > millis())
+      {
+        contctrl = contctrl | 1;
+      }
     }
-
-    pwmcomms();
-
-    if (millis() - chargertimer > chargerspd)
-    {
-      chargercomms();
-    }
+    chargercomms();
+    //pwmcomms();
   }
   else
   {
@@ -446,7 +462,7 @@ void loop()
         {
           balancecells = 0;
         }
-        if (digitalRead(IN3) == HIGH && (settings.balanceVoltage + settings.balanceHyst) > bms.getHighCellVolt()) //detect AC present for charging and check not balancing
+        if (digitalRead(IN3) == HIGH && (bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))) //detect AC present for charging and check not balancing
         {
           bmsstatus = Charge;
         }
@@ -489,7 +505,7 @@ void loop()
         {
           balancecells = 0;
         }
-        if (bms.getHighCellVolt() > settings.OverVSetpoint)
+        if (bms.getHighCellVolt() > settings.ChargeVsetpoint)
         {
           digitalWrite(OUT3, LOW);//turn off charger
           bmsstatus = Ready;
