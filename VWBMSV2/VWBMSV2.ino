@@ -56,7 +56,7 @@ int Discharge;
 //variables for output control
 int pulltime = 1000;
 int contctrl, contstat = 0; //1 = out 5 high 2 = out 6 high 3 = both high
-unsigned long conttimer1, conttimer2, Pretimer,Pretimer1 = 0;
+unsigned long conttimer1, conttimer2, Pretimer, Pretimer1 = 0;
 uint16_t pwmfreq = 15000;//pwm frequency
 
 int pwmcurmax = 200;//Max current to be shown with pwm
@@ -436,7 +436,7 @@ void loop()
         contctrl = contctrl | 1;
       }
     }
-    
+
     //pwmcomms();
   }
   else
@@ -2477,18 +2477,18 @@ void chargercomms()
   msg.buf[0] = 0x80;
   if (digitalRead(IN2) == LOW)//Gen OFF
   {
-    msg.buf[1] = lowByte(maxac1 * 10);
-    msg.buf[2] = highByte(maxac1 * 10);
+    msg.buf[1] = highByte(maxac1 * 10);
+    msg.buf[2] = lowByte(maxac1 * 10);
   }
   else
   {
-    msg.buf[1] = lowByte(maxac2 * 10);
     msg.buf[1] = highByte(maxac2 * 10);
+    msg.buf[2] = lowByte(maxac2 * 10);
   }
-  msg.buf[3] = lowByte(chargecurrent / 3);
-  msg.buf[4] = highByte(chargecurrent / 3);
-  msg.buf[5] = lowByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
-  msg.buf[6] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+  msg.buf[3] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+  msg.buf[4] = lowByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+  msg.buf[5] = highByte(chargecurrent / 3);
+  msg.buf[6] = lowByte(chargecurrent / 3);
   Can0.write(msg);
 
 
