@@ -2453,21 +2453,21 @@ void chargercomms()
 {
   msg.id  = chargerid1;
   msg.len = 7;
-  msg.buf[0] = 0x20;
+  msg.buf[0] = 0x80;
   if (digitalRead(IN2) == LOW)//Gen OFF
   {
-    msg.buf[1] = lowByte(maxac1 * 10);
-    msg.buf[2] = highByte(maxac1 * 10);
+    msg.buf[1] = highByte(maxac1 * 10);
+    msg.buf[2] = lowByte(maxac1 * 10);
   }
   else
   {
-    msg.buf[1] = lowByte(maxac2 * 10);
     msg.buf[1] = highByte(maxac2 * 10);
+    msg.buf[2] = lowByte(maxac2 * 10);
   }
-  msg.buf[3] = lowByte(chargecurrent / 3);
-  msg.buf[4] = highByte(chargecurrent / 3);
-  msg.buf[5] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
-  msg.buf[6] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend)  * 10));
+  msg.buf[5] = highByte(chargecurrent / 3);
+  msg.buf[6] = lowByte(chargecurrent / 3);
+  msg.buf[3] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
+  msg.buf[4] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend)  * 10));
   Can0.write(msg);
 
   delay(2);
