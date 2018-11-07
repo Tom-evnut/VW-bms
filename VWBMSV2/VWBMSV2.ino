@@ -119,6 +119,7 @@ int chargerid2 = 0x638; //finishing charger
 float chargerend = 10.0; //turning off the bulk charger before end voltage
 int chargerspd = 104; //ms between charger CAN messages
 int chargertoggle = 0;
+int ncharger =3; // number of chargers
 
 //variables
 int outputstate = 0;
@@ -2484,8 +2485,8 @@ void chargercomms()
   }
   msg.buf[3] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
   msg.buf[4] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend)  * 10));
-  msg.buf[5] = highByte(chargecurrent / 3);
-  msg.buf[6] = lowByte(chargecurrent / 3);
+  msg.buf[5] = highByte(chargecurrent / ncharger);
+  msg.buf[6] = lowByte(chargecurrent / ncharger);
   Can0.write(msg);
 
   delay(2);
@@ -2505,7 +2506,7 @@ void chargercomms()
   }
   msg.buf[3] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
   msg.buf[4] = lowByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
-  msg.buf[5] = highByte(chargecurrent / 3);
-  msg.buf[6] = lowByte(chargecurrent / 3);
+  msg.buf[5] = highByte(chargecurrent / ncharger);
+  msg.buf[6] = lowByte(chargecurrent / ncharger);
   Can0.write(msg);
 }
