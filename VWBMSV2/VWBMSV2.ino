@@ -2459,7 +2459,8 @@ void chargercomms()
   msg.id  = chargerid1;
   msg.len = 7;
   
-  //msg.buf[0] = 0x80;
+  msg.buf[0] = 0x80;
+  /*
     if (chargertoggle == 0)
     {
     msg.buf[0] = 0x80;
@@ -2470,6 +2471,7 @@ void chargercomms()
     msg.buf[0] = 0xC0;
     chargertoggle = 0;
     }
+    */
   if (digitalRead(IN2) == LOW)//Gen OFF
   {
     msg.buf[1] = highByte(maxac1 * 10);
