@@ -2474,7 +2474,7 @@ void chargercomms()
 
   msg.id  = chargerid2;
   msg.len = 7;
-  msg.buf[0] = 0x20;
+  msg.buf[0] = 0x80;
   if (digitalRead(IN2) == LOW)//Gen OFF
   {
     msg.buf[1] = lowByte(maxac1 * 10);
