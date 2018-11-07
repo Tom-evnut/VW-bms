@@ -436,7 +436,7 @@ void loop()
         contctrl = contctrl | 1;
       }
     }
-    chargercomms();
+    
     //pwmcomms();
   }
   else
@@ -596,6 +596,7 @@ void loop()
       }
     }
     alarmupdate();
+    chargercomms();
     resetwdog();
   }
   if (millis() - cleartime > 5000)
