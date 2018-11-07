@@ -97,7 +97,7 @@ int highconv = 285;
 float currentact, RawCur;
 float ampsecond;
 unsigned long lasttime;
-unsigned long looptime, cleartime, chargertimer = 0; //ms
+unsigned long looptime, looptime1, cleartime, chargertimer = 0; //ms
 int currentsense = 14;
 int sensor = 1;
 
@@ -596,12 +596,15 @@ void loop()
       }
     }
     alarmupdate();
-    chargercomms();
     resetwdog();
   }
   if (millis() - cleartime > 5000)
   {
     //bms.clearmodules();
+  }
+  if (millis() - looptime1 > chargerspd)
+  {
+    chargercomms();
   }
 }
 
