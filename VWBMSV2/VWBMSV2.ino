@@ -605,7 +605,7 @@ void loop()
   }
   if (millis() - looptime1 > chargerspd)
   {
-    looptime1 =millis();
+    looptime1 = millis();
     chargercomms();
   }
 }
@@ -2458,19 +2458,18 @@ void chargercomms()
 {
   msg.id  = chargerid1;
   msg.len = 7;
-  msg.buf[0] = 0x80;
-  /*
-  if (chargertoggle == 0)
-  {
+  
+  //msg.buf[0] = 0x80;
+    if (chargertoggle == 0)
+    {
     msg.buf[0] = 0x80;
     chargertoggle++;
-  }
-  else
-  {
+    }
+    else
+    {
     msg.buf[0] = 0xC0;
     chargertoggle = 0;
-  }
-  */
+    }
   if (digitalRead(IN2) == LOW)//Gen OFF
   {
     msg.buf[1] = highByte(maxac1 * 10);
@@ -2481,10 +2480,10 @@ void chargercomms()
     msg.buf[1] = highByte(maxac2 * 10);
     msg.buf[2] = lowByte(maxac2 * 10);
   }
-  msg.buf[5] = highByte(chargecurrent / 3);
-  msg.buf[6] = lowByte(chargecurrent / 3);
   msg.buf[3] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
   msg.buf[4] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend)  * 10));
+  msg.buf[5] = highByte(chargecurrent / 3);
+  msg.buf[6] = lowByte(chargecurrent / 3);
   Can0.write(msg);
 
   delay(2);
@@ -2507,6 +2506,4 @@ void chargercomms()
   msg.buf[5] = highByte(chargecurrent / 3);
   msg.buf[6] = lowByte(chargecurrent / 3);
   Can0.write(msg);
-
-
 }
