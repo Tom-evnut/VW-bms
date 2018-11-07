@@ -117,7 +117,8 @@ int maxac2 = 10; //Generator Charging
 int chargerid1 = 0x618; //bulk chargers
 int chargerid2 = 0x638; //finishing charger
 float chargerend = 10.0; //turning off the bulk charger before end voltage
-int chargerspd = 100; //ms between charger CAN messages
+int chargerspd = 104; //ms between charger CAN messages
+int chargertoggle = 0;
 
 //variables
 int outputstate = 0;
@@ -604,6 +605,7 @@ void loop()
   }
   if (millis() - looptime1 > chargerspd)
   {
+    looptime1 =millis();
     chargercomms();
   }
 }
@@ -2457,6 +2459,18 @@ void chargercomms()
   msg.id  = chargerid1;
   msg.len = 7;
   msg.buf[0] = 0x80;
+  /*
+  if (chargertoggle == 0)
+  {
+    msg.buf[0] = 0x80;
+    chargertoggle++;
+  }
+  else
+  {
+    msg.buf[0] = 0xC0;
+    chargertoggle = 0;
+  }
+  */
   if (digitalRead(IN2) == LOW)//Gen OFF
   {
     msg.buf[1] = highByte(maxac1 * 10);
