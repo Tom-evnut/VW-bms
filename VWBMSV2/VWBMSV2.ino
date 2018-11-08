@@ -7,6 +7,7 @@
 #include <EEPROM.h>
 #include <FlexCAN.h> //https://github.com/teachop/FlexCAN_Library 
 #include <SPI.h>
+#include <Filters.h>//https://github.com/JonHub/Filters
 #include "BMSUtil.h"
 
 #define CPU_REBOOT (_reboot_Teensyduino_());
@@ -14,6 +15,10 @@
 BMSModuleManager bms;
 SerialConsole console;
 EEPROMSettings settings;
+
+//Curent filter//
+float filterFrequency = 5.0 ;
+FilterOnePole lowpassFilter( LOWPASS, filterFrequency );
 
 
 //Simple BMS V2 wiring//
@@ -842,19 +847,14 @@ void getcurrent()
   {
     RawCur = RawCur * -1;
   }
-  RunningAverageBuffer[NextRunningAverage++] = RawCur * settings.ncur;
-  if (NextRunningAverage >= RunningAverageCount)
+  
+  lowpassFilter.input(RawCur);
+  if (debugCur != 0)
   {
-    NextRunningAverage = 0;
+    SERIALCONSOLE.print(lowpassFilter.output());
   }
-  float RunningAverageCur = 0;
-  for (int i = 0; i < RunningAverageCount; ++i)
-  {
-    RunningAverageCur += RunningAverageBuffer[i];
-  }
-  RunningAverageCur /= RunningAverageCount;
 
-  currentact = RunningAverageCur;
+  currentact = lowpassFilter.output();
 
   if ( settings.cursens == Analogue)
   {
