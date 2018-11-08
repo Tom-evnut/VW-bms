@@ -72,6 +72,10 @@ typedef struct {
   int invertcur;
   int cursens;
   int voltsoc;
+    uint16_t offset1;
+  uint16_t offset2;
+    float convhigh;
+  float convlow;
   int Pretime;
   int conthold;
   int Precurrent;
