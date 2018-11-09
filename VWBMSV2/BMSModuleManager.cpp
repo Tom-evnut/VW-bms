@@ -46,7 +46,19 @@ void BMSModuleManager::clearmodules()
 
 void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
 {
-  int CMU =(msg.id & 0xFF);
+  int CMU = (msg.id & 0xFF);
+  if (CMU > 32 && CMU < 41)
+  {
+    CMU = CMU - 24;
+  }
+  if (CMU > 64 && CMU < 73)
+  {
+    CMU = CMU - 48;
+  }
+  if (CMU > 97 && CMU < 104)
+  {
+    CMU = CMU - 72;
+  }
   modules[CMU].decodetemp(msg);
   if (debug == 1 && CMU > 0)
   {
@@ -62,312 +74,314 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
   switch (msg.id)
   {
     ///////////////// Two extender increment//////////
-    case (0x100):
+    case (0x210):
+      CMU = 25;
+      Id = 0;
+      break;
+    case (0x211):
+      CMU = 25;
+      Id = 1;
+      break;
+    case (0x212):
+      CMU = 25;
+      Id = 2;
+      break;
+
+    case (0x214):
+      CMU = 26;
+      Id = 0;
+      break;
+    case (0x215):
+      CMU = 26;
+      Id = 1;
+      break;
+    case (0x216):
+      CMU = 26;
+      Id = 2;
+      break;
+    case (0x218):
+      CMU = 27;
+      Id = 0;
+      break;
+    case (0x219):
+      CMU = 27;
+      Id = 1;
+      break;
+    case (0x21A):
+      CMU = 27;
+      Id = 2;
+      break;
+    case (0x21C):
+      CMU = 28;
+      Id = 0;
+      break;
+    case (0x21D):
+      CMU = 28;
+      Id = 1;
+      break;
+    case (0x21E):
+      CMU = 28;
+      Id = 2;
+      break;
+
+    case (0x220):
+      CMU = 29;
+      Id = 0;
+      break;
+    case (0x221):
+      CMU = 29;
+      Id = 1;
+      break;
+    case (0x222):
+      CMU = 29;
+      Id = 2;
+      break;
+
+    case (0x224):
+      CMU = 30;
+      Id = 0;
+      break;
+    case (0x225):
+      CMU = 30;
+      Id = 1;
+      break;
+    case (0x226):
+      CMU = 30;
+      Id = 2;
+      break;
+
+    case (0x228):
       CMU = 31;
       Id = 0;
       break;
-    case (0x101):
+    case (0x229):
       CMU = 31;
       Id = 1;
       break;
-    case (0x102):
+    case (0x22A):
       CMU = 31;
       Id = 2;
       break;
 
-    case (0x104):
+    case (0x22C):
       CMU = 32;
       Id = 0;
       break;
-    case (0x105):
+    case (0x22D):
       CMU = 32;
       Id = 1;
       break;
-    case (0x106):
+    case (0x22E):
       CMU = 32;
-      Id = 2;
-      break;
-    case (0x108):
-      CMU = 33;
-      Id = 0;
-      break;
-    case (0x109):
-      CMU = 33;
-      Id = 1;
-      break;
-    case (0x10A):
-      CMU = 33;
-      Id = 2;
-      break;
-    case (0x10C):
-      CMU = 34;
-      Id = 0;
-      break;
-    case (0x10D):
-      CMU = 34;
-      Id = 1;
-      break;
-    case (0x10E):
-      CMU = 34;
-      Id = 2;
-      break;
-
-    case (0x110):
-      CMU = 35;
-      Id = 0;
-      break;
-    case (0x111):
-      CMU = 35;
-      Id = 1;
-      break;
-    case (0x112):
-      CMU = 35;
-      Id = 2;
-      break;
-
-    case (0x114):
-      CMU = 36;
-      Id = 0;
-      break;
-    case (0x115):
-      CMU = 36;
-      Id = 1;
-      break;
-    case (0x116):
-      CMU = 36;
-      Id = 2;
-      break;
-
-    case (0x118):
-      CMU = 37;
-      Id = 0;
-      break;
-    case (0x119):
-      CMU = 37;
-      Id = 1;
-      break;
-    case (0x11A):
-      CMU = 37;
-      Id = 2;
-      break;
-
-    case (0x11C):
-      CMU = 38;
-      Id = 0;
-      break;
-    case (0x11D):
-      CMU = 38;
-      Id = 1;
-      break;
-    case (0x11E):
-      CMU = 38;
       Id = 2;
       break;
 
 
     ///////////////// Two extender increment//////////
-    case (0x130):
+    case (0x1F0):
+      CMU = 17;
+      Id = 0;
+      break;
+    case (0x1F1):
+      CMU = 17;
+      Id = 1;
+      break;
+    case (0x1F2):
+      CMU = 17;
+      Id = 2;
+      break;
+
+    case (0x1F4):
+      CMU = 18;
+      Id = 0;
+      break;
+    case (0x1F5):
+      CMU = 18;
+      Id = 1;
+      break;
+    case (0x1F6):
+      CMU = 1;
+      Id = 2;
+      break;
+      
+    case (0x1F8):
+      CMU = 19;
+      Id = 0;
+      break;
+    case (0x1F9):
+      CMU = 19;
+      Id = 1;
+      break;
+    case (0x1FA):
+      CMU = 19;
+      Id = 2;
+      break;
+      
+    case (0x1FC):
+      CMU = 20;
+      Id = 0;
+      break;
+    case (0x1FD):
+      CMU = 20;
+      Id = 1;
+      break;
+    case (0x1FE):
+      CMU = 20;
+      Id = 2;
+      break;
+
+    case (0x200):
       CMU = 21;
       Id = 0;
       break;
-    case (0x131):
+    case (0x201):
       CMU = 21;
       Id = 1;
       break;
-    case (0x132):
+    case (0x202):
       CMU = 21;
       Id = 2;
       break;
 
-    case (0x134):
+    case (0x204):
       CMU = 22;
       Id = 0;
       break;
-    case (0x135):
+    case (0x205):
       CMU = 22;
       Id = 1;
       break;
-    case (0x136):
+    case (0x206):
       CMU = 22;
       Id = 2;
       break;
-    case (0x138):
+
+    case (0x208):
       CMU = 23;
       Id = 0;
       break;
-    case (0x139):
+    case (0x209):
       CMU = 23;
       Id = 1;
       break;
-    case (0x13A):
+    case (0x20A):
       CMU = 23;
       Id = 2;
       break;
-    case (0x13C):
+
+    case (0x20C):
       CMU = 24;
       Id = 0;
       break;
-    case (0x13D):
+    case (0x20D):
       CMU = 24;
       Id = 1;
       break;
-    case (0x13E):
+    case (0x20E):
       CMU = 24;
-      Id = 2;
-      break;
-
-    case (0x140):
-      CMU = 25;
-      Id = 0;
-      break;
-    case (0x141):
-      CMU = 25;
-      Id = 1;
-      break;
-    case (0x142):
-      CMU = 25;
-      Id = 2;
-      break;
-
-    case (0x144):
-      CMU = 26;
-      Id = 0;
-      break;
-    case (0x145):
-      CMU = 26;
-      Id = 1;
-      break;
-    case (0x146):
-      CMU = 26;
-      Id = 2;
-      break;
-
-    case (0x148):
-      CMU = 27;
-      Id = 0;
-      break;
-    case (0x149):
-      CMU = 27;
-      Id = 1;
-      break;
-    case (0x14A):
-      CMU = 27;
-      Id = 2;
-      break;
-
-    case (0x14C):
-      CMU = 28;
-      Id = 0;
-      break;
-    case (0x14D):
-      CMU = 28;
-      Id = 1;
-      break;
-    case (0x14E):
-      CMU = 28;
       Id = 2;
       break;
 
     ///////////////// one extender increment//////////
-    case (0x170):
+    case (0x1D0):
+      CMU = 9;
+      Id = 0;
+      break;
+    case (0x1D1):
+      CMU = 9;
+      Id = 1;
+      break;
+    case (0x1D2):
+      CMU = 9;
+      Id = 2;
+      break;
+
+    case (0x1D4):
+      CMU = 10;
+      Id = 0;
+      break;
+    case (0x1D5):
+      CMU = 10;
+      Id = 1;
+      break;
+    case (0x1D6):
+      CMU = 10;
+      Id = 2;
+      break;
+    case (0x1D8):
       CMU = 11;
       Id = 0;
       break;
-    case (0x171):
+    case (0x1D9):
       CMU = 11;
       Id = 1;
       break;
-    case (0x172):
+    case (0x1DA):
       CMU = 11;
       Id = 2;
       break;
-
-    case (0x174):
+    case (0x1DC):
       CMU = 12;
       Id = 0;
       break;
-    case (0x175):
+    case (0x1DD):
       CMU = 12;
       Id = 1;
       break;
-    case (0x176):
+    case (0x1DE):
       CMU = 12;
       Id = 2;
       break;
-    case (0x178):
+
+    case (0x1E0):
       CMU = 13;
       Id = 0;
       break;
-    case (0x179):
+    case (0x1E1):
       CMU = 13;
       Id = 1;
       break;
-    case (0x17A):
+    case (0x1E2):
       CMU = 13;
       Id = 2;
       break;
-    case (0x17C):
+
+    case (0x1E4):
       CMU = 14;
       Id = 0;
       break;
-    case (0x17D):
+    case (0x1E5):
       CMU = 14;
       Id = 1;
       break;
-    case (0x17E):
+    case (0x1E6):
       CMU = 14;
       Id = 2;
       break;
 
-    case (0x180):
+    case (0x1E8):
       CMU = 15;
       Id = 0;
       break;
-    case (0x181):
+    case (0x1E9):
       CMU = 15;
       Id = 1;
       break;
-    case (0x182):
+    case (0x1EA):
       CMU = 15;
       Id = 2;
       break;
 
-    case (0x184):
+    case (0x1EC):
       CMU = 16;
       Id = 0;
       break;
-    case (0x185):
+    case (0x1ED):
       CMU = 16;
       Id = 1;
       break;
-    case (0x186):
+    case (0x1EE):
       CMU = 16;
-      Id = 2;
-      break;
-
-    case (0x188):
-      CMU = 17;
-      Id = 0;
-      break;
-    case (0x189):
-      CMU = 17;
-      Id = 1;
-      break;
-    case (0x18A):
-      CMU = 17;
-      Id = 2;
-      break;
-
-    case (0x18C):
-      CMU = 18;
-      Id = 0;
-      break;
-    case (0x18D):
-      CMU = 18;
-      Id = 1;
-      break;
-    case (0x18E):
-      CMU = 18;
       Id = 2;
       break;
 
