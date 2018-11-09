@@ -847,7 +847,7 @@ void getcurrent()
   {
     RawCur = RawCur * -1;
   }
-  
+
   lowpassFilter.input(RawCur);
   if (debugCur != 0)
   {
@@ -1382,7 +1382,7 @@ void menu()
         }
         incomingByte = 'c';
         break;
-        
+
       case '4':
         menuload = 1;
         if (Serial.available() > 0)
@@ -2025,7 +2025,7 @@ void menu()
         menuload = 4;
         break;
 
- case 99: //c for calibrate zero offset
+      case 99: //c for calibrate zero offset
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2041,10 +2041,10 @@ void menu()
         SERIALCONSOLE.print("3 - Current Multiplication :");
         SERIALCONSOLE.println(settings.ncur);
         SERIALCONSOLE.print("4 - Analogue Low Range Conv:");
-        SERIALCONSOLE.print(settings.convlow*0.1,1);
+        SERIALCONSOLE.print(settings.convlow * 0.1, 1);
         SERIALCONSOLE.println(" mV/A");
         SERIALCONSOLE.print("5 - Analogue High Range Conv:");
-        SERIALCONSOLE.print(settings.convhigh*0.1,1);
+        SERIALCONSOLE.print(settings.convhigh * 0.1, 1);
         SERIALCONSOLE.println(" mV/A");
 
         SERIALCONSOLE.println("q - Go back to menu");
@@ -2114,7 +2114,7 @@ void canread()
     }
   }
 
-  if ((inMsg.id & 0x1FFFFFFF) < 0x1A5554F0 && (inMsg.id & 0x1FFFFFFF) > 0x1A555400)   // Determine if ID is Temperature CAN-ID
+  if ((inMsg.id & 0x1FFFFFFF) < 0x1A555460 && (inMsg.id & 0x1FFFFFFF) > 0x1A555400)   // Determine if ID is Temperature CAN-ID
   {
     if (candebug == 1)
     {
@@ -2126,30 +2126,27 @@ void canread()
       bms.decodetemp(inMsg, 0);
     }
   }
-  if (debug == 1)
+  if (candebug == 1)
   {
-    if (candebug == 1)
-    {
-      Serial.print(millis());
-      if ((inMsg.id & 0x80000000) == 0x80000000)    // Determine if ID is standard (11 bits) or extended (29 bits)
-        sprintf(msgString, "Extended ID: 0x%.8lX  DLC: %1d  Data:", (inMsg.id & 0x1FFFFFFF), inMsg.len);
-      else
-        sprintf(msgString, ",0x%.3lX,false,%1d", inMsg.id, inMsg.len);
+    Serial.print(millis());
+    if ((inMsg.id & 0x80000000) == 0x80000000)    // Determine if ID is standard (11 bits) or extended (29 bits)
+      sprintf(msgString, "Extended ID: 0x%.8lX  DLC: %1d  Data:", (inMsg.id & 0x1FFFFFFF), inMsg.len);
+    else
+      sprintf(msgString, ",0x%.3lX,false,%1d", inMsg.id, inMsg.len);
 
+    Serial.print(msgString);
+
+    if ((inMsg.id & 0x40000000) == 0x40000000) {  // Determine if message is a remote request frame.
+      sprintf(msgString, " REMOTE REQUEST FRAME");
       Serial.print(msgString);
-
-      if ((inMsg.id & 0x40000000) == 0x40000000) {  // Determine if message is a remote request frame.
-        sprintf(msgString, " REMOTE REQUEST FRAME");
+    } else {
+      for (byte i = 0; i < inMsg.len; i++) {
+        sprintf(msgString, ", 0x%.2X", inMsg.buf[i]);
         Serial.print(msgString);
-      } else {
-        for (byte i = 0; i < inMsg.len; i++) {
-          sprintf(msgString, ", 0x%.2X", inMsg.buf[i]);
-          Serial.print(msgString);
-        }
       }
-
-      Serial.println();
     }
+
+    Serial.println();
   }
 }
 
