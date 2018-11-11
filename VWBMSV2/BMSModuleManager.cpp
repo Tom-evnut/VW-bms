@@ -200,7 +200,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       Id = 1;
       break;
     case (0x1F6):
-      CMU = 1;
+      CMU = 18;
       Id = 2;
       break;
       
