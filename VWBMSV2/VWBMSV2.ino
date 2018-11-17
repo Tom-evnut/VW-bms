@@ -2253,7 +2253,7 @@ void currentlimit()
     {
       chargecurrent = map(bms.getHighCellVolt(), (settings.StoreVsetpoint - settings.ChargeHys), settings.StoreVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
     }
-    if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.StoreVsetpoint)
+    if (bms.getHighCellVolt() > settings.OverVSetpoint)
     {
       chargecurrent = 0;
     }
@@ -2264,7 +2264,7 @@ void currentlimit()
     {
       chargecurrent = map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
     }
-    if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
+    if (bms.getHighCellVolt() > settings.OverVSetpoint)
     {
       chargecurrent = 0;
     }
