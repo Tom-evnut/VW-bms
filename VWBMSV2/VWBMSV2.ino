@@ -2570,11 +2570,11 @@ void chargercomms()
     msg.len = 7;
     msg.buf[0] = 0x01;
     msg.buf[1] = lowByte(1000);
-    msg.buf[2] = highByte(1000);
-    msg.buf[3] = lowByte(chargecurrent / ncharger);
-    msg.buf[4] = highByte(chargecurrent / ncharger);
-    msg.buf[5] = lowByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
-    msg.buf[6] = highByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
+    msg.buf[2] = highByte(1000);  
+    msg.buf[3] = lowByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
+    msg.buf[4] = highByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
+    msg.buf[5] = lowByte(chargecurrent / ncharger);
+    msg.buf[6] = highByte(chargecurrent / ncharger);
 
     Can0.write(msg);
   }
