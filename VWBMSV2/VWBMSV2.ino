@@ -18,7 +18,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 181117;
+int firmver = 271117;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -243,7 +243,7 @@ void setup()
   analogWriteFrequency(OUT7, pwmfreq);
   analogWriteFrequency(OUT8, pwmfreq);
 
-  Can0.begin(settings.canSpeed);
+  Can0.begin(500000);
 
   //set filters for standard
   for (int i = 0; i < 8; i++)
@@ -1629,16 +1629,6 @@ void menu()
           incomingByte = 'e';
         }
         break;
-
-      case '7':
-        if (Serial.available() > 0)
-        {
-          settings.canSpeed = Serial.parseInt() * 1000;
-          Can0.begin(settings.canSpeed);
-          menuload = 1;
-          incomingByte = 'e';
-        }
-        break;
     }
   }
 
@@ -1952,9 +1942,11 @@ void menu()
         SERIALCONSOLE.print("6- Charger Can Msg Spd: ");
         SERIALCONSOLE.print(settings.chargerspd);
         SERIALCONSOLE.println("mS");
+        /*
         SERIALCONSOLE.print("7- Can Speed:");
         SERIALCONSOLE.print(settings.canSpeed/1000);
         SERIALCONSOLE.println("kbps");
+        */
         SERIALCONSOLE.println();
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 6;
