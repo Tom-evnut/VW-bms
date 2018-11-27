@@ -2577,7 +2577,7 @@ void chargercomms()
     msg.buf[1] = lowByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
     msg.buf[2] = highByte(chargecurrent / ncharger);
     msg.buf[3] = lowByte(chargecurrent / ncharger);
-    msg.buf[4] = 0x00;
+    msg.buf[4] = 0x01;
     msg.buf[5] = 0x00;
     msg.buf[6] = 0x00;
     msg.buf[7] = 0x00;
