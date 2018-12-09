@@ -160,6 +160,7 @@ int inputcheck = 0; //read digital inputs
 int outputcheck = 0; //check outputs
 int candebug = 0; //view can frames
 int debugCur = 0;
+int CSVdebug =0;
 int menuload = 0;
 
 
@@ -576,6 +577,10 @@ void loop()
     {
       printbmsstat();
       bms.printPackDetails();
+    }
+    if (CSVdebug != 0)
+    {
+      bms.printAllCSV();
     }
     if (inputcheck != 0)
     {
@@ -1375,6 +1380,12 @@ void menu()
         incomingByte = 'd';
         break;
 
+      case '8':
+        menuload = 1;
+        CSVdebug = !CSVdebug;
+        incomingByte = 'd';
+        break;
+
       case 113: //q for quite menu
 
         menuload = 0;
@@ -1503,6 +1514,7 @@ void menu()
           settings.IgnoreVolt = Serial.parseInt();
           settings.IgnoreVolt = settings.IgnoreVolt * 0.001;
           bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+          // Serial.println(settings.IgnoreVolt);
           menuload = 1;
           incomingByte = 'i';
         }
@@ -1613,7 +1625,7 @@ void menu()
 
       case '5': //1 Over Voltage Setpoint
         settings.chargertype = settings.chargertype + 1;
-        if (settings.chargertype > 4)
+        if (settings.chargertype > 5)
         {
           settings.chargertype = 0;
         }
@@ -1913,17 +1925,20 @@ void menu()
         SERIALCONSOLE.print("2 - Charge Hystersis: ");
         SERIALCONSOLE.print(settings.ChargeHys * 1000, 0 );
         SERIALCONSOLE.println("mV");
-        SERIALCONSOLE.print("3 - Pack Max Charge Current: ");
-        SERIALCONSOLE.print(settings.chargecurrentmax * 0.1);
-        SERIALCONSOLE.println("A");
-        SERIALCONSOLE.print("4- Pack End of Charge Current: ");
-        SERIALCONSOLE.print(settings.chargecurrentend * 0.1);
-        SERIALCONSOLE.println("A");
+        if (settings.chargertype > 0)
+        {
+          SERIALCONSOLE.print("3 - Pack Max Charge Current: ");
+          SERIALCONSOLE.print(settings.chargecurrentmax * 0.1);
+          SERIALCONSOLE.println("A");
+          SERIALCONSOLE.print("4- Pack End of Charge Current: ");
+          SERIALCONSOLE.print(settings.chargecurrentend * 0.1);
+          SERIALCONSOLE.println("A");
+        }
         SERIALCONSOLE.print("5- Charger Type: ");
         switch (settings.chargertype)
         {
           case 0:
-            SERIALCONSOLE.print("None");
+            SERIALCONSOLE.print("Relay Control");
             break;
           case 1:
             SERIALCONSOLE.print("Brusa NLG5xx");
@@ -1937,11 +1952,17 @@ void menu()
           case 4:
             SERIALCONSOLE.print("Elcon Charger");
             break;
+          case 5:
+            SERIALCONSOLE.print("Victron Charger");
+            break;
         }
         SERIALCONSOLE.println();
-        SERIALCONSOLE.print("6- Charger Can Msg Spd: ");
-        SERIALCONSOLE.print(settings.chargerspd);
-        SERIALCONSOLE.println("mS");
+        if (settings.chargertype > 0)
+        {
+          SERIALCONSOLE.print("6- Charger Can Msg Spd: ");
+          SERIALCONSOLE.print(settings.chargerspd);
+          SERIALCONSOLE.println("mS");
+        }
         /*
           SERIALCONSOLE.print("7- Can Speed:");
           SERIALCONSOLE.print(settings.canSpeed/1000);
@@ -2020,6 +2041,8 @@ void menu()
         SERIALCONSOLE.println(cellspresent);
         SERIALCONSOLE.print("7 - Gauge Debug :");
         SERIALCONSOLE.println(gaugedebug);
+        SERIALCONSOLE.print("8 - CSV Output :");
+        SERIALCONSOLE.println(CSVdebug);
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 4;
         break;
