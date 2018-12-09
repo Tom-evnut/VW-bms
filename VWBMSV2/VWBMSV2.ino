@@ -18,7 +18,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 271117;
+int firmver = 181209;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -1943,9 +1943,9 @@ void menu()
         SERIALCONSOLE.print(settings.chargerspd);
         SERIALCONSOLE.println("mS");
         /*
-        SERIALCONSOLE.print("7- Can Speed:");
-        SERIALCONSOLE.print(settings.canSpeed/1000);
-        SERIALCONSOLE.println("kbps");
+          SERIALCONSOLE.print("7- Can Speed:");
+          SERIALCONSOLE.print(settings.canSpeed/1000);
+          SERIALCONSOLE.println("kbps");
         */
         SERIALCONSOLE.println();
         SERIALCONSOLE.println("q - Go back to menu");
@@ -2335,6 +2335,15 @@ void currentlimit()
   {
     discurrent = 0;
 
+  }
+  ///No negative currents///
+  if (discurrent < 0)
+  {
+    discurrent = 0;
+  }
+  if (chargecurrent < 0)
+  {
+    chargecurrent = 0;
   }
 }
 
