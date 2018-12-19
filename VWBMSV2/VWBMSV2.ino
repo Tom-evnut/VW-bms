@@ -717,8 +717,7 @@ void printbmsstat()
   SERIALCONSOLE.println();
   SERIALCONSOLE.println();
   SERIALCONSOLE.println();
-  SERIALCONSOLE.print(millis());
-  SERIALCONSOLE.print(" BMS Status : ");
+  SERIALCONSOLE.print("BMS Status : ");
   if (settings.ESSmode == 1)
   {
     SERIALCONSOLE.print("ESS Mode ");
@@ -731,16 +730,43 @@ void printbmsstat()
     {
       SERIALCONSOLE.print(": OverVoltage ");
     }
-    if (bms.getLowCellVolt() > settings.UnderVSetpoint && bms.getHighCellVolt() < settings.OverVSetpoint)
+    if ((bms.getHighCellVolt() - bms.getLowCellVolt()) > settings.CellGap)
     {
-
-      if ( bmsstatus == Error)
+      SERIALCONSOLE.print(": Cell Imbalance ");
+    }
+    if (bms.getAvgTemperature() > settings.OverTSetpoint)
+    {
+      SERIALCONSOLE.print(": Over Temp ");
+    }
+    if (bms.getAvgTemperature() < settings.UnderTSetpoint)
+    {
+      SERIALCONSOLE.print(": Under Temp ");
+    }
+    if (storagemode == 1)
+    {
+      if (bms.getLowCellVolt() > settings.StoreVsetpoint)
       {
+        SERIALCONSOLE.print(": OverVoltage Storage ");
         SERIALCONSOLE.print(": UNhappy:");
       }
       else
       {
         SERIALCONSOLE.print(": Happy ");
+      }
+    }
+    else
+    {
+      if (bms.getLowCellVolt() > settings.UnderVSetpoint && bms.getHighCellVolt() < settings.OverVSetpoint)
+      {
+
+        if ( bmsstatus == Error)
+        {
+          SERIALCONSOLE.print(": UNhappy:");
+        }
+        else
+        {
+          SERIALCONSOLE.print(": Happy ");
+        }
       }
     }
   }
@@ -785,8 +811,23 @@ void printbmsstat()
   }
   if (balancecells == 1)
   {
-    //SERIALCONSOLE.print("|Balancing Active"); //No balancing on Vw modules
+    SERIALCONSOLE.print("|Balancing Active");
   }
+  SERIALCONSOLE.print("  ");
+  SERIALCONSOLE.print(cellspresent);
+  SERIALCONSOLE.println();
+  SERIALCONSOLE.print("Out:");
+  SERIALCONSOLE.print(digitalRead(OUT1));
+  SERIALCONSOLE.print(digitalRead(OUT2));
+  SERIALCONSOLE.print(digitalRead(OUT3));
+  SERIALCONSOLE.print(digitalRead(OUT4));
+  SERIALCONSOLE.print(" Cont:");
+  SERIALCONSOLE.print(contstat, BIN);
+  SERIALCONSOLE.print(" In:");
+  SERIALCONSOLE.print(digitalRead(IN1));
+  SERIALCONSOLE.print(digitalRead(IN2));
+  SERIALCONSOLE.print(digitalRead(IN3));
+  SERIALCONSOLE.print(digitalRead(IN4));
 }
 
 
