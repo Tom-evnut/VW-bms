@@ -72,7 +72,7 @@ int Discharge;
 //variables for output control
 int pulltime = 1000;
 int contctrl, contstat = 0; //1 = out 5 high 2 = out 6 high 3 = both high
-unsigned long conttimer1, conttimer2, Pretimer, Pretimer1 = 0;
+unsigned long conttimer1, conttimer2, conttimer3, Pretimer, Pretimer1 = 0;
 uint16_t pwmfreq = 15000;//pwm frequency
 
 int pwmcurmax = 200;//Max current to be shown with pwm
@@ -456,7 +456,6 @@ void loop()
         contctrl = contctrl | 1;
       }
     }
-
     //pwmcomms();
   }
   else
@@ -1089,34 +1088,67 @@ void contcon()
       analogWrite(OUT6, 0);
       contstat = contstat & 253;
     }
+    if ((contctrl & 4) == 0)
+    {
+      analogWrite(OUT7, 0);
+      contstat = contstat & 251;
+    }
+
 
     if ((contctrl & 1) == 1)
     {
-      if (conttimer1 == 0)
+      if ((contstat & 1) != 1)
       {
-        analogWrite(OUT5, 255);
-        conttimer1 = millis() + pulltime ;
-      }
-      if (conttimer1 < millis())
-      {
-        analogWrite(OUT5, settings.conthold);
-        contstat = contstat | 1;
-        conttimer1 = 0;
+        if (conttimer1 == 0)
+        {
+          analogWrite(OUT5, 255);
+          conttimer1 = millis() + pulltime ;
+        }
+        if (conttimer1 < millis())
+        {
+          analogWrite(OUT5, settings.conthold);
+          contstat = contstat | 1;
+          conttimer1 = 0;
+        }
       }
     }
 
     if ((contctrl & 2) == 2)
     {
-      if (conttimer2 == 0)
+      if ((contstat & 2) != 2)
       {
-        analogWrite(OUT6, 255);
-        conttimer2 = millis() + pulltime ;
+        if (conttimer2 == 0)
+        {
+          Serial.println();
+          Serial.println("pull in OUT6");
+          analogWrite(OUT6, 255);
+          conttimer2 = millis() + pulltime ;
+        }
+        if (conttimer2 < millis())
+        {
+          analogWrite(OUT6, settings.conthold);
+          contstat = contstat | 2;
+          conttimer2 = 0;
+        }
       }
-      if (conttimer2 < millis())
+    }
+    if ((contctrl & 4) == 4)
+    {
+      if ((contstat & 4) != 4)
       {
-        analogWrite(OUT6, settings.conthold);
-        contstat = contstat | 2;
-        conttimer2 = 0;
+        if (conttimer3 == 0)
+        {
+          Serial.println();
+          Serial.println("pull in OUT7");
+          analogWrite(OUT7, 255);
+          conttimer3 = millis() + pulltime ;
+        }
+        if (conttimer3 < millis())
+        {
+          analogWrite(OUT7, settings.conthold);
+          contstat = contstat | 4;
+          conttimer3 = 0;
+        }
       }
     }
     /*
