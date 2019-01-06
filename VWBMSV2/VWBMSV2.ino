@@ -715,9 +715,9 @@ void alarmupdate()
 
 void gaugeupdate()
 {
-  if (gaugedebug != 0)
+  if (gaugedebug == 1)
   {
-    SOCtest = SOCtest + 5;
+    SOCtest = SOCtest + 10;
     if (SOCtest > 1000)
     {
       SOCtest = 0;
@@ -731,7 +731,17 @@ void gaugeupdate()
     SERIALCONSOLE.print(map(SOCtest * 0.1, 0, 100, settings.gaugelow, settings.gaugehigh));
     SERIALCONSOLE.println("  ");
   }
-  else
+  if (gaugedebug == 2)
+  {
+    SOCtest = 0;
+    analogWrite(OUT8, map(SOCtest * 0.1, 0, 100, settings.gaugelow, settings.gaugehigh));
+  }
+  if (gaugedebug == 3)
+  {
+    SOCtest = 1000;
+    analogWrite(OUT8, map(SOCtest * 0.1, 0, 100, settings.gaugelow, settings.gaugehigh));
+  }
+  if (gaugedebug == 0)
   {
     analogWrite(OUT8, map(SOC, 0, 100, settings.gaugelow, settings.gaugehigh));
   }
@@ -1805,6 +1815,8 @@ void menu()
         if (Serial.available() > 0)
         {
           settings.gaugelow = Serial.parseInt();
+          gaugedebug = 2;
+          gaugeupdate();
           menuload = 1;
           incomingByte = 'k';
         }
@@ -1814,13 +1826,15 @@ void menu()
         if (Serial.available() > 0)
         {
           settings.gaugehigh = Serial.parseInt();
+          gaugedebug = 3;
+          gaugeupdate();
           menuload = 1;
           incomingByte = 'k';
         }
         break;
 
       case 113: //q to go back to main menu
-
+        gaugedebug = 0;
         menuload = 0;
         incomingByte = 115;
         break;
