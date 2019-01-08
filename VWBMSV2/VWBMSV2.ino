@@ -18,7 +18,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 190106;
+int firmver = 190108;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -132,7 +132,8 @@ int maxac1 = 16; //Shore power 16A per charger
 int maxac2 = 10; //Generator Charging
 int chargerid1 = 0x618; //bulk chargers
 int chargerid2 = 0x638; //finishing charger
-float chargerend = 10.0; //turning off the bulk charger before end voltage
+float chargerendbulk = 10.0; //V before Charge Voltage to turn off the bulk charger/s
+float chargerend = 10.0; //V before Charge Voltage to turn off the finishing charger/s
 int chargertoggle = 0;
 int ncharger = 1; // number of chargers
 
@@ -143,6 +144,7 @@ int storagemode = 0;
 int x = 0;
 int balancecells;
 int cellspresent = 0;
+int Charged = 0;
 
 //VW BMS CAN variables////////////
 int controlid = 0x0BA;
@@ -412,11 +414,13 @@ void loop()
           digitalWrite(OUT3, LOW);//turn off charger
           contctrl = contctrl & 253;
           Pretimer = millis();
+          Charged = 1;
         }
         else
         {
-          if (bms.getHighCellVolt() < (settings.StoreVsetpoint - settings.ChargeHys))
+          if (Charged == 1 && bms.getHighCellVolt() < (settings.StoreVsetpoint - settings.ChargeHys))
           {
+            Charged = 0;
             digitalWrite(OUT3, HIGH);//turn on charger
             if (Pretimer + settings.Pretime < millis())
             {
@@ -433,11 +437,13 @@ void loop()
           digitalWrite(OUT3, LOW);//turn off charger
           contctrl = contctrl & 253;
           Pretimer = millis();
+          Charged = 1;
         }
         else
         {
-          if (bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
+          if (Charged == 1 && bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
           {
+            Charged = 0;
             digitalWrite(OUT3, HIGH);//turn on charger
             if (Pretimer + settings.Pretime < millis())
             {
@@ -2813,8 +2819,8 @@ void chargercomms()
     }
     msg.buf[5] = highByte(chargecurrent / ncharger);
     msg.buf[6] = lowByte(chargecurrent / ncharger);
-    msg.buf[3] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
-    msg.buf[4] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend)  * 10));
+    msg.buf[3] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerendbulk) * 10));
+    msg.buf[4] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerendbulk)  * 10));
     Can0.write(msg);
 
     delay(2);
@@ -2832,8 +2838,8 @@ void chargercomms()
       msg.buf[1] = highByte(maxac2 * 10);
       msg.buf[2] = lowByte(maxac2 * 10);
     }
-    msg.buf[3] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
-    msg.buf[4] = lowByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+    msg.buf[3] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
+    msg.buf[4] = lowByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells ) - chargerend) * 10));
     msg.buf[5] = highByte(chargecurrent / ncharger);
     msg.buf[6] = lowByte(chargecurrent / ncharger);
     Can0.write(msg);
