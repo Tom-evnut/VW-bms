@@ -18,7 +18,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 190113;
+int firmver = 190119;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -468,6 +468,16 @@ void loop()
           contctrl = contctrl | 1;
         }
       }
+      
+      if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() > settings.OverVSetpoint || bms.getAvgTemperature() > settings.OverTSetpoint)
+      {
+        digitalWrite(OUT2, HIGH);//trip breaker
+      }
+      else
+      {
+        digitalWrite(OUT2, LOW);//trip breaker
+      }
+      
       //pwmcomms();
     }
     else
