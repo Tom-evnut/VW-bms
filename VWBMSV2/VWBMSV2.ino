@@ -18,7 +18,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 190119;
+int firmver = 190127;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -26,8 +26,8 @@ FilterOnePole lowpassFilter( LOWPASS, filterFrequency );
 
 
 //Simple BMS V2 wiring//
-const int ACUR1 = A0; // current 1
-const int ACUR2 = A1; // current 2
+const int ACUR2 = A0; // current 1
+const int ACUR1 = A1; // current 2
 const int IN1 = 17; // input 1 - high active
 const int IN2 = 16; // input 2- high active
 const int IN3 = 18; // input 1 - high active
@@ -107,9 +107,6 @@ signed long CANmilliamps;
 
 //variables for current calulation
 int value;
-uint16_t offset1 = 1735;
-uint16_t offset2 = 1733;
-int highconv = 285;
 float currentact, RawCur;
 float ampsecond;
 unsigned long lasttime;
@@ -132,8 +129,8 @@ int maxac1 = 16; //Shore power 16A per charger
 int maxac2 = 10; //Generator Charging
 int chargerid1 = 0x618; //bulk chargers
 int chargerid2 = 0x638; //finishing charger
-float chargerendbulk = 10.0; //V before Charge Voltage to turn off the bulk charger/s
-float chargerend = 10.0; //V before Charge Voltage to turn off the finishing charger/s
+float chargerendbulk = 0; //V before Charge Voltage to turn off the bulk charger/s
+float chargerend = 0; //V before Charge Voltage to turn off the finishing charger/s
 int chargertoggle = 0;
 int ncharger = 1; // number of chargers
 
@@ -171,14 +168,14 @@ ADC *adc = new ADC(); // adc object
 void loadSettings()
 {
   Logger::console("Resetting to factory defaults");
-  settings.version = EEPROM_VERSION;
   settings.checksum = 2;
   settings.canSpeed = 500000;
   settings.batteryID = 0x01; //in the future should be 0xFF to force it to ask for an address
-  settings.OverVSetpoint = 4.1f;
+  settings.OverVSetpoint = 4.2f;
   settings.UnderVSetpoint = 3.0f;
   settings.ChargeVsetpoint = 4.1f;
   settings.ChargeHys = 0.2f; // voltage drop required for charger to kick back on
+  settings.WarnOff = 0.1f; //voltage offset to raise a warning
   settings.DischVsetpoint = 3.2f;
   settings.CellGap = 0.2f; //max delta between high and low cell
   settings.OverTSetpoint = 65.0f;
@@ -192,8 +189,9 @@ void loadSettings()
   settings.balanceHyst = 0.04f;
   settings.logLevel = 2;
   settings.CAP = 100; //battery size in Ah
-  settings.Pstrings = 2; // strings in parallel used to divide voltage of pack
-  settings.Scells = 14;//Cells in series
+  settings.Pstrings = 1; // strings in parallel used to divide voltage of pack
+  settings.Scells = 12;//Cells in series
+  settings.StoreVsetpoint = 3.8; // V storage mode charge max
   settings.discurrentmax = 300; // max discharge current in 0.1A
   settings.chargecurrentmax = 300; //max charge current in 0.1A
   settings.chargecurrentend = 50; //end charge current in 0.1A
@@ -207,10 +205,14 @@ void loadSettings()
   settings.Pretime = 5000; //ms of precharge time
   settings.conthold = 50; //holding duty cycle for contactor 0-255
   settings.Precurrent = 1000; //ma before closing main contator
-  settings.Serialexp = 0; //0 standalone - 1 Serial Master - 2 Serial Slave
+  settings.convhigh = 58; // mV/A current sensor high range channel
+  settings.convlow = 643; // mV/A current sensor low range channel
+  settings.offset1 = 1750; //mV mid point of channel 1
+  settings.offset2 = 1750;//mV mid point of channel 2
   settings.gaugelow = 50; //empty fuel gauge pwm
   settings.gaugehigh = 255; //full fuel gauge pwm
   settings.ESSmode = 0; //activate ESS mode
+  settings.ncur = 1; //number of multiples to use for current measurement
   settings.chargertype = 2; // 1 - Brusa NLG5xx 2 - Volt charger 0 -No Charger
   settings.chargerspd = 100; //ms per message
   settings.UnderDur = 5000; //ms of allowed undervoltage before throwing open stopping discharge.
@@ -1226,16 +1228,17 @@ void calcur()
 {
   adc->startContinuous(ACUR1, ADC_0);
   sensor = 1;
+  x = 0;
   SERIALCONSOLE.print(" Calibrating Current Offset ::::: ");
   while (x < 20)
   {
-    offset1 = offset1 + ((uint16_t)adc->analogReadContinuous(ADC_0) * 3300 / adc->getMaxValue(ADC_0));
+    settings.offset1 = settings.offset1 + ((uint16_t)adc->analogReadContinuous(ADC_0) * 3300 / adc->getMaxValue(ADC_0));
     SERIALCONSOLE.print(".");
     delay(100);
     x++;
   }
-  offset1 = offset1 / 21;
-  SERIALCONSOLE.print(offset1);
+  settings.offset1 = settings.offset1 / 21;
+  SERIALCONSOLE.print(settings.offset1);
   SERIALCONSOLE.print(" current offset 1 calibrated ");
   SERIALCONSOLE.println("  ");
   x = 0;
@@ -1244,13 +1247,13 @@ void calcur()
   SERIALCONSOLE.print(" Calibrating Current Offset ::::: ");
   while (x < 20)
   {
-    offset2 = offset2 + ((uint16_t)adc->analogReadContinuous(ADC_0) * 3300 / adc->getMaxValue(ADC_0));
+    settings.offset2 = settings.offset2 + ((uint16_t)adc->analogReadContinuous(ADC_0) * 3300 / adc->getMaxValue(ADC_0));
     SERIALCONSOLE.print(".");
     delay(100);
     x++;
   }
-  offset2 = offset2 / 21;
-  SERIALCONSOLE.print(offset2);
+  settings.offset2 = settings.offset2 / 21;
+  SERIALCONSOLE.print(settings.offset2);
   SERIALCONSOLE.print(" current offset 2 calibrated ");
   SERIALCONSOLE.println("  ");
 }
