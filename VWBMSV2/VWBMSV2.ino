@@ -193,6 +193,7 @@ void loadSettings()
   settings.Scells = 12;//Cells in series
   settings.StoreVsetpoint = 3.8; // V storage mode charge max
   settings.discurrentmax = 300; // max discharge current in 0.1A
+  settings.DisTaper = 0.3f; //V offset to bring in discharge taper to Zero Amps at settings.DischVsetpoint
   settings.chargecurrentmax = 300; //max charge current in 0.1A
   settings.chargecurrentend = 50; //end charge current in 0.1A
   settings.socvolt[0] = 3100; //Voltage and SOC curve for voltage based SOC calc
@@ -470,7 +471,7 @@ void loop()
           contctrl = contctrl | 1;
         }
       }
-      
+
       if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() > settings.OverVSetpoint || bms.getAvgTemperature() > settings.OverTSetpoint)
       {
         digitalWrite(OUT2, HIGH);//trip breaker
@@ -479,7 +480,7 @@ void loop()
       {
         digitalWrite(OUT2, LOW);//trip breaker
       }
-      
+
       //pwmcomms();
     }
     else
@@ -1469,7 +1470,6 @@ void BMVmessage()//communication with the Victron Color Control System over VEdi
 void menu()
 {
 
-
   incomingByte = Serial.read(); // read the incoming byte:
   if (menuload == 4)
   {
@@ -1933,6 +1933,15 @@ void menu()
           incomingByte = 'b';
         }
 
+      case 'h':
+        if (Serial.available() > 0)
+        {
+          settings.DisTaper = Serial.parseInt();
+          settings.DisTaper = settings.DisTaper / 1000;
+          menuload = 1;
+          incomingByte = 'b';
+        }
+
       case 'b':
         if (Serial.available() > 0)
         {
@@ -2077,7 +2086,9 @@ void menu()
         break;
 
       case 'i': //Ignore Value Settings
-      while (Serial.available()) {Serial.read();}
+        while (Serial.available()) {
+          Serial.read();
+        }
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2094,7 +2105,9 @@ void menu()
         break;
 
       case 'e': //Charging settings
-      while (Serial.available()) {Serial.read();}
+        while (Serial.available()) {
+          Serial.read();
+        }
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2156,7 +2169,9 @@ void menu()
         break;
 
       case 'a': //Alarm and Warning settings
-      while (Serial.available()) {Serial.read();}
+        while (Serial.available()) {
+          Serial.read();
+        }
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2179,7 +2194,9 @@ void menu()
         break;
 
       case 'k': //contactor settings
-      while (Serial.available()) {Serial.read();}
+        while (Serial.available()) {
+          Serial.read();
+        }
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2207,7 +2224,9 @@ void menu()
         debug = 1;
         break;
       case 'd': //d for debug settings
-        while (Serial.available()) {Serial.read();}
+        while (Serial.available()) {
+          Serial.read();
+        }
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2238,7 +2257,9 @@ void menu()
         break;
 
       case 99: //c for calibrate zero offset
-      while (Serial.available()) {Serial.read();}
+        while (Serial.available()) {
+          Serial.read();
+        }
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2291,7 +2312,10 @@ void menu()
         break;
 
       case 98: //c for calibrate zero offset
-      while (Serial.available()) {Serial.read();}
+        while (Serial.available())
+        {
+          Serial.read();
+        }
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
         SERIALCONSOLE.println();
@@ -2365,6 +2389,10 @@ void menu()
         SERIALCONSOLE.print(settings.StoreVsetpoint * 1000, 0 );
         SERIALCONSOLE.print("mV");
         SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print("h - Discharge Current Taper Offset: ");
+        SERIALCONSOLE.print(settings.DisTaper * 1000, 0 );
+        SERIALCONSOLE.print("mV");
+        SERIALCONSOLE.println("  ");
 
         SERIALCONSOLE.println();
         menuload = 3;
@@ -2379,7 +2407,6 @@ void menu()
 
   if (incomingByte == 115 & menuload == 0)
   {
-    while (Serial.available()) {Serial.read();}
     SERIALCONSOLE.println();
     SERIALCONSOLE.println("MENU");
     SERIALCONSOLE.println("Debugging Paused");
@@ -2493,6 +2520,7 @@ void currentlimit()
   }
   else
   {
+    ///////////temperature based current limit////////////
     if (bms.getAvgTemperature() < settings.UnderTSetpoint)
     {
       discurrent = 0;
@@ -2555,7 +2583,17 @@ void currentlimit()
   if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
   {
     discurrent = 0;
-
+  }
+  else
+  {
+    if (bms.getLowCellVolt() > (settings.DischVsetpoint + settings.DisTaper))
+    {
+      discurrent = settings.discurrentmax;
+    }
+    else
+    {
+      discurrent = map(bms.getLowCellVolt(), settings.DischVsetpoint, (settings.DischVsetpoint + settings.DisTaper), 0, settings.chargecurrentmax);
+    }
   }
   ///No negative currents///
   if (discurrent < 0)
