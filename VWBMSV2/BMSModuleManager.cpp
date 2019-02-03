@@ -730,6 +730,14 @@ float BMSModuleManager::getAvgTemperature()
       if (modules[x].getAvgTemp() > -70)
       {
         avg += modules[x].getAvgTemp();
+        if (modules[x].getAvgTemp() > highTemp)
+        {
+          highTemp = modules[x].getAvgTemp();
+        }
+        if (modules[x].getAvgTemp() < lowTemp)
+        {
+          lowTemp = modules[x].getAvgTemp();
+        }
       }
       else
       {
@@ -740,6 +748,16 @@ float BMSModuleManager::getAvgTemperature()
   avg = avg / (float)(numFoundModules - y);
 
   return avg;
+}
+
+float BMSModuleManager::getHighTemperature()
+{
+  return highTemp;
+}
+
+float BMSModuleManager::getLowTemperature()
+{
+  return lowTemp;
 }
 
 float BMSModuleManager::getAvgCellVolt()
