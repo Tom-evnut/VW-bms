@@ -1125,7 +1125,7 @@ void updateSOC()
 
 void Prechargecon()
 {
-  if (digitalRead(IN1) == HIGH) //detect Key ON
+  if (digitalRead(IN1) == HIGH || digitalRead(IN3) == HIGH) //detect Key ON or AC present
   {
     digitalWrite(OUT4, HIGH);//Negative Contactor Close
     contctrl = 2;
@@ -1137,7 +1137,21 @@ void Prechargecon()
     {
       digitalWrite(OUT1, HIGH);//Positive Contactor Close
       contctrl = 3;
-      bmsstatus = Drive;
+      if (settings.ChargerDirect == 1)
+      {
+        bmsstatus = Drive;
+      }
+      else
+      {
+        if (digitalRead(IN3) == HIGH)
+        {
+          bmsstatus = Charge;
+        }
+        if (digitalRead(IN1) == HIGH)
+        {
+          bmsstatus = Drive;
+        }
+      }
       digitalWrite(OUT2, LOW);
     }
   }
@@ -1837,6 +1851,20 @@ void menu()
           incomingByte = 'e';
         }
         break;
+
+      case '7':
+        if ( settings.ChargerDirect == 1)
+        {
+          settings.ChargerDirect = 0;
+        }
+        else
+        {
+          settings.ChargerDirect = 1;
+        }
+        menuload = 1;
+        incomingByte = 'e';
+        break;
+
     }
   }
 
@@ -2177,13 +2205,13 @@ void menu()
           SERIALCONSOLE.print("6- Charger Can Msg Spd: ");
           SERIALCONSOLE.print(settings.chargerspd);
           SERIALCONSOLE.println("mS");
+          SERIALCONSOLE.println();
         }
         /*
           SERIALCONSOLE.print("7- Can Speed:");
           SERIALCONSOLE.print(settings.canSpeed/1000);
           SERIALCONSOLE.println("kbps");
         */
-        SERIALCONSOLE.println();
         SERIALCONSOLE.print("7 - Charger HV Connection: ");
         switch (settings.ChargerDirect)
         {
