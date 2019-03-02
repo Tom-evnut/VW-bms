@@ -363,26 +363,17 @@ void loop()
   {
     canread();
   }
+
   if (SERIALCONSOLE.available() > 0)
   {
     menu();
   }
-  if (settings.Serialexp != 0)
-  {
-    if (SERIALBMS.available() > 0)
-    {
-      Serialexp();
-    }
-  }
-
 
   if (outputcheck != 1)
   {
     contcon();
-
     if (settings.ESSmode == 1)
     {
-      bmsstatus = Boot;
       contctrl = contctrl | 4; //turn on negative contactor
 
 
@@ -613,23 +604,29 @@ void loop()
           break;
       }
     }
-    if (settings.cursens == Analoguedual || settings.cursens == Analoguesing)
+    if ( settings.cursens == Analoguedual || settings.cursens == Analoguesing)
     {
       getcurrent();
     }
   }
+
   if (millis() - looptime > 500)
   {
-
     looptime = millis();
     bms.getAllVoltTemp();
     //UV  check
     if (settings.ESSmode == 1)
     {
-      if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() < settings.UnderVSetpoint)
+      if (SOCset != 0)
       {
-
-        bmsstatus = Error;
+        if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() < settings.UnderVSetpoint)
+        {
+          SERIALCONSOLE.println("  ");
+          SERIALCONSOLE.print("   !!! Undervoltage Fault !!!");
+          SERIALCONSOLE.println("  ");
+          bmsstatus = Error;
+          ErrorReason = 1;
+        }
       }
     }
     else //In 'vehicle' mode
@@ -639,6 +636,7 @@ void loop()
         if (UnderTime > millis()) //check is last time not undervoltage is longer thatn UnderDur ago
         {
           bmsstatus = Error;
+          ErrorReason = 2;
         }
       }
       else
@@ -646,7 +644,6 @@ void loop()
         UnderTime = millis() + settings.UnderDur;
       }
     }
-
 
     if (debug != 0)
     {
@@ -670,12 +667,13 @@ void loop()
     {
       gaugeupdate();
     }
+
     updateSOC();
     currentlimit();
     VEcan();
-    sendcommand();
 
-    if (cellspresent == 0)
+    sendcommand();
+if (cellspresent == 0)
     {
       cellspresent = bms.seriescells();//set amount of connected cells, might need delay
     }
@@ -683,24 +681,47 @@ void loop()
     {
       if (cellspresent != bms.seriescells()) //detect a fault in cells detected
       {
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print("   !!! Series Cells Fault !!!");
+        SERIALCONSOLE.println("  ");
         bmsstatus = Error;
-      }
-    }
-    if (settings.Serialexp != 0)
-    {
-      if (settings.Serialexp == 1)
-      {
-        SerialReqData();
+        ErrorReason = 3;
       }
     }
     alarmupdate();
-    dashupdate();
+    if (CSVdebug != 1)
+    {
+      dashupdate();
+    }
 
     resetwdog();
   }
   if (millis() - cleartime > 5000)
   {
-    //bms.clearmodules();
+    //bms.clearmodules(); // Not functional
+    if (bms.checkcomms())
+    {
+      //no missing modules
+      /*
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print(" ALL OK NO MODULE MISSING :) ");
+        SERIALCONSOLE.println("  ");
+      */
+      if (  bmsstatus == Error)
+      {
+        bmsstatus = Boot;
+      }
+    }
+    else
+    {
+      //missing module
+      SERIALCONSOLE.println("  ");
+      SERIALCONSOLE.print("   !!! MODULE MISSING !!!");
+      SERIALCONSOLE.println("  ");
+      bmsstatus = Error;
+      ErrorReason = 4;
+    }
+    cleartime = millis();
   }
   if (millis() - looptime1 > settings.chargerspd)
   {

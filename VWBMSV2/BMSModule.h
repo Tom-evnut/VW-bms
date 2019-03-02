@@ -31,6 +31,8 @@ class BMSModule
     void setAddress(int newAddr);
     int getAddress();
     bool isExisting();
+        bool isReset();
+    void setReset(bool ex);
     void setExists(bool ex);
     void settempsensor(int tempsensor);
     void setIgnoreCell(float Ignore);
@@ -48,6 +50,7 @@ class BMSModule
     float highestModuleVolt;
     float IgnoreCell;
     bool exists;
+    bool reset;
     int alerts;
     int faults;
     int COVFaults;

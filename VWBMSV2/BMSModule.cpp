@@ -20,6 +20,7 @@ BMSModule::BMSModule()
   lowestModuleVolt = 200.0f;
   highestModuleVolt = 0.0f;
   exists = false;
+    reset = false;
   moduleAddress = 0;
 }
 
@@ -34,6 +35,7 @@ void BMSModule::clearmodule()
   temperatures[1] = 0.0f;
   temperatures[2] = 0.0f;
   exists = false;
+    reset = false;
   moduleAddress = 0;
 }
 
@@ -317,6 +319,11 @@ bool BMSModule::isExisting()
   return exists;
 }
 
+bool BMSModule::isReset()
+{
+  return reset;
+}
+
 void BMSModule::settempsensor(int tempsensor)
 {
   sensor = tempsensor;
@@ -325,6 +332,11 @@ void BMSModule::settempsensor(int tempsensor)
 void BMSModule::setExists(bool ex)
 {
   exists = ex;
+}
+
+void BMSModule::setReset(bool ex)
+{
+  reset = ex;
 }
 
 void BMSModule::setIgnoreCell(float Ignore)
