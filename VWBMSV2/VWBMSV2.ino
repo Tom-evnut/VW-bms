@@ -68,6 +68,7 @@ byte bmsstatus = 0;
 //
 
 int Discharge;
+int ErrorReason = 0;
 
 //variables for output control
 int pulltime = 1000;
@@ -673,7 +674,7 @@ void loop()
     VEcan();
 
     sendcommand();
-if (cellspresent == 0)
+    if (cellspresent == 0)
     {
       cellspresent = bms.seriescells();//set amount of connected cells, might need delay
     }
@@ -2663,57 +2664,56 @@ void currentlimit()
         }
       }
     }
-  }
-  ///voltage influence on current///
-  if (storagemode == 1)
-  {
-    if (bms.getHighCellVolt() > (settings.StoreVsetpoint - settings.ChargeHys))
+    ///voltage influence on current///
+    if (storagemode == 1)
     {
-      chargecurrent = map(bms.getHighCellVolt(), (settings.StoreVsetpoint - settings.ChargeHys), settings.StoreVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
-    }
-    if (bms.getHighCellVolt() > settings.OverVSetpoint)
-    {
-      chargecurrent = 0;
-    }
-  }
-  else
-  {
-    if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
-    {
-      chargecurrent = map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
-    }
-    if (bms.getHighCellVolt() > settings.OverVSetpoint)
-    {
-      chargecurrent = 0;
-    }
-  }
-
-  if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
-  {
-    discurrent = 0;
-  }
-  else
-  {
-    if (bms.getLowCellVolt() > (settings.DischVsetpoint + settings.DisTaper))
-    {
-      discurrent = settings.discurrentmax;
+      if (bms.getHighCellVolt() > (settings.StoreVsetpoint - settings.ChargeHys))
+      {
+        chargecurrent = map(bms.getHighCellVolt(), (settings.StoreVsetpoint - settings.ChargeHys), settings.StoreVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
+      }
+      if (bms.getHighCellVolt() > settings.OverVSetpoint)
+      {
+        chargecurrent = 0;
+      }
     }
     else
     {
-      discurrent = map(bms.getLowCellVolt(), settings.DischVsetpoint, (settings.DischVsetpoint + settings.DisTaper), 0, settings.chargecurrentmax);
+      if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
+      {
+        chargecurrent = map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
+      }
+      if (bms.getHighCellVolt() > settings.OverVSetpoint)
+      {
+        chargecurrent = 0;
+      }
+    }
+
+    if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
+    {
+      discurrent = 0;
+    }
+    else
+    {
+      if (bms.getLowCellVolt() > (settings.DischVsetpoint + settings.DisTaper))
+      {
+        discurrent = settings.discurrentmax;
+      }
+      else
+      {
+        discurrent = map(bms.getLowCellVolt(), settings.DischVsetpoint, (settings.DischVsetpoint + settings.DisTaper), 0, settings.chargecurrentmax);
+      }
+    }
+    ///No negative currents///
+    if (discurrent < 0)
+    {
+      discurrent = 0;
+    }
+    if (chargecurrent < 0)
+    {
+      chargecurrent = 0;
     }
   }
-  ///No negative currents///
-  if (discurrent < 0)
-  {
-    discurrent = 0;
-  }
-  if (chargecurrent < 0)
-  {
-    chargecurrent = 0;
-  }
 }
-
 void inputdebug()
 {
   Serial.println();
