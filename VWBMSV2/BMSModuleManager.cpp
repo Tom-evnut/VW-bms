@@ -935,15 +935,21 @@ Logger::console("Modules: %i Cells: %i Strings: %i  Voltage: %fV   Avg Cell Volt
     }
   }
 }
-void BMSModuleManager::printAllCSV()
+void BMSModuleManager::printAllCSV(unsigned long timestamp, float current, int SOC)
 {
   for (int y = 1; y < 63; y++)
   {
     if (modules[y].isExisting())
     {
+      SERIALCONSOLE.print(timestamp);
+      SERIALCONSOLE.print(",");
+      SERIALCONSOLE.print(current, 0);
+      SERIALCONSOLE.print(",");
+      SERIALCONSOLE.print(SOC);
+      SERIALCONSOLE.print(",");
       SERIALCONSOLE.print(y);
       SERIALCONSOLE.print(",");
-      for (int i = 0; i < 12; i++)
+      for (int i = 0; i < 8; i++)
       {
         SERIALCONSOLE.print(modules[y].getCellVoltage(i));
         SERIALCONSOLE.print(",");
@@ -954,6 +960,31 @@ void BMSModuleManager::printAllCSV()
       SERIALCONSOLE.print(",");
       SERIALCONSOLE.print(modules[y].getTemperature(2));
       SERIALCONSOLE.println();
+    }
+  }
+  for (int y = 1; y < 63; y++)
+  {
+    if (modules[y].isExisting())
+    {
+      Serial2.print(timestamp);
+      Serial2.print(",");
+      Serial2.print(current, 0);
+      Serial2.print(",");
+      Serial2.print(SOC);
+      Serial2.print(",");
+      Serial2.print(y);
+      Serial2.print(",");
+      for (int i = 0; i < 8; i++)
+      {
+        Serial2.print(modules[y].getCellVoltage(i));
+        Serial2.print(",");
+      }
+      Serial2.print(modules[y].getTemperature(0));
+      Serial2.print(",");
+      Serial2.print(modules[y].getTemperature(1));
+      Serial2.print(",");
+      Serial2.print(modules[y].getTemperature(2));
+      Serial2.println();
     }
   }
 }

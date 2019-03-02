@@ -5,7 +5,7 @@
 #include "Logger.h"
 #include <ADC.h> //https://github.com/pedvide/ADC
 #include <EEPROM.h>
-#include <FlexCAN.h> //https://github.com/teachop/FlexCAN_Library 
+#include <FlexCAN.h> https://github.com/collin80/FlexCAN_Library
 #include <SPI.h>
 #include <Filters.h>//https://github.com/JonHub/Filters
 #include "BMSUtil.h"
@@ -18,7 +18,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 190215;
+int firmver = 280302;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -419,6 +419,7 @@ void loop()
           contctrl = contctrl & 253;
           Pretimer = millis();
           Charged = 1;
+          SOCcharged(2);
         }
         else
         {
@@ -442,6 +443,7 @@ void loop()
           contctrl = contctrl & 253;
           Pretimer = millis();
           Charged = 1;
+          SOCcharged(2);
         }
         else
         {
@@ -567,6 +569,14 @@ void loop()
           }
           if (bms.getHighCellVolt() > settings.ChargeVsetpoint)
           {
+            if (bms.getAvgCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
+            {
+              SOCcharged(2);
+            }
+            else
+            {
+              SOCcharged(1);
+            }
             digitalWrite(OUT3, LOW);//turn off charger
             bmsstatus = Ready;
           }
@@ -578,6 +588,11 @@ void loop()
 
         case (Error):
           Discharge = 0;
+          digitalWrite(OUT4, LOW);
+          digitalWrite(OUT3, LOW);//turn off charger
+          digitalWrite(OUT2, LOW);
+          digitalWrite(OUT1, LOW);//turn off discharge
+          contctrl = 0; //turn off out 5 and 6
           /*
                     if (digitalRead(IN3) == HIGH) //detect AC present for charging
                     {
@@ -640,7 +655,7 @@ void loop()
     }
     if (CSVdebug != 0)
     {
-      bms.printAllCSV();
+      bms.printAllCSV(millis(), currentact, SOC);
     }
     if (inputcheck != 0)
     {
@@ -1120,6 +1135,19 @@ void updateSOC()
     SERIALCONSOLE.print(ampsecond * 0.27777777777778, 2);
     SERIALCONSOLE.println ("mAh");
 
+  }
+}
+
+void SOCcharged(int y)
+{
+  if (y == 1)
+  {
+    SOC = 95;
+    ampsecond = (settings.CAP * settings.Pstrings * 1000) / 0.27777777777778 ; //reset to full, dependant on given capacity. Need to improve with auto correction for capcity.
+  }
+  if (y == 2)
+  {
+    SOC = 100;
   }
 }
 
