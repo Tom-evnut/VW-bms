@@ -20,8 +20,9 @@ BMSModule::BMSModule()
   lowestModuleVolt = 200.0f;
   highestModuleVolt = 0.0f;
   exists = false;
-    reset = false;
+  reset = false;
   moduleAddress = 0;
+  timeout = 30000; //milliseconds before comms timeout;
 }
 
 void BMSModule::clearmodule()
@@ -35,7 +36,7 @@ void BMSModule::clearmodule()
   temperatures[1] = 0.0f;
   temperatures[2] = 0.0f;
   exists = false;
-    reset = false;
+  reset = false;
   moduleAddress = 0;
 }
 
@@ -65,26 +66,110 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
   switch (Id)
   {
     case 0:
-      cellVolt[0] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
-      cellVolt[2] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001;
-
-      cellVolt[1] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001;
-      cellVolt[3] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001;
+      cmuerror = 0;
+      if (float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > 0)
+      {
+        cellVolt[0] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) > 0)
+      {
+        cellVolt[2] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) > 0)
+      {
+        cellVolt[1] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) > 0)
+      {
+        cellVolt[3] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
       break;
     case 1:
-      cellVolt[4] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
-      cellVolt[6] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001;
-
-      cellVolt[5] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001;
-      cellVolt[7] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001;
+      cmuerror = 0;
+      if (float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > 0)
+      {
+        cellVolt[4] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) > 0)
+      {
+        cellVolt[6] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) > 0)
+      {
+        cellVolt[5] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) > 0)
+      {
+        cellVolt[7] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
       break;
 
     case 2:
-      cellVolt[8] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
-      cellVolt[10] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001;
-
-      cellVolt[9] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001;
-      cellVolt[11] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001;
+      cmuerror = 0;
+      if (float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > 0)
+      {
+        cellVolt[8] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) > 0)
+      {
+        cellVolt[10] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) > 0)
+      {
+        cellVolt[9] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
+      if (float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) > 0)
+      {
+        cellVolt[11] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001;
+      }
+      else
+      {
+        cmuerror = 1;
+      }
       break;
 
     default:
@@ -98,6 +183,28 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
   {
     if (lowestCellVolt[i] > cellVolt[i] && cellVolt[i] >= IgnoreCell) lowestCellVolt[i] = cellVolt[i];
     if (highestCellVolt[i] < cellVolt[i] && cellVolt[i] > 5.0) highestCellVolt[i] = cellVolt[i];
+  }
+
+  if (cmuerror == 0)
+  {
+    lasterror = millis();
+  }
+  else
+  {
+    SERIALCONSOLE.println("  ");
+    SERIALCONSOLE.print("   Counter Till Can Error : ");
+    SERIALCONSOLE.println(lasterror + timeout - millis() );
+    if (millis() - lasterror > timeout)
+    {
+      for (int i = 0; i < 8; i++)
+      {
+        cellVolt[i] = 0.0f;
+      }
+      moduleVolt = 0.0f;
+      temperatures[0] = 0.0f;
+      temperatures[1] = 0.0f;
+      temperatures[2] = 0.0f;
+    }
   }
 }
 

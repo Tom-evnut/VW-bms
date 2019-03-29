@@ -59,4 +59,7 @@ class BMSModule
     uint8_t moduleAddress;     //1 to 0x3E
     int scells;
     int balstat;
+        uint32_t lasterror;
+    uint8_t cmuerror;
+    uint16_t timeout;
 };
