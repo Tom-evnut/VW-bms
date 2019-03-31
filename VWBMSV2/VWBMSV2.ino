@@ -375,105 +375,120 @@ void loop()
     contcon();
     if (settings.ESSmode == 1)
     {
-      contctrl = contctrl | 4; //turn on negative contactor
-
-
-      if (digitalRead(IN1) == LOW)//Key OFF
+      if (bmsstatus != Error)
       {
+        contctrl = contctrl | 4; //turn on negative contactor
+
+
+        if (digitalRead(IN1) == LOW)//Key OFF
+        {
+          if (storagemode == 1)
+          {
+            storagemode = 0;
+          }
+        }
+        else
+        {
+          if (storagemode == 0)
+          {
+            storagemode = 1;
+          }
+        }
+        if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
+        {
+          balancecells = 1;
+        }
+        else
+        {
+          balancecells = 0;
+        }
+
+        //Pretimer + settings.Pretime > millis();
+
         if (storagemode == 1)
         {
-          storagemode = 0;
-        }
-      }
-      else
-      {
-        if (storagemode == 0)
-        {
-          storagemode = 1;
-        }
-      }
-      if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
-      {
-        balancecells = 1;
-      }
-      else
-      {
-        balancecells = 0;
-      }
-
-      //Pretimer + settings.Pretime > millis();
-
-      if (storagemode == 1)
-      {
-        if (bms.getHighCellVolt() > settings.StoreVsetpoint)
-        {
-          digitalWrite(OUT3, LOW);//turn off charger
-          contctrl = contctrl & 253;
-          Pretimer = millis();
-          Charged = 1;
-          SOCcharged(2);
-        }
-        else
-        {
-          if (Charged == 1 && bms.getHighCellVolt() < (settings.StoreVsetpoint - settings.ChargeHys))
+          if (bms.getHighCellVolt() > settings.StoreVsetpoint)
           {
-            Charged = 0;
-            digitalWrite(OUT3, HIGH);//turn on charger
-            if (Pretimer + settings.Pretime < millis())
+            digitalWrite(OUT3, LOW);//turn off charger
+            contctrl = contctrl & 253;
+            Pretimer = millis();
+            Charged = 1;
+            SOCcharged(2);
+          }
+          else
+          {
+            if (Charged == 1 && bms.getHighCellVolt() < (settings.StoreVsetpoint - settings.ChargeHys))
             {
-              contctrl = contctrl | 2;
-              Pretimer = 0;
+              Charged = 0;
+              digitalWrite(OUT3, HIGH);//turn on charger
+              if (Pretimer + settings.Pretime < millis())
+              {
+                contctrl = contctrl | 2;
+                Pretimer = 0;
+              }
             }
           }
         }
-      }
-      else
-      {
-        if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
-        {
-          digitalWrite(OUT3, LOW);//turn off charger
-          contctrl = contctrl & 253;
-          Pretimer = millis();
-          Charged = 1;
-          SOCcharged(2);
-        }
         else
         {
-          if (Charged == 1 && bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
+          if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint)
           {
-            Charged = 0;
-            digitalWrite(OUT3, HIGH);//turn on charger
-            if (Pretimer + settings.Pretime < millis())
+            digitalWrite(OUT3, LOW);//turn off charger
+            contctrl = contctrl & 253;
+            Pretimer = millis();
+            Charged = 1;
+            SOCcharged(2);
+          }
+          else
+          {
+            if (Charged == 1 && bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
             {
-              // Serial.println();
-              //Serial.print(Pretimer);
-              contctrl = contctrl | 2;
+              Charged = 0;
+              digitalWrite(OUT3, HIGH);//turn on charger
+              if (Pretimer + settings.Pretime < millis())
+              {
+                // Serial.println();
+                //Serial.print(Pretimer);
+                contctrl = contctrl | 2;
+              }
             }
           }
         }
-      }
-      if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
-      {
-        digitalWrite(OUT1, LOW);//turn off discharge
-        contctrl = contctrl & 254;
-        Pretimer1 = millis();
+        if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
+        {
+          digitalWrite(OUT1, LOW);//turn off discharge
+          contctrl = contctrl & 254;
+          Pretimer1 = millis();
+        }
+        else
+        {
+          digitalWrite(OUT1, HIGH);//turn on discharge
+          if (Pretimer1 + settings.Pretime < millis())
+          {
+            contctrl = contctrl | 1;
+          }
+        }
+
+        if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() > settings.OverVSetpoint || bms.getAvgTemperature() > settings.OverTSetpoint)
+        {
+          digitalWrite(OUT2, HIGH);//trip breaker
+        }
+        else
+        {
+          digitalWrite(OUT2, LOW);//trip breaker
+        }
       }
       else
       {
-        digitalWrite(OUT1, HIGH);//turn on discharge
-        if (Pretimer1 + settings.Pretime < millis())
-        {
-          contctrl = contctrl | 1;
-        }
-      }
-
-      if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() > settings.OverVSetpoint || bms.getAvgTemperature() > settings.OverTSetpoint)
-      {
+        /*
         digitalWrite(OUT2, HIGH);//trip breaker
-      }
-      else
-      {
-        digitalWrite(OUT2, LOW);//trip breaker
+        Discharge = 0;
+        digitalWrite(OUT4, LOW);
+        digitalWrite(OUT3, LOW);//turn off charger
+        digitalWrite(OUT2, LOW);
+        digitalWrite(OUT1, LOW);//turn off discharge
+        contctrl = 0; //turn off out 5 and 6
+        */
       }
 
       //pwmcomms();
@@ -697,7 +712,7 @@ void loop()
 
     resetwdog();
   }
-  if (millis() - cleartime > 5000)
+  if (millis() - cleartime > 30000)
   {
     //bms.clearmodules(); // Not functional
     if (bms.checkcomms())
