@@ -329,6 +329,7 @@ void setup()
   EEPROM.get(0, settings);
   if (settings.version != EEPROM_VERSION)
   {
+    Serial.println();
     loadSettings();
   }
 
@@ -484,13 +485,13 @@ void loop()
       else
       {
         /*
-        digitalWrite(OUT2, HIGH);//trip breaker
-        Discharge = 0;
-        digitalWrite(OUT4, LOW);
-        digitalWrite(OUT3, LOW);//turn off charger
-        digitalWrite(OUT2, LOW);
-        digitalWrite(OUT1, LOW);//turn off discharge
-        contctrl = 0; //turn off out 5 and 6
+          digitalWrite(OUT2, HIGH);//trip breaker
+          Discharge = 0;
+          digitalWrite(OUT4, LOW);
+          digitalWrite(OUT3, LOW);//turn off charger
+          digitalWrite(OUT2, LOW);
+          digitalWrite(OUT1, LOW);//turn off discharge
+          contctrl = 0; //turn off out 5 and 6
         */
       }
 
