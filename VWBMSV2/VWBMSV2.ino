@@ -169,6 +169,7 @@ ADC *adc = new ADC(); // adc object
 void loadSettings()
 {
   Logger::console("Resetting to factory defaults");
+  settings.version = EEPROM_VERSION;
   settings.checksum = 2;
   settings.canSpeed = 500000;
   settings.batteryID = 0x01; //in the future should be 0xFF to force it to ask for an address
@@ -356,6 +357,8 @@ void setup()
   ///precharge timer kickers
   Pretimer = millis();
   Pretimer1  = millis();
+
+  cleartime = millis();
 }
 
 void loop()
