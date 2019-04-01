@@ -693,7 +693,7 @@ void loop()
     VEcan();
 
     sendcommand();
-    if (cellspresent == 0)
+    if (cellspresent == 0 && SOCset == 1)
     {
       cellspresent = bms.seriescells();//set amount of connected cells, might need delay
     }
