@@ -956,7 +956,38 @@ void printbmsstat()
   SERIALCONSOLE.print(digitalRead(OUT3));
   SERIALCONSOLE.print(digitalRead(OUT4));
   SERIALCONSOLE.print(" Cont:");
-  SERIALCONSOLE.print(contstat, BIN);
+  if ((contstat & 1) == 1)
+  {
+    SERIALCONSOLE.print("1");
+  }
+  else
+  {
+    SERIALCONSOLE.print("0");
+  }
+  if ((contstat & 2) == 2)
+  {
+    SERIALCONSOLE.print("1");
+  }
+  else
+  {
+    SERIALCONSOLE.print("0");
+  }
+  if ((contstat & 4) == 4)
+  {
+    SERIALCONSOLE.print("1");
+  }
+  else
+  {
+    SERIALCONSOLE.print("0");
+  }
+  if ((contstat & 8) == 8)
+  {
+    SERIALCONSOLE.print("1");
+  }
+  else
+  {
+    SERIALCONSOLE.print("0");
+  }
   SERIALCONSOLE.print(" In:");
   SERIALCONSOLE.print(digitalRead(IN1));
   SERIALCONSOLE.print(digitalRead(IN2));
