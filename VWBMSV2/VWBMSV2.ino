@@ -445,9 +445,22 @@ void loop()
           }
           else
           {
-            if (Charged == 1 && bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
+            if (Charged == 1)
             {
-              Charged = 0;
+              if (bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys))
+              {
+                Charged = 0;
+                digitalWrite(OUT3, HIGH);//turn on charger
+                if (Pretimer + settings.Pretime < millis())
+                {
+                  // Serial.println();
+                  //Serial.print(Pretimer);
+                  contctrl = contctrl | 2;
+                }
+              }
+            }
+            else
+            {
               digitalWrite(OUT3, HIGH);//turn on charger
               if (Pretimer + settings.Pretime < millis())
               {
