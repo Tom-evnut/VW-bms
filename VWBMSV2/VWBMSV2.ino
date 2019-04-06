@@ -241,13 +241,21 @@ void setup()
   pinMode(IN3, INPUT);
   pinMode(IN4, INPUT);
   pinMode(OUT1, OUTPUT); // drive contactor
+  digitalWrite(OUT1, LOW);
   pinMode(OUT2, OUTPUT); // precharge
+  digitalWrite(OUT2, LOW);
   pinMode(OUT3, OUTPUT); // charge relay
+  digitalWrite(OUT3, LOW);
   pinMode(OUT4, OUTPUT); // Negative contactor
+  digitalWrite(OUT4, LOW);
   pinMode(OUT5, OUTPUT); // pwm driver output
+  digitalWrite(OUT5, LOW);
   pinMode(OUT6, OUTPUT); // pwm driver output
+  digitalWrite(OUT6, LOW);
   pinMode(OUT7, OUTPUT); // pwm driver output
+  digitalWrite(OUT7, LOW);
   pinMode(OUT8, OUTPUT); // pwm driver output
+  digitalWrite(OUT8, LOW);
   pinMode(led, OUTPUT);
 
   analogWriteFrequency(OUT5, pwmfreq);
