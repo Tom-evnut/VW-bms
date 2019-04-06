@@ -67,7 +67,7 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
   {
     case 0:
       cmuerror = 0;
-      if (float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > 0 && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) < cellVolt[0] + VoltDelta && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > cellVolt[0] - VoltDelta)
+      if (float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > 0 && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) < cellVolt[0] + VoltDelta && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > cellVolt[0] - VoltDelta || cellVolt[0] == 0)
       {
         cellVolt[0] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
       }
@@ -75,7 +75,7 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
       {
         cmuerror = 1;
       }
-      if (float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) > 0 && float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) <  cellVolt[2] + VoltDelta && float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) > cellVolt[2] - VoltDelta)
+      if (float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) > 0 && float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) <  cellVolt[2] + VoltDelta && float((uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001) > cellVolt[2] - VoltDelta|| cellVolt[2] == 0)
       {
         cellVolt[2] = (uint16_t(msg.buf[5] << 4) + uint16_t(msg.buf[4] >> 4) + 1000) * 0.001;
       }
@@ -83,7 +83,7 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
       {
         cmuerror = 1;
       }
-      if (float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) > 0 && float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) < cellVolt[1] + VoltDelta && float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) > cellVolt[1] - VoltDelta)
+      if (float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) > 0 && float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) < cellVolt[1] + VoltDelta && float((msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001) > cellVolt[1] - VoltDelta|| cellVolt[1] == 0)
       {
         cellVolt[1] = (msg.buf[3] + uint16_t((msg.buf[4] & 0x0F) << 8) + 1000) * 0.001;
       }
@@ -91,7 +91,7 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
       {
         cmuerror = 1;
       }
-      if (float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) > 0 && float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) < cellVolt[3] + VoltDelta && float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) > cellVolt[3] - VoltDelta)
+      if (float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) > 0 && float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) < cellVolt[3] + VoltDelta && float((msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001) > cellVolt[3] - VoltDelta|| cellVolt[3] == 0)
       {
         cellVolt[3] = (msg.buf[6] + uint16_t((msg.buf[7] & 0x0F) << 8) + 1000) * 0.001;
       }
