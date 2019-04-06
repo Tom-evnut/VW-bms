@@ -515,15 +515,6 @@ void loop()
         {
           digitalWrite(OUT2, LOW);//trip breaker
         }
-        if (bms.seriescells() < 2)
-        {
-          Discharge = 0;
-          digitalWrite(OUT4, LOW);
-          digitalWrite(OUT3, LOW);//turn off charger
-          digitalWrite(OUT2, LOW);
-          digitalWrite(OUT1, LOW);//turn off discharge
-          contctrl = 0; //turn off out 5 and 6
-        }
       }
       else
       {
@@ -537,7 +528,15 @@ void loop()
           contctrl = 0; //turn off out 5 and 6
         */
       }
-
+      if (bms.seriescells() < 2)
+      {
+        Discharge = 0;
+        digitalWrite(OUT4, LOW);
+        digitalWrite(OUT3, LOW);//turn off charger
+        digitalWrite(OUT2, LOW);
+        digitalWrite(OUT1, LOW);//turn off discharge
+        contctrl = 0; //turn off out 5 and 6
+      }
       //pwmcomms();
     }
     else
