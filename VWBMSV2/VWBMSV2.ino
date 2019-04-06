@@ -352,7 +352,7 @@ void setup()
   bms.findBoards();
   digitalWrite(led, HIGH);
   bms.setPstrings(settings.Pstrings);
-  bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
+  bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
 
   ////Calculate fixed numbers
   pwmcurmin = (pwmcurmid / 50 * pwmcurmax * -1);
@@ -514,6 +514,15 @@ void loop()
         else
         {
           digitalWrite(OUT2, LOW);//trip breaker
+        }
+        if (bms.seriescells() < 2)
+        {
+          Discharge = 0;
+          digitalWrite(OUT4, LOW);
+          digitalWrite(OUT3, LOW);//turn off charger
+          digitalWrite(OUT2, LOW);
+          digitalWrite(OUT1, LOW);//turn off discharge
+          contctrl = 0; //turn off out 5 and 6
         }
       }
       else
@@ -1183,7 +1192,7 @@ void updateSOC()
   {
     if (millis() > 9000)
     {
-      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
+      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
     }
     if (millis() > 10000)
     {
@@ -1842,7 +1851,7 @@ void menu()
         {
           settings.IgnoreTemp = 0;
         }
-        bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
+        bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
         menuload = 1;
         incomingByte = 'i';
         break;
@@ -1852,18 +1861,18 @@ void menu()
         {
           settings.IgnoreVolt = Serial.parseInt();
           settings.IgnoreVolt = settings.IgnoreVolt * 0.001;
-          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
+          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
           // Serial.println(settings.IgnoreVolt);
           menuload = 1;
           incomingByte = 'i';
         }
         break;
-     case '3':
+      case '3':
         if (Serial.available() > 0)
         {
           settings.DeltaVolt = Serial.parseInt();
           settings.DeltaVolt = settings.DeltaVolt * 0.001;
-          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
+          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
           // Serial.println(settings.IgnoreVolt);
           menuload = 1;
           incomingByte = 'i';
@@ -2296,7 +2305,7 @@ void menu()
         SERIALCONSOLE.print(settings.IgnoreVolt * 1000, 0);
         SERIALCONSOLE.println("mV");
         SERIALCONSOLE.print("3 - Allowed Difference Between Measurments:");
-        SERIALCONSOLE.print(settings.DeltaVolt * 1000, 0);     
+        SERIALCONSOLE.print(settings.DeltaVolt * 1000, 0);
         SERIALCONSOLE.println("mV");
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 8;
