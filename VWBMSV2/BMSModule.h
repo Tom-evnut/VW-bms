@@ -36,6 +36,7 @@ class BMSModule
     void setExists(bool ex);
     void settempsensor(int tempsensor);
     void setIgnoreCell(float Ignore);
+    void setDelta(float ex);
     
     
   private:
@@ -49,6 +50,7 @@ class BMSModule
     float lowestModuleVolt;
     float highestModuleVolt;
     float IgnoreCell;
+    float VoltDelta;
     bool exists;
     bool reset;
     int alerts;
@@ -62,4 +64,5 @@ class BMSModule
         uint32_t lasterror;
     uint8_t cmuerror;
     uint16_t timeout;
+    
 };

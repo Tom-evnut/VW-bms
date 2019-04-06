@@ -221,6 +221,7 @@ void loadSettings()
   settings.UnderDur = 5000; //ms of allowed undervoltage before throwing open stopping discharge.
   settings.CurDead = 5;// mV of dead band on current sensor
   settings.ChargerDirect = 1; //1 - charger is always connected to HV battery // 0 - Charger is behind the contactors
+  settings.DeltaVolt = 0.1; //V of allowable difference between measurements
 }
 
 CAN_message_t msg;
@@ -343,7 +344,7 @@ void setup()
   bms.findBoards();
   digitalWrite(led, HIGH);
   bms.setPstrings(settings.Pstrings);
-  bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+  bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
 
   ////Calculate fixed numbers
   pwmcurmin = (pwmcurmid / 50 * pwmcurmax * -1);
@@ -1174,7 +1175,7 @@ void updateSOC()
   {
     if (millis() > 9000)
     {
-      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
     }
     if (millis() > 10000)
     {
@@ -1833,7 +1834,7 @@ void menu()
         {
           settings.IgnoreTemp = 0;
         }
-        bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+        bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
         menuload = 1;
         incomingByte = 'i';
         break;
@@ -1843,7 +1844,18 @@ void menu()
         {
           settings.IgnoreVolt = Serial.parseInt();
           settings.IgnoreVolt = settings.IgnoreVolt * 0.001;
-          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt);
+          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
+          // Serial.println(settings.IgnoreVolt);
+          menuload = 1;
+          incomingByte = 'i';
+        }
+        break;
+     case '3':
+        if (Serial.available() > 0)
+        {
+          settings.DeltaVolt = Serial.parseInt();
+          settings.DeltaVolt = settings.DeltaVolt * 0.001;
+          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt,settings.DeltaVolt);
           // Serial.println(settings.IgnoreVolt);
           menuload = 1;
           incomingByte = 'i';
@@ -1851,7 +1863,6 @@ void menu()
         break;
 
       case 113: //q to go back to main menu
-
         menuload = 0;
         incomingByte = 115;
         break;
@@ -2275,6 +2286,9 @@ void menu()
         SERIALCONSOLE.println(settings.IgnoreTemp);
         SERIALCONSOLE.print("2 - Voltage Under Which To Ignore Cells:");
         SERIALCONSOLE.print(settings.IgnoreVolt * 1000, 0);
+        SERIALCONSOLE.println("mV");
+        SERIALCONSOLE.print("3 - Allowed Difference Between Measurments:");
+        SERIALCONSOLE.print(settings.DeltaVolt * 1000, 0);     
         SERIALCONSOLE.println("mV");
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 8;

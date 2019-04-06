@@ -62,6 +62,7 @@ typedef struct {
   float IgnoreVolt;
   float balanceVoltage;
   float balanceHyst;
+  float DeltaVolt;
   int Scells;
   int Pstrings;
   int CAP;

@@ -229,7 +229,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 18;
       Id = 2;
       break;
-      
+
     case (0x1F8):
       CMU = 19;
       Id = 0;
@@ -242,7 +242,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 19;
       Id = 2;
       break;
-      
+
     case (0x1FC):
       CMU = 20;
       Id = 0;
@@ -732,7 +732,7 @@ void BMSModuleManager::setPstrings(int Pstrings)
   Pstring = Pstrings;
 }
 
-void BMSModuleManager::setSensors(int sensor, float Ignore)
+void BMSModuleManager::setSensors(int sensor, float Ignore, float VoltDelta)
 {
   for (int x = 1; x <= MAX_MODULE_ADDR; x++)
   {
@@ -740,6 +740,7 @@ void BMSModuleManager::setSensors(int sensor, float Ignore)
     {
       modules[x].settempsensor(sensor);
       modules[x].setIgnoreCell(Ignore);
+      modules[x].setDelta(VoltDelta);
     }
   }
 }
@@ -923,8 +924,8 @@ void BMSModuleManager::printPackDetails(int digits)
   Logger::console("");
   Logger::console("");
   Logger::console("");
-Logger::console("Modules: %i Cells: %i Strings: %i  Voltage: %fV   Avg Cell Voltage: %fV  Low Cell Voltage: %fV   High Cell Voltage: %fV Delta Voltage: %zmV   Avg Temp: %fC ", numFoundModules, seriescells(),
-                  Pstring, getPackVoltage(), getAvgCellVolt(), LowCellVolt, HighCellVolt, (HighCellVolt-LowCellVolt)*1000, getAvgTemperature());
+  Logger::console("Modules: %i Cells: %i Strings: %i  Voltage: %fV   Avg Cell Voltage: %fV  Low Cell Voltage: %fV   High Cell Voltage: %fV Delta Voltage: %zmV   Avg Temp: %fC ", numFoundModules, seriescells(),
+                  Pstring, getPackVoltage(), getAvgCellVolt(), LowCellVolt, HighCellVolt, (HighCellVolt - LowCellVolt) * 1000, getAvgTemperature());
   Logger::console("");
   for (int y = 1; y < 63; y++)
   {
@@ -939,7 +940,7 @@ Logger::console("Modules: %i Cells: %i Strings: %i  Voltage: %fV   Avg Cell Volt
       SERIALCONSOLE.print(y);
       if (y < 10) SERIALCONSOLE.print(" ");
       SERIALCONSOLE.print("  ");
-      SERIALCONSOLE.print(modules[y].getModuleVoltage(),digits);
+      SERIALCONSOLE.print(modules[y].getModuleVoltage(), digits);
       SERIALCONSOLE.print("V");
       for (int i = 0; i < 12; i++)
       {
@@ -947,7 +948,7 @@ Logger::console("Modules: %i Cells: %i Strings: %i  Voltage: %fV   Avg Cell Volt
         SERIALCONSOLE.print("  Cell");
         SERIALCONSOLE.print(cellNum++);
         SERIALCONSOLE.print(": ");
-        SERIALCONSOLE.print(modules[y].getCellVoltage(i),digits);
+        SERIALCONSOLE.print(modules[y].getCellVoltage(i), digits);
         SERIALCONSOLE.print("V");
       }
       SERIALCONSOLE.println();
