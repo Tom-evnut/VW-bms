@@ -196,7 +196,9 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
       if (lasterror + timeout - millis() < 5000)
       {
         SERIALCONSOLE.println("  ");
-        SERIALCONSOLE.print("   Counter Till Can Error : ");
+        SERIALCONSOLE.print("Module");
+        SERIALCONSOLE.print(moduleAddress);
+        SERIALCONSOLE.print("Counter Till Can Error : ");
         SERIALCONSOLE.println(lasterror + timeout - millis() );
       }
     }

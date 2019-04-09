@@ -36,6 +36,7 @@ bool BMSModuleManager::checkcomms()
       }
     }
     modules[y].setReset(false);
+    modules[y].setAddress(y);
   }
   if ( g == 0)
   {
