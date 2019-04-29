@@ -18,7 +18,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 190409;
+int firmver = 190428;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -65,6 +65,8 @@ byte bmsstatus = 0;
 #define ChevyVolt 2
 #define Eltek 3
 #define Elcon 4
+#define Victron 5
+#define Coda 6
 //
 
 int Discharge;
@@ -94,7 +96,7 @@ uint16_t SOH = 100; // SOH place holder
 unsigned char alarm[4], warning[4] = {0, 0, 0, 0};
 unsigned char mes[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 unsigned char bmsname[8] = {'S', 'I', 'M', 'P', ' ', 'B', 'M', 'S'};
-unsigned char bmsmanu[8] = {'T', 'O', 'M', ' ', 'D', 'E', ' ', 'B'};
+unsigned char bmsmanu[8] = {'S', 'I', 'M', 'P', ' ', 'E', 'C', 'O'};
 long unsigned int rxId;
 unsigned char len = 0;
 byte rxBuf[8];
@@ -268,14 +270,14 @@ void setup()
   //set filters for standard
   for (int i = 0; i < 8; i++)
   {
-    Can0.getFilter(filter, i);
+    //Can0.getFilter(filter, i);
     filter.flags.extended = 0;
     Can0.setFilter(filter, i);
   }
   //set filters for extended
   for (int i = 9; i < 13; i++)
   {
-    Can0.getFilter(filter, i);
+    //Can0.getFilter(filter, i);
     filter.flags.extended = 1;
     Can0.setFilter(filter, i);
   }
@@ -1866,19 +1868,9 @@ void menu()
           incomingByte = 'i';
         }
         break;
-      case '3':
-        if (Serial.available() > 0)
-        {
-          settings.DeltaVolt = Serial.parseInt();
-          settings.DeltaVolt = settings.DeltaVolt * 0.001;
-          bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
-          // Serial.println(settings.IgnoreVolt);
-          menuload = 1;
-          incomingByte = 'i';
-        }
-        break;
 
       case 113: //q to go back to main menu
+
         menuload = 0;
         incomingByte = 115;
         break;
@@ -1990,7 +1982,7 @@ void menu()
 
       case '5': //1 Over Voltage Setpoint
         settings.chargertype = settings.chargertype + 1;
-        if (settings.chargertype > 5)
+        if (settings.chargertype > 6)
         {
           settings.chargertype = 0;
         }
@@ -2303,9 +2295,6 @@ void menu()
         SERIALCONSOLE.print("2 - Voltage Under Which To Ignore Cells:");
         SERIALCONSOLE.print(settings.IgnoreVolt * 1000, 0);
         SERIALCONSOLE.println("mV");
-        SERIALCONSOLE.print("3 - Allowed Difference Between Measurments:");
-        SERIALCONSOLE.print(settings.DeltaVolt * 1000, 0);
-        SERIALCONSOLE.println("mV");
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 8;
         break;
@@ -2355,6 +2344,9 @@ void menu()
             break;
           case 5:
             SERIALCONSOLE.print("Victron/SMA");
+            break;
+                      case 6:
+            SERIALCONSOLE.print("Coda");
             break;
         }
         SERIALCONSOLE.println();
