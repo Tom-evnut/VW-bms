@@ -3133,6 +3133,7 @@ void Serialslaveinit()
   */
 }
 
+
 void chargercomms()
 {
   if (settings.chargertype == Elcon)
@@ -3251,4 +3252,36 @@ void chargercomms()
     }
     Can0.write(msg);
   }
+
+  if (settings.chargertype == Coda)
+  {
+    msg.id  = 0x050;
+    msg.len = 8;
+    msg.buf[0] = 0x00;
+    msg.buf[1] = 0xDC;
+    if ((settings.ChargeVsetpoint * settings.Scells ) > 200)
+    {
+      msg.buf[2] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+      msg.buf[3] = lowByte(uint16_t((settings.ChargeVsetpoint * settings.Scells ) * 10));
+    }
+    else
+    {
+      msg.buf[2] = highByte( 400);
+      msg.buf[3] = lowByte( 400);
+    }
+    msg.buf[4] = 0x00;
+    if ((settings.ChargeVsetpoint * settings.Scells)*chargecurrent < 3300)
+    {
+      msg.buf[5] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells) * chargecurrent) / 240));
+      msg.buf[6] = highByte(uint16_t(((settings.ChargeVsetpoint * settings.Scells) * chargecurrent) / 240));
+    }
+    else //15 A AC limit
+    {
+      msg.buf[5] = 0x00;
+      msg.buf[6] = 0x96;
+    }
+    msg.buf[7] = 0x01; //HV charging
+    Can0.write(msg);
+  }
 }
+////////END///////////
