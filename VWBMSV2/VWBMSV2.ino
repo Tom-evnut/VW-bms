@@ -9,7 +9,7 @@
   the following conditions:
   The above copyright notice and this permission notice shall be included
   in all copies or substantial portions of the Software.
-
+  
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 190511;
+int firmver = 190428;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -244,8 +244,6 @@ void loadSettings()
   settings.CurDead = 5;// mV of dead band on current sensor
   settings.ChargerDirect = 1; //1 - charger is always connected to HV battery // 0 - Charger is behind the contactors
   settings.DeltaVolt = 0.1; //V of allowable difference between measurements
-  settings.LockedBatt = 0; //Lock out if a none recoverable error occured
-  settings.LockVolt = 2.5; // Voltage under which the battery gets locked out.
 }
 
 CAN_message_t msg;
@@ -318,7 +316,7 @@ void setup()
   SERIALCONSOLE.println("Starting up!");
   SERIALCONSOLE.println("SimpBMS V2 VW");
 
-  Serial2.begin(115200);
+   Serial2.begin(115200);
 
   // Display reason the Teensy was last reset
   Serial.println();
@@ -409,7 +407,7 @@ void loop()
     menu();
   }
 
-  if (outputcheck != 1 && settings.LockedBatt != 1)
+  if (outputcheck != 1)
   {
     contcon();
     if (settings.ESSmode == 1)
@@ -696,18 +694,6 @@ void loop()
     }
   }
 
-  if (settings.LockedBatt == 1) // battery locked down no more outputs allowed
-  {
-    digitalWrite(OUT1, LOW);
-    digitalWrite(OUT2, LOW);
-    digitalWrite(OUT3, LOW);
-    digitalWrite(OUT4, LOW);
-    analogWrite(OUT5, 0);
-    analogWrite(OUT6, 0);
-    analogWrite(OUT7, 0);
-    analogWrite(OUT8, 0);
-  }
-
   if (millis() - looptime > 500)
   {
     looptime = millis();
@@ -735,11 +721,6 @@ void loop()
         {
           bmsstatus = Error;
           ErrorReason = 2;
-
-          if (bms.getLowCellVolt() < settings.LockVolt)
-          {
-            settings.LockedBatt = 1;
-          }
         }
       }
       else
@@ -799,8 +780,6 @@ void loop()
     {
       dashupdate();
     }
-
-
 
     resetwdog();
   }
@@ -937,37 +916,49 @@ void printbmsstat()
   SERIALCONSOLE.println();
   SERIALCONSOLE.println();
   SERIALCONSOLE.print("BMS Status : ");
-  if (settings.LockedBatt != 1)
+  if (settings.ESSmode == 1)
   {
-    if (settings.ESSmode == 1)
-    {
-      SERIALCONSOLE.print("ESS Mode ");
+    SERIALCONSOLE.print("ESS Mode ");
 
-      if (bms.getLowCellVolt() < settings.UnderVSetpoint)
+    if (bms.getLowCellVolt() < settings.UnderVSetpoint)
+    {
+      SERIALCONSOLE.print(": UnderVoltage ");
+    }
+    if (bms.getHighCellVolt() > settings.OverVSetpoint)
+    {
+      SERIALCONSOLE.print(": OverVoltage ");
+    }
+    if ((bms.getHighCellVolt() - bms.getLowCellVolt()) > settings.CellGap)
+    {
+      SERIALCONSOLE.print(": Cell Imbalance ");
+    }
+    if (bms.getAvgTemperature() > settings.OverTSetpoint)
+    {
+      SERIALCONSOLE.print(": Over Temp ");
+    }
+    if (bms.getAvgTemperature() < settings.UnderTSetpoint)
+    {
+      SERIALCONSOLE.print(": Under Temp ");
+    }
+    if (storagemode == 1)
+    {
+      if (bms.getLowCellVolt() > settings.StoreVsetpoint)
       {
-        SERIALCONSOLE.print(": UnderVoltage ");
+        SERIALCONSOLE.print(": OverVoltage Storage ");
+        SERIALCONSOLE.print(": UNhappy:");
       }
-      if (bms.getHighCellVolt() > settings.OverVSetpoint)
+      else
       {
-        SERIALCONSOLE.print(": OverVoltage ");
+        SERIALCONSOLE.print(": Happy ");
       }
-      if ((bms.getHighCellVolt() - bms.getLowCellVolt()) > settings.CellGap)
+    }
+    else
+    {
+      if (bms.getLowCellVolt() > settings.UnderVSetpoint && bms.getHighCellVolt() < settings.OverVSetpoint)
       {
-        SERIALCONSOLE.print(": Cell Imbalance ");
-      }
-      if (bms.getAvgTemperature() > settings.OverTSetpoint)
-      {
-        SERIALCONSOLE.print(": Over Temp ");
-      }
-      if (bms.getAvgTemperature() < settings.UnderTSetpoint)
-      {
-        SERIALCONSOLE.print(": Under Temp ");
-      }
-      if (storagemode == 1)
-      {
-        if (bms.getLowCellVolt() > settings.StoreVsetpoint)
+
+        if ( bmsstatus == Error)
         {
-          SERIALCONSOLE.print(": OverVoltage Storage ");
           SERIALCONSOLE.print(": UNhappy:");
         }
         else
@@ -975,58 +966,37 @@ void printbmsstat()
           SERIALCONSOLE.print(": Happy ");
         }
       }
-      else
-      {
-        if (bms.getLowCellVolt() > settings.UnderVSetpoint && bms.getHighCellVolt() < settings.OverVSetpoint)
-        {
-
-          if ( bmsstatus == Error)
-          {
-            SERIALCONSOLE.print(": UNhappy:");
-          }
-          else
-          {
-            SERIALCONSOLE.print(": Happy ");
-          }
-        }
-      }
-    }
-    else
-    {
-      SERIALCONSOLE.print(bmsstatus);
-      switch (bmsstatus)
-      {
-        case (Boot):
-          SERIALCONSOLE.print(" Boot ");
-          break;
-
-        case (Ready):
-          SERIALCONSOLE.print(" Ready ");
-          break;
-
-        case (Precharge):
-          SERIALCONSOLE.print(" Precharge ");
-          break;
-
-        case (Drive):
-          SERIALCONSOLE.print(" Drive ");
-          break;
-
-        case (Charge):
-          SERIALCONSOLE.print(" Charge ");
-          break;
-
-        case (Error):
-          SERIALCONSOLE.print(" Error ");
-          break;
-      }
     }
   }
   else
   {
-    SERIALCONSOLE.print("  ");
-    SERIALCONSOLE.print("Battery Locked Service Required");
-    SERIALCONSOLE.print("  ");
+    SERIALCONSOLE.print(bmsstatus);
+    switch (bmsstatus)
+    {
+      case (Boot):
+        SERIALCONSOLE.print(" Boot ");
+        break;
+
+      case (Ready):
+        SERIALCONSOLE.print(" Ready ");
+        break;
+
+      case (Precharge):
+        SERIALCONSOLE.print(" Precharge ");
+        break;
+
+      case (Drive):
+        SERIALCONSOLE.print(" Drive ");
+        break;
+
+      case (Charge):
+        SERIALCONSOLE.print(" Charge ");
+        break;
+
+      case (Error):
+        SERIALCONSOLE.print(" Error ");
+        break;
+    }
   }
   SERIALCONSOLE.print("  ");
   if (digitalRead(IN3) == HIGH)
@@ -2319,22 +2289,6 @@ void menu()
         }
         break;
 
-      case 'x':
-        settings.LockedBatt = 0;
-        menuload = 1;
-        incomingByte = 'b';
-        break;
-
-      case 'y': //5 Balance Voltage Setpoint
-        if (Serial.available() > 0)
-        {
-          settings.LockVolt = Serial.parseInt();
-          settings.LockVolt = settings.LockVolt / 1000;
-          menuload = 1;
-          incomingByte = 'b';
-        }
-        break;
-
     }
   }
 
@@ -2411,7 +2365,7 @@ void menu()
           case 5:
             SERIALCONSOLE.print("Victron/SMA");
             break;
-          case 6:
+                      case 6:
             SERIALCONSOLE.print("Coda");
             break;
         }
@@ -2668,14 +2622,6 @@ void menu()
         SERIALCONSOLE.print(settings.DisTaper * 1000, 0 );
         SERIALCONSOLE.print("mV");
         SERIALCONSOLE.println("  ");
-        SERIALCONSOLE.print("y - Battery Lock Out Voltage: ");
-        SERIALCONSOLE.print(settings.LockVolt * 1000, 0  );
-        SERIALCONSOLE.print("mV");
-        SERIALCONSOLE.println("  ");
-        SERIALCONSOLE.print("x - Battery Lock Out Active: ");
-        SERIALCONSOLE.print(settings.LockedBatt);
-        SERIALCONSOLE.println("  ");
-
 
         SERIALCONSOLE.println();
         menuload = 3;
