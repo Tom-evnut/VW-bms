@@ -652,6 +652,7 @@ void BMSModuleManager::wakeBoards()
 void BMSModuleManager::getAllVoltTemp()
 {
   packVolt = 0.0f;
+
   for (int x = 1; x <= MAX_MODULE_ADDR; x++)
   {
     if (modules[x].isExisting())
@@ -749,6 +750,8 @@ void BMSModuleManager::setSensors(int sensor, float Ignore, float VoltDelta)
 float BMSModuleManager::getAvgTemperature()
 {
   float avg = 0.0f;
+  lowTemp = 999.0f;
+  highTemp = -999.0f;
   int y = 0; //counter for modules below -70 (no sensors connected)
   numFoundModules = 0;
   for (int x = 1; x <= MAX_MODULE_ADDR; x++)
@@ -759,13 +762,13 @@ float BMSModuleManager::getAvgTemperature()
       if (modules[x].getAvgTemp() > -70)
       {
         avg += modules[x].getAvgTemp();
-        if (modules[x].getAvgTemp() > highTemp)
+        if (modules[x].getHighTemp() > highTemp)
         {
-          highTemp = modules[x].getAvgTemp();
+          highTemp = modules[x].getHighTemp();
         }
-        if (modules[x].getAvgTemp() < lowTemp)
+        if (modules[x].getLowTemp() < lowTemp)
         {
-          lowTemp = modules[x].getAvgTemp();
+          lowTemp = modules[x].getLowTemp();
         }
       }
       else
