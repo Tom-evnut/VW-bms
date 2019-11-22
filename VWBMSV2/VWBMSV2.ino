@@ -9,7 +9,7 @@
   the following conditions:
   The above copyright notice and this permission notice shall be included
   in all copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 190428;
+int firmver = 190528;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -316,7 +316,7 @@ void setup()
   SERIALCONSOLE.println("Starting up!");
   SERIALCONSOLE.println("SimpBMS V2 VW");
 
-   Serial2.begin(115200);
+  Serial2.begin(115200);
 
   // Display reason the Teensy was last reset
   Serial.println();
@@ -757,16 +757,14 @@ void loop()
     VEcan();
 
     sendcommand();
-    if (cellspresent == 0)
+    if (cellspresent == 0 && SOCset == 1)
     {
-      if (SOCset == 1)
-      {
-        cellspresent = bms.seriescells();//set amount of connected cells, might need delay
-      }
+      cellspresent = bms.seriescells();
+      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
     }
     else
     {
-      if (cellspresent != bms.seriescells()) //detect a fault in cells detected
+      if (cellspresent != bms.seriescells() || cellspresent != (settings.Scells * settings.Pstrings)) //detect a fault in cells detected
       {
         SERIALCONSOLE.println("  ");
         SERIALCONSOLE.print("   !!! Series Cells Fault !!!");
@@ -838,12 +836,12 @@ void alarmupdate()
   {
     alarm[0] |= 0x10;
   }
-  if (bms.getAvgTemperature() > settings.OverTSetpoint)
+  if (bms.getHighTemperature() > settings.OverTSetpoint)
   {
     alarm[0] |= 0x40;
   }
   alarm[1] = 0;
-  if (bms.getAvgTemperature() < settings.UnderTSetpoint)
+  if (bms.getLowTemperature() < settings.UnderTSetpoint)
   {
     alarm[1] = 0x01;
   }
@@ -865,12 +863,12 @@ void alarmupdate()
     warning[0] |= 0x10;
   }
 
-  if (bms.getAvgTemperature() > (settings.OverTSetpoint - settings.WarnToff))
+  if (bms.getHighTemperature() > (settings.OverTSetpoint - settings.WarnToff))
   {
     warning[0] |= 0x40;
   }
   warning[1] = 0;
-  if (bms.getAvgTemperature() < (settings.UnderTSetpoint + settings.WarnToff))
+  if (bms.getLowTemperature() < (settings.UnderTSetpoint + settings.WarnToff))
   {
     warning[1] = 0x01;
   }
@@ -1212,10 +1210,6 @@ void updateSOC()
 {
   if (SOCset == 0)
   {
-    if (millis() > 9000)
-    {
-      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
-    }
     if (millis() > 10000)
     {
       SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
@@ -1479,20 +1473,8 @@ void VEcan() //communication with Victron system over CAN
   msg.buf[3] = highByte(chargecurrent);
   msg.buf[4] = lowByte(discurrent );
   msg.buf[5] = highByte(discurrent);
-  msg.buf[6] = lowByte(uint16_t((settings.DischVsetpoint *  settings.Scells) * 10));
-  msg.buf[7] = highByte(uint16_t((settings.DischVsetpoint *  settings.Scells) * 10));
-  if (bmsstatus == Error)
-  {
-    msg.buf[2] = 0x00;
-    msg.buf[3] = 0x00;
-    msg.buf[4] = 0x00;
-    msg.buf[5] = 0x00;
-    alarm[2] = 0xF0;
-  }
-  else
-  {
-    alarm[2] = 0x00;
-  }
+  msg.buf[6] = lowByte(uint16_t((settings.DischVsetpoint * settings.Scells) * 10));
+  msg.buf[7] = highByte(uint16_t((settings.DischVsetpoint * settings.Scells) * 10));
   Can0.write(msg);
 
   msg.id  = 0x355;
@@ -1513,8 +1495,8 @@ void VEcan() //communication with Victron system over CAN
   msg.buf[1] = highByte(uint16_t(bms.getPackVoltage() * 100));
   msg.buf[2] = lowByte(long(currentact / 100));
   msg.buf[3] = highByte(long(currentact / 100));
-  msg.buf[4] = lowByte(uint16_t(bms.getAvgTemperature() * 10));
-  msg.buf[5] = highByte(uint16_t(bms.getAvgTemperature() * 10));
+  msg.buf[4] = lowByte(int16_t(bms.getAvgTemperature() * 10));
+  msg.buf[5] = highByte(int16_t(bms.getAvgTemperature() * 10));
   msg.buf[6] = 0;
   msg.buf[7] = 0;
   Can0.write(msg);
@@ -1526,10 +1508,10 @@ void VEcan() //communication with Victron system over CAN
   msg.buf[1] = alarm[1]; // High Discharge Current | Low Temperature
   msg.buf[2] = alarm[2]; //Internal Failure | High Charge current
   msg.buf[3] = alarm[3];// Cell Imbalance
-  msg.buf[4] = warning[0];
-  msg.buf[5] = warning[1];
-  msg.buf[6] = warning[2];
-  msg.buf[7] = warning[3];
+  msg.buf[4] = warning[0];//High temp  Low Voltage | High Voltage
+  msg.buf[5] = warning[1];// High Discharge Current | Low Temperature
+  msg.buf[6] = warning[2];//Internal Failure | High Charge current
+  msg.buf[7] = warning[3];// Cell Imbalance
   Can0.write(msg);
 
   msg.id  = 0x35E;
@@ -1565,13 +1547,13 @@ void VEcan() //communication with Victron system over CAN
       msg.len = 8;
       if (bms.getLowCellVolt() < settings.balanceVoltage)
       {
-        msg.buf[0] = lowByte(uint16_t(settings.balanceVoltage * 1000));
-        msg.buf[1] = highByte(uint16_t(settings.balanceVoltage * 1000));
+        msg.buf[0] = highByte(uint16_t(settings.balanceVoltage * 1000));
+        msg.buf[1] = lowByte(uint16_t(settings.balanceVoltage * 1000));
       }
       else
       {
-        msg.buf[0] = lowByte(uint16_t(bms.getLowCellVolt() * 1000));
-        msg.buf[1] = highByte(uint16_t(bms.getLowCellVolt() * 1000));
+        msg.buf[0] = highByte(uint16_t(bms.getLowCellVolt() * 1000));
+        msg.buf[1] = lowByte(uint16_t(bms.getLowCellVolt() * 1000));
       }
       msg.buf[2] =  0x01;
       msg.buf[3] =  0x04;
@@ -2366,7 +2348,7 @@ void menu()
           case 5:
             SERIALCONSOLE.print("Victron/SMA");
             break;
-                      case 6:
+          case 6:
             SERIALCONSOLE.print("Coda");
             break;
         }
@@ -2748,93 +2730,106 @@ void currentlimit()
     discurrent = 0;
     chargecurrent = 0;
   }
+  /*
+    settings.PulseCh = 600; //Peak Charge current in 0.1A
+    settings.PulseChDur = 5000; //Ms of discharge pulse derating
+    settings.PulseDi = 600; //Peak Charge current in 0.1A
+    settings.PulseDiDur = 5000; //Ms of discharge pulse derating
+  */
   else
   {
-    ///////////temperature based current limit////////////
-    if (bms.getAvgTemperature() < settings.UnderTSetpoint)
+
+    ///Start at no derating///
+    discurrent = settings.discurrentmax;
+    chargecurrent = settings.chargecurrentmax;
+
+
+    ///////All hard limits to into zeros
+    if (bms.getLowTemperature() < settings.UnderTSetpoint)
+    {
+      //discurrent = 0; Request Daniel
+      chargecurrent = 0;
+    }
+    if (bms.getHighTemperature() > settings.OverTSetpoint)
     {
       discurrent = 0;
       chargecurrent = 0;
     }
-    else
+    if (bms.getHighCellVolt() > settings.OverVSetpoint)
     {
-      if (bms.getAvgTemperature() < settings.ChargeTSetpoint)
-      {
-        discurrent = settings.discurrentmax;
-        chargecurrent = map(bms.getAvgTemperature(), settings.UnderTSetpoint, settings.ChargeTSetpoint, 0, settings.chargecurrentmax);
-      }
-      else
-      {
-        if (bms.getAvgTemperature() < settings.DisTSetpoint)
-        {
-          discurrent = settings.discurrentmax;
-          chargecurrent = settings.chargecurrentmax;
-        }
-        else
-        {
-          if (bms.getAvgTemperature() < settings.OverTSetpoint)
-          {
-            discurrent = map(bms.getAvgTemperature(), settings.DisTSetpoint, settings.OverTSetpoint, settings.discurrentmax, 0);
-            chargecurrent = settings.chargecurrentmax;
-          }
-          else
-          {
-            discurrent = 0;
-            chargecurrent = 0;
-          }
-        }
-      }
+      chargecurrent = 0;
     }
-    ///voltage influence on current///
-    if (storagemode == 1)
+    if (bms.getHighCellVolt() > settings.OverVSetpoint)
     {
-      if (bms.getHighCellVolt() > (settings.StoreVsetpoint - settings.ChargeHys))
-      {
-        chargecurrent = map(bms.getHighCellVolt(), (settings.StoreVsetpoint - settings.ChargeHys), settings.StoreVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
-      }
-      if (bms.getHighCellVolt() > settings.OverVSetpoint)
-      {
-        chargecurrent = 0;
-      }
+      chargecurrent = 0;
     }
-    else
-    {
-      if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
-      {
-        chargecurrent = map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentmax, settings.chargecurrentend);
-      }
-      if (bms.getHighCellVolt() > settings.OverVSetpoint)
-      {
-        chargecurrent = 0;
-      }
-    }
-
     if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getLowCellVolt() < settings.DischVsetpoint)
     {
       discurrent = 0;
     }
-    else
+
+
+    //Modifying discharge current///
+
+    if (discurrent > 0)
     {
-      if (bms.getLowCellVolt() > (settings.DischVsetpoint + settings.DisTaper))
+      //Temperature based///
+
+      if (bms.getLowTemperature() > settings.DisTSetpoint)
       {
-        discurrent = settings.discurrentmax;
+        discurrent = discurrent - map(bms.getLowTemperature(), settings.DisTSetpoint, settings.OverTSetpoint, 0, settings.discurrentmax);
+      }
+      //Voltagee based///
+      if (bms.getLowCellVolt() > settings.UnderVSetpoint || bms.getLowCellVolt() > settings.DischVsetpoint)
+      {
+        if (bms.getLowCellVolt() < (settings.DischVsetpoint + settings.DisTaper))
+        {
+          discurrent = discurrent - map(bms.getLowCellVolt(), settings.DischVsetpoint, (settings.DischVsetpoint + settings.DisTaper), settings.chargecurrentmax, 0);
+        }
+      }
+
+    }
+
+    //Modifying Charge current///
+    if (chargecurrent > 0)
+    {
+      //Temperature based///
+      if (bms.getHighTemperature() < settings.ChargeTSetpoint)
+      {
+        chargecurrent = chargecurrent - map(bms.getHighTemperature(), settings.UnderTSetpoint, settings.ChargeTSetpoint, settings.chargecurrentmax, 0);
+      }
+      //Voltagee based///
+      if (storagemode == 1)
+      {
+        if (bms.getHighCellVolt() > (settings.StoreVsetpoint - settings.ChargeHys))
+        {
+          chargecurrent = chargecurrent - map(bms.getHighCellVolt(), (settings.StoreVsetpoint - settings.ChargeHys), settings.StoreVsetpoint, settings.chargecurrentend, settings.chargecurrentmax);
+        }
       }
       else
       {
-        discurrent = map(bms.getLowCellVolt(), settings.DischVsetpoint, (settings.DischVsetpoint + settings.DisTaper), 0, settings.chargecurrentmax);
+        if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
+        {
+          chargecurrent = chargecurrent - map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentend, settings.chargecurrentmax);
+        }
       }
     }
-    ///No negative currents///
-    if (discurrent < 0)
-    {
-      discurrent = 0;
-    }
-    if (chargecurrent < 0)
-    {
-      chargecurrent = 0;
-    }
+
+  }
+  ///No negative currents///
+
+  if (discurrent < 0)
+  {
+    discurrent = 0;
+  }
+  if (chargecurrent < 0)
+  {
+    chargecurrent = 0;
   }
 }
+
+
+
 void inputdebug()
 {
   Serial.println();
