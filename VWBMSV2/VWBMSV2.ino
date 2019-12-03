@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 191122;
+int firmver = 191203;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -531,33 +531,41 @@ void loop()
           }
         }
 
-        if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() > settings.OverVSetpoint || bms.getAvgTemperature() > settings.OverTSetpoint)
+
+        if (SOCset == 1)
         {
-          digitalWrite(OUT2, HIGH);//trip breaker
-        }
-        else
-        {
-          digitalWrite(OUT2, LOW);//trip breaker
+          if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighTemperature() > settings.OverTSetpoint)
+          {
+            digitalWrite(OUT2, HIGH);//trip breaker
+          }
+          else
+          {
+            digitalWrite(OUT2, LOW);//trip breaker
+          }
         }
       }
       else
       {
-        digitalWrite(OUT2, HIGH);//trip breaker
-        Discharge = 0;
-        digitalWrite(OUT4, LOW);
-        digitalWrite(OUT3, LOW);//turn off charger
-        digitalWrite(OUT2, LOW);
-        digitalWrite(OUT1, LOW);//turn off discharge
-        contctrl = 0; //turn off out 5 and 6
-      }
-      if (bms.seriescells() < 2)
-      {
-        Discharge = 0;
-        digitalWrite(OUT4, LOW);
-        digitalWrite(OUT3, LOW);//turn off charger
-        digitalWrite(OUT2, LOW);
-        digitalWrite(OUT1, LOW);//turn off discharge
-        contctrl = 0; //turn off out 5 and 6
+        /*
+          digitalWrite(OUT2, HIGH);//trip breaker
+          Discharge = 0;
+          digitalWrite(OUT4, LOW);
+          digitalWrite(OUT3, LOW);//turn off charger
+          digitalWrite(OUT2, LOW);
+          digitalWrite(OUT1, LOW);//turn off discharge
+          contctrl = 0; //turn off out 5 and 6
+        */
+        if (SOCset == 1)
+        {
+          if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighTemperature() > settings.OverTSetpoint)
+          {
+            digitalWrite(OUT2, HIGH);//trip breaker
+          }
+          else
+          {
+            digitalWrite(OUT2, LOW);//trip breaker
+          }
+        }
       }
       //pwmcomms();
     }
