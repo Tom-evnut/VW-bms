@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 191203;
+int firmver = 191206;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -713,9 +713,12 @@ void loop()
       {
         if (bms.getLowCellVolt() < settings.UnderVSetpoint || bms.getHighCellVolt() < settings.UnderVSetpoint)
         {
-          SERIALCONSOLE.println("  ");
-          SERIALCONSOLE.print("   !!! Undervoltage Fault !!!");
-          SERIALCONSOLE.println("  ");
+          if (debug != 0)
+          {
+            SERIALCONSOLE.println("  ");
+            SERIALCONSOLE.print("   !!! Undervoltage Fault !!!");
+            SERIALCONSOLE.println("  ");
+          }
           bmsstatus = Error;
           ErrorReason = 1;
         }
@@ -774,9 +777,12 @@ void loop()
     {
       if (cellspresent != bms.seriescells() || cellspresent != (settings.Scells * settings.Pstrings)) //detect a fault in cells detected
       {
-        SERIALCONSOLE.println("  ");
-        SERIALCONSOLE.print("   !!! Series Cells Fault !!!");
-        SERIALCONSOLE.println("  ");
+        if (debug != 0)
+        {
+          SERIALCONSOLE.println("  ");
+          SERIALCONSOLE.print("   !!! Series Cells Fault !!!");
+          SERIALCONSOLE.println("  ");
+        }
         bmsstatus = Error;
         ErrorReason = 3;
       }
@@ -808,9 +814,12 @@ void loop()
     else
     {
       //missing module
-      SERIALCONSOLE.println("  ");
-      SERIALCONSOLE.print("   !!! MODULE MISSING !!!");
-      SERIALCONSOLE.println("  ");
+      if (debug != 0)
+      {
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.print("   !!! MODULE MISSING !!!");
+        SERIALCONSOLE.println("  ");
+      }
       bmsstatus = Error;
       ErrorReason = 4;
     }
@@ -1224,8 +1233,11 @@ void updateSOC()
 
       ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778 ;
       SOCset = 1;
-      SERIALCONSOLE.println("  ");
-      SERIALCONSOLE.println("//////////////////////////////////////// SOC SET ////////////////////////////////////////");
+      if (debug != 0)
+      {
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.println("//////////////////////////////////////// SOC SET ////////////////////////////////////////");
+      }
     }
   }
   if (settings.voltsoc == 1)
@@ -1290,7 +1302,7 @@ void SOCcharged(int y)
   if (y == 2)
   {
     SOC = 100;
-     ampsecond = (settings.CAP * settings.Pstrings * 1000) / 0.27777777777778 ; //reset to full, dependant on given capacity. Need to improve with auto correction for capcity.
+    ampsecond = (settings.CAP * settings.Pstrings * 1000) / 0.27777777777778 ; //reset to full, dependant on given capacity. Need to improve with auto correction for capcity.
   }
 }
 
