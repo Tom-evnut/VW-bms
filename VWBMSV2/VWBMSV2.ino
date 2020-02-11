@@ -232,6 +232,7 @@ void loadSettings()
   settings.Precurrent = 1000; //ma before closing main contator
   settings.convhigh = 58; // mV/A current sensor high range channel
   settings.convlow = 643; // mV/A current sensor low range channel
+  settings.changecur = 20000;//mA change overpoint
   settings.offset1 = 1750; //mV mid point of channel 1
   settings.offset2 = 1750;//mV mid point of channel 2
   settings.gaugelow = 50; //empty fuel gauge pwm
@@ -1081,7 +1082,7 @@ void getcurrent()
   {
     if ( settings.cursens == Analoguedual)
     {
-      if (currentact < 19000 && currentact > -19000)
+      if (currentact < settings.changecur && currentact > (settings.changecur * -1))
       {
         sensor = 1;
         adc->startContinuous(ACUR1, ADC_0);
@@ -1119,7 +1120,7 @@ void getcurrent()
         SERIALCONSOLE.print(" ");
         SERIALCONSOLE.print(settings.offset1);
       }
-      RawCur = int16_t((value * 3300 / adc->getMaxValue(ADC_0)) - settings.offset1) / (settings.convlow * 0.0001);
+      RawCur = int16_t((value * 3300 / adc->getMaxValue(ADC_0)) - settings.offset1) / (settings.convlow * 0.00001);
 
       if (abs((int16_t(value * 3300 / adc->getMaxValue(ADC_0)) - settings.offset1)) <  settings.CurDead)
       {
@@ -1150,7 +1151,7 @@ void getcurrent()
         SERIALCONSOLE.print("  ");
         SERIALCONSOLE.print(settings.offset2);
       }
-      RawCur = int16_t((value * 3300 / adc->getMaxValue(ADC_0)) - settings.offset2) / (settings.convhigh * 0.0001);
+      RawCur = int16_t((value * 3300 / adc->getMaxValue(ADC_0)) - settings.offset2) / (settings.convhigh * 0.00001);
       if (value < 100 || value > (adc->getMaxValue(ADC_0) - 100))
       {
         RawCur = 0;
@@ -1166,6 +1167,7 @@ void getcurrent()
       }
     }
   }
+
   if (settings.invertcur == 1)
   {
     RawCur = RawCur * -1;
@@ -1175,9 +1177,18 @@ void getcurrent()
   if (debugCur != 0)
   {
     SERIALCONSOLE.print(lowpassFilter.output());
+    SERIALCONSOLE.print(" | ");
+    SERIALCONSOLE.print(settings.changecur);
+    SERIALCONSOLE.print(" | ");
   }
 
   currentact = lowpassFilter.output();
+
+  if (debugCur != 0)
+  {
+    SERIALCONSOLE.print(currentact);
+    SERIALCONSOLE.print("mA  ");
+  }
 
   if ( settings.cursens == Analoguedual)
   {
@@ -1195,7 +1206,7 @@ void getcurrent()
     }
     if (sensor == 2)
     {
-      if (currentact > 180000 || currentact < -18000 )
+      if (currentact > settings.changecur || currentact < (settings.changecur * -1) )
       {
         ampsecond = ampsecond + ((currentact * (millis() - lasttime) / 1000) / 1000);
         lasttime = millis();
@@ -1227,19 +1238,24 @@ void updateSOC()
 {
   if (SOCset == 0)
   {
-    if (millis() > 10000)
+    SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
+    if (debug != 0)
     {
-      SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
-
-      ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778 ;
-      SOCset = 1;
-      if (debug != 0)
-      {
-        SERIALCONSOLE.println("  ");
-        SERIALCONSOLE.println("//////////////////////////////////////// SOC SET ////////////////////////////////////////");
-      }
+      SERIALCONSOLE.print("  ");
+      SERIALCONSOLE.print(SOC);
+      SERIALCONSOLE.print("  ");
     }
+    ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778 ;
+    SOCset = 1;
   }
+  /*
+    if (settings.cursens == 1)
+    {
+    SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
+
+    ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778 ;
+    }
+  */
   if (settings.voltsoc == 1)
   {
     SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
@@ -1820,6 +1836,16 @@ void menu()
         {
           settings.CurDead = Serial.parseInt();
         }
+        incomingByte = 'c';
+        break;
+
+  case '8':
+        menuload = 1;
+        if (Serial.available() > 0)
+        {
+          settings.changecur = Serial.parseInt();
+        }
+        menuload = 1;
         incomingByte = 'c';
         break;
 
@@ -2540,6 +2566,13 @@ void menu()
           SERIALCONSOLE.print(settings.CurDead);
           SERIALCONSOLE.println(" mV");
         }
+                if ( settings.cursens == Analoguedual)
+        {
+
+          SERIALCONSOLE.print("8 - Current Channel ChangeOver:");
+          SERIALCONSOLE.print(settings.changecur * 0.001);
+          SERIALCONSOLE.println(" A");
+        }
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 2;
         break;
@@ -2663,7 +2696,7 @@ void canread()
 {
   Can0.read(inMsg);
   // Read data: len = data length, buf = data byte(s)
-  if (inMsg.id == 0x3c)
+  if (inMsg.id == 0x3c2)
   {
     CAB300();
   }

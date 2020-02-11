@@ -75,6 +75,7 @@ typedef struct {
   int voltsoc;
   uint16_t offset1;
   uint16_t offset2;
+    int32_t changecur;
   float convhigh;
   float convlow;
   int Pretime;
