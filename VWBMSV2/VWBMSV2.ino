@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 191206;
+int firmver = 200213;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -434,7 +434,7 @@ void loop()
         }
         if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
         {
-          balancecells = 1;
+          //balancecells = 1;
         }
         else
         {
@@ -594,7 +594,7 @@ void loop()
           if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
           {
             //bms.balanceCells();
-            balancecells = 1;
+            //balancecells = 1;
           }
           else
           {
@@ -645,7 +645,7 @@ void loop()
           if (bms.getHighCellVolt() > settings.balanceVoltage)
           {
             //bms.balanceCells();
-            balancecells = 1;
+            //balancecells = 1;
           }
           else
           {
@@ -1238,25 +1238,20 @@ void updateSOC()
 {
   if (SOCset == 0)
   {
-    SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
-    if (debug != 0)
+    if (millis() > 10000)
     {
-      SERIALCONSOLE.print("  ");
-      SERIALCONSOLE.print(SOC);
-      SERIALCONSOLE.print("  ");
-    }
-    ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778 ;
-    SOCset = 1;
-  }
-  /*
-    if (settings.cursens == 1)
-    {
-    SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
+      SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
 
-    ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778 ;
+      ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778 ;
+      SOCset = 1;
+      if (debug != 0)
+      {
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.println("//////////////////////////////////////// SOC SET ////////////////////////////////////////");
+      }
     }
-  */
-  if (settings.voltsoc == 1)
+  }
+  if (settings.voltsoc == 1 || settings.cursens == 0)
   {
     SOC = map(uint16_t(bms.getAvgCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
 
@@ -1303,8 +1298,7 @@ void updateSOC()
     SERIALCONSOLE.print(SOC);
     SERIALCONSOLE.print("% SOC ");
     SERIALCONSOLE.print(ampsecond * 0.27777777777778, 2);
-    SERIALCONSOLE.println ("mAh");
-
+    SERIALCONSOLE.print ("mAh");
   }
 }
 
@@ -1839,7 +1833,7 @@ void menu()
         incomingByte = 'c';
         break;
 
-  case '8':
+      case '8':
         menuload = 1;
         if (Serial.available() > 0)
         {
@@ -2566,7 +2560,7 @@ void menu()
           SERIALCONSOLE.print(settings.CurDead);
           SERIALCONSOLE.println(" mV");
         }
-                if ( settings.cursens == Analoguedual)
+        if ( settings.cursens == Analoguedual)
         {
 
           SERIALCONSOLE.print("8 - Current Channel ChangeOver:");
@@ -2685,7 +2679,6 @@ void menu()
     SERIALCONSOLE.println("k - Contactor and Gauge Settings");
     SERIALCONSOLE.println("i - Ignore Value Settings");
     SERIALCONSOLE.println("d - Debug Settings");
-    SERIALCONSOLE.println("R - Restart BMS");
     SERIALCONSOLE.println("q - exit menu");
     debug = 0;
     menuload = 1;
