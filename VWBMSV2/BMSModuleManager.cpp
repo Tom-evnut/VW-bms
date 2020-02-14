@@ -100,6 +100,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
   int CMU, Id = 0;
   switch (msg.id)
   {
+    /*
     ///////////////// Two extender increment//////////
     case (0x210):
       CMU = 25;
@@ -310,6 +311,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       break;
 
     ///////////////// one extender increment//////////
+    
     case (0x1D0):
       CMU = 9;
       Id = 0;
@@ -412,8 +414,9 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       Id = 2;
       break;
 
-
+*/
     ///////////////////////standard ids////////////////
+    
 
     case (0x1B0):
       CMU = 1;
