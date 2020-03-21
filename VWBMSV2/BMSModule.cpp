@@ -138,7 +138,7 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
 
     case 2:
       cmuerror = 0;
-if (float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > 0 && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) < cellVolt[8] + VoltDelta && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > cellVolt[8] - VoltDelta || cellVolt[8] == 0)
+      if (float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > 0 && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) < cellVolt[8] + VoltDelta && float((uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001) > cellVolt[8] - VoltDelta || cellVolt[8] == 0)
       {
         cellVolt[8] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
       }
@@ -322,35 +322,49 @@ float BMSModule::getLowestTemp()
 
 float BMSModule::getLowTemp()
 {
-  if (getAvgTemp() > 0.5)
+  if (sensor == 0)
   {
-    if (temperatures[0] > 0.5)
+    if (getAvgTemp() > 0.5)
     {
-      if (temperatures[0] < temperatures[1] && temperatures[0] < temperatures[2])
+      if (temperatures[0] > 0.5)
       {
-        return (temperatures[0]);
+        if (temperatures[0] < temperatures[1] && temperatures[0] < temperatures[2])
+        {
+          return (temperatures[0]);
+        }
+      }
+      if (temperatures[1] > 0.5)
+      {
+        if (temperatures[1] < temperatures[0] && temperatures[1] < temperatures[2])
+        {
+          return (temperatures[1]);
+        }
+      }
+      if (temperatures[2] > 0.5)
+      {
+        if (temperatures[2] < temperatures[1] && temperatures[2] < temperatures[0])
+        {
+          return (temperatures[2]);
+        }
       }
     }
-    if (temperatures[1] > 0.5)
-    {
-      if (temperatures[1] < temperatures[0] && temperatures[1] < temperatures[2])
-      {
-        return (temperatures[1]);
-      }
-    }
-    if (temperatures[2] > 0.5)
-    {
-      if (temperatures[2] < temperatures[1] && temperatures[2] < temperatures[0])
-      {
-        return (temperatures[2]);
-      }
-    }
+  }
+  else
+  {
+    return temperatures[sensor - 1];
   }
 }
 
 float BMSModule::getHighTemp()
 {
-  return (temperatures[0] < temperatures[1]) ? temperatures[1] : temperatures[0];
+  if (sensor == 0)
+  {
+    return (temperatures[0] < temperatures[1]) ? temperatures[1] : temperatures[0];
+  }
+  else
+  {
+    return temperatures[sensor - 1];
+  }
 }
 
 float BMSModule::getAvgTemp()
