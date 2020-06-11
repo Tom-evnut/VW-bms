@@ -92,4 +92,7 @@ typedef struct {
   uint16_t CurDead;
   float DisTaper;
   bool ChargerDirect;
+  uint8_t tripcont;
+  uint16_t triptime;
+  float DischHys;
 } EEPROMSettings;
