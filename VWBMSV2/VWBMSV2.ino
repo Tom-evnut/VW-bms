@@ -2296,6 +2296,25 @@ case '4':
         }
         break;
 
+      case 'k': //Discharge Voltage hysteresis
+        if (Serial.available() > 0)
+        {
+          settings.DischHys = Serial.parseInt();
+          settings.DischHys  = settings.DischHys  / 1000;
+          menuload = 1;
+          incomingByte = 'b';
+        }
+        break;
+        
+      case 'j':
+        if (Serial.available() > 0)
+        {
+          settings.DisTSetpoint = Serial.parseInt();
+          menuload = 1;
+          incomingByte = 'b';
+        }
+        break;
+
       case '9': //Discharge Voltage Setpoint
         if (Serial.available() > 0)
         {

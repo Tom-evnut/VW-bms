@@ -74,13 +74,9 @@ void BMSModuleManager::clearmodules()
 void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
 {
   int CMU = (msg.id & 0xFF);
-  if (CMU > 32 && CMU < 41)
+  if (CMU > 32 && CMU < 60)
   {
-    CMU = CMU - 24;
-  }
-    if (CMU > 9 && CMU < 18)
-  {
-    CMU = CMU - 9;
+    CMU = (CMU*0.5)-15;
   }
   /*
   if (CMU > 64 && CMU < 73)
@@ -317,7 +313,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       break;
 */
     ///////////////// one extender increment//////////
-  /*  
+   
     case (0x1D0):
       CMU = 9;
       Id = 0;
@@ -330,7 +326,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 9;
       Id = 2;
       break;
-         case (0x1D2):
+         case (0x1D3):
       CMU = 9;
       Id = 3;
       break;
@@ -424,7 +420,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       Id = 2;
       break;
 
-*/
+
     ///////////////////////standard ids////////////////
     
 
