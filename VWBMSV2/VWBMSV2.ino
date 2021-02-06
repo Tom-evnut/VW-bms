@@ -25,7 +25,7 @@
 #include "Logger.h"
 #include <ADC.h> //https://github.com/pedvide/ADC
 #include <EEPROM.h>
-#include <FlexCAN.h> https://github.com/collin80/FlexCAN_Library
+#include <FlexCAN.h> //https://github.com/collin80/FlexCAN_Library
 #include <SPI.h>
 #include <Filters.h>//https://github.com/JonHub/Filters
 #include "BMSUtil.h"
@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 180820;
+int firmver = 210206;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -369,14 +369,9 @@ void setup()
     loadSettings();
   }
 
-  bms.renumberBoardIDs();
-
   Logger::setLoglevel(Logger::Off); //Debug = 0, Info = 1, Warn = 2, Error = 3, Off = 4
 
   lastUpdate = 0;
-
-  //bms.clearFaults();
-  bms.findBoards();
   digitalWrite(led, HIGH);
   bms.setPstrings(settings.Pstrings);
   bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
@@ -2827,6 +2822,7 @@ void canread()
       bms.decodetemp(inMsg, 0);
     }
   }
+  
   if (candebug == 1)
   {
     Serial.print(millis());

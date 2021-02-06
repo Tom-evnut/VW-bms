@@ -5,7 +5,7 @@
 
 BMSModule::BMSModule()
 {
-  for (int i = 0; i < 12; i++)
+  for (int i = 0; i < 13; i++)
   {
     cellVolt[i] = 0.0f;
     lowestCellVolt[i] = 5.0f;
@@ -27,7 +27,7 @@ BMSModule::BMSModule()
 
 void BMSModule::clearmodule()
 {
-  for (int i = 0; i < 12; i++)
+  for (int i = 0; i < 13; i++)
   {
     cellVolt[i] = 0.0f;
   }
@@ -43,7 +43,7 @@ void BMSModule::clearmodule()
 void BMSModule::decodetemp(CAN_message_t &msg)
 {
   temperatures[0] = (msg.buf[0] * 0.5) - 43;
-  if (msg.buf[4] = ! 0xFE)
+  if (msg.buf[4] < 0xF0)
   {
     temperatures[1] = (msg.buf[4] * 0.5) - 43;
   }
@@ -51,7 +51,7 @@ void BMSModule::decodetemp(CAN_message_t &msg)
   {
     temperatures[1] = 0;
   }
-  if (msg.buf[5] = ! 0xFE)
+  if (msg.buf[5] < 0xF0)
   {
     temperatures[2] = (msg.buf[5] * 0.5) - 43;
   }
@@ -193,14 +193,19 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
       */
       break;
 
-    default:
-
+ case 3:
+      cmuerror = 0;
+      cellVolt[12] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
       break;
+
+    default:
+break;
+
   }
   if (getLowTemp() < lowestTemperature) lowestTemperature = getLowTemp();
   if (getHighTemp() > highestTemperature) highestTemperature = getHighTemp();
 
-  for (int i = 0; i < 12; i++)
+  for (int i = 0; i < 13; i++)
   {
     if (lowestCellVolt[i] > cellVolt[i] && cellVolt[i] >= IgnoreCell) lowestCellVolt[i] = cellVolt[i];
     if (highestCellVolt[i] < cellVolt[i] && cellVolt[i] > 5.0) highestCellVolt[i] = cellVolt[i];
@@ -264,21 +269,21 @@ uint8_t BMSModule::getCUVCells()
 
 float BMSModule::getCellVoltage(int cell)
 {
-  if (cell < 0 || cell > 12) return 0.0f;
+  if (cell < 0 || cell > 13) return 0.0f;
   return cellVolt[cell];
 }
 
 float BMSModule::getLowCellV()
 {
   float lowVal = 10.0f;
-  for (int i = 0; i < 12; i++) if (cellVolt[i] < lowVal && cellVolt[i] > IgnoreCell) lowVal = cellVolt[i];
+  for (int i = 0; i < 13; i++) if (cellVolt[i] < lowVal && cellVolt[i] > IgnoreCell) lowVal = cellVolt[i];
   return lowVal;
 }
 
 float BMSModule::getHighCellV()
 {
   float hiVal = 0.0f;
-  for (int i = 0; i < 12; i++)
+  for (int i = 0; i < 13; i++)
     if (cellVolt[i] > IgnoreCell && cellVolt[i] < 5.0)
     {
       if (cellVolt[i] > hiVal) hiVal = cellVolt[i];
@@ -290,7 +295,7 @@ float BMSModule::getAverageV()
 {
   int x = 0;
   float avgVal = 0.0f;
-  for (int i = 0; i < 12; i++)
+  for (int i = 0; i < 13; i++)
   {
     if (cellVolt[i] > IgnoreCell && cellVolt[i] < 5.0)
     {
@@ -321,13 +326,13 @@ float BMSModule::getLowestModuleVolt()
 
 float BMSModule::getHighestCellVolt(int cell)
 {
-  if (cell < 0 || cell > 12) return 0.0f;
+  if (cell < 0 || cell > 13) return 0.0f;
   return highestCellVolt[cell];
 }
 
 float BMSModule::getLowestCellVolt(int cell)
 {
-  if (cell < 0 || cell > 12) return 0.0f;
+  if (cell < 0 || cell > 13) return 0.0f;
   return lowestCellVolt[cell];
 }
 
@@ -437,7 +442,7 @@ float BMSModule::getAvgTemp()
 float BMSModule::getModuleVoltage()
 {
   moduleVolt = 0;
-  for (int I; I < 12; I++)
+  for (int I; I < 13; I++)
   {
     if (cellVolt[I] > IgnoreCell && cellVolt[I] < 5.0)
     {

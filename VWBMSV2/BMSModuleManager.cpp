@@ -78,6 +78,7 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
   {
     CMU = CMU - 24;
   }
+  /*
   if (CMU > 64 && CMU < 73)
   {
     CMU = CMU - 48;
@@ -86,6 +87,7 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
   {
     CMU = CMU - 72;
   }
+  */
   modules[CMU].decodetemp(msg);
   if (debug == 1 && CMU > 0)
   {
@@ -311,7 +313,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       break;
 */
     ///////////////// one extender increment//////////
-    
+  /*  
     case (0x1D0):
       CMU = 9;
       Id = 0;
@@ -323,6 +325,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
     case (0x1D2):
       CMU = 9;
       Id = 2;
+      break;
+         case (0x1D2):
+      CMU = 9;
+      Id = 3;
       break;
 
     case (0x1D4):
@@ -414,7 +420,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       Id = 2;
       break;
 
-
+*/
     ///////////////////////standard ids////////////////
     
 
@@ -430,6 +436,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 1;
       Id = 2;
       break;
+          case (0x1B3):
+      CMU = 1;
+      Id = 3;
+      break;
 
     case (0x1B4):
       CMU = 2;
@@ -442,6 +452,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
     case (0x1B6):
       CMU = 2;
       Id = 2;
+      break;
+    case (0x1B7):
+      CMU = 2;
+      Id = 3;
       break;
 
     case (0x1B8):
@@ -456,7 +470,11 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 3;
       Id = 2;
       break;
-
+    case (0x1BB):
+      CMU = 3;
+      Id = 3;
+      break;
+      
     case (0x1BC):
       CMU = 4;
       Id = 0;
@@ -468,6 +486,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
     case (0x1BE):
       CMU = 4;
       Id = 2;
+      break;
+    case (0x1BF):
+      CMU = 4;
+      Id = 3;
       break;
 
     case (0x1C0):
@@ -482,6 +504,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 5;
       Id = 2;
       break;
+    case (0x1C3):
+      CMU = 5;
+      Id = 3;
+      break;
 
     case (0x1C4):
       CMU = 6;
@@ -494,6 +520,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
     case (0x1C6):
       CMU = 6;
       Id = 2;
+      break;
+    case (0x1C7):
+      CMU = 6;
+      Id = 3;
       break;
 
     case (0x1C8):
@@ -508,6 +538,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 7;
       Id = 2;
       break;
+    case (0x1CB):
+      CMU = 7;
+      Id = 3;
+      break;
 
     case (0x1CC):
       CMU = 8;
@@ -520,6 +554,10 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
     case (0x1CE):
       CMU = 8;
       Id = 2;
+      break;
+    case (0x1CF):
+      CMU = 8;
+      Id = 3;
       break;
 
     default:
@@ -542,115 +580,6 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
   }
 }
 
-void BMSModuleManager::balanceCells()
-{
-  /*
-    uint8_t payload[4];
-    uint8_t buff[30];
-    uint8_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
-
-    for (int address = 1; address <= MAX_MODULE_ADDR; address++)
-    {
-        balance = 0;
-        for (int i = 0; i < 6; i++)
-        {
-            if (getLowCellVolt() < modules[address].getCellVoltage(i))
-            {
-                balance = balance | (1<<i);
-            }
-        }
-
-        if (balance != 0) //only send balance command when needed
-        {
-            payload[0] = address << 1;
-            payload[1] = REG_BAL_TIME;
-            payload[2] = 0x05; //5 second balance limit, if not triggered to balance it will stop after 5 seconds
-            BMSUtil::sendData(payload, 3, true);
-            delay(2);
-            BMSUtil::getReply(buff, 30);
-
-            payload[0] = address << 1;
-            payload[1] = REG_BAL_CTRL;
-            payload[2] = balance; //write balance state to register
-            BMSUtil::sendData(payload, 3, true);
-            delay(2);
-            BMSUtil::getReply(buff, 30);
-
-            if (Logger::isDebug()) //read registers back out to check if everthing is good
-            {
-                delay(50);
-                payload[0] = address << 1;
-                payload[1] = REG_BAL_TIME;
-                payload[2] = 1; //
-                BMSUtil::sendData(payload, 3, false);
-                delay(2);
-                BMSUtil::getReply(buff, 30);
-
-                payload[0] = address << 1;
-                payload[1] = REG_BAL_CTRL;
-                payload[2] = 1; //
-                BMSUtil::sendData(payload, 3, false);
-                delay(2);
-                BMSUtil::getReply(buff, 30);
-            }
-        }
-    }
-  */
-}
-
-/*
-   Try to set up any unitialized boards. Send a command to address 0 and see if there is a response. If there is then there is
-   still at least one unitialized board. Go ahead and give it the first ID not registered as already taken.
-   If we send a command to address 0 and no one responds then every board is inialized and this routine stops.
-   Don't run this routine until after the boards have already been enumerated.\
-   Note: The 0x80 conversion it is looking might in theory block the message from being forwarded so it might be required
-   To do all of this differently. Try with multiple boards. The alternative method would be to try to set the next unused
-   address and see if any boards respond back saying that they set the address.
-*/
-void BMSModuleManager::setupBoards()
-{
-
-}
-/*
-   Iterate through all 62 possible board addresses (1-62) to see if they respond
-*/
-void BMSModuleManager::findBoards()
-{
-}
-
-
-/*
-   Force all modules to reset back to address 0 then set them all up in order so that the first module
-   in line from the master board is 1, the second one 2, and so on.
-*/
-void BMSModuleManager::renumberBoardIDs()
-{
-
-}
-
-/*
-  After a RESET boards have their faults written due to the hard restart or first time power up, this clears thier faults
-*/
-void BMSModuleManager::clearFaults()
-{
-}
-
-/*
-  Puts all boards on the bus into a Sleep state, very good to use when the vehicle is a rest state.
-  Pulling the boards out of sleep only to check voltage decay and temperature when the contactors are open.
-*/
-
-void BMSModuleManager::sleepBoards()
-{
-}
-
-/*
-  Wakes all the boards up and clears thier SLEEP state bit in the Alert Status Registery
-*/
-
-void BMSModuleManager::wakeBoards()
-{
-}
 
 void BMSModuleManager::getAllVoltTemp()
 {
@@ -949,7 +878,7 @@ void BMSModuleManager::printPackDetails(int digits)
       SERIALCONSOLE.print("  ");
       SERIALCONSOLE.print(modules[y].getModuleVoltage(), digits);
       SERIALCONSOLE.print("V");
-      for (int i = 0; i < 12; i++)
+      for (int i = 0; i < 13; i++)
       {
         if (cellNum < 10) SERIALCONSOLE.print(" ");
         SERIALCONSOLE.print("  Cell");
@@ -1009,7 +938,7 @@ void BMSModuleManager::printAllCSV(unsigned long timestamp, float current, int S
       Serial2.print(",");
       Serial2.print(y);
       Serial2.print(",");
-      for (int i = 0; i < 8; i++)
+      for (int i = 0; i < 13; i++)
       {
         Serial2.print(modules[y].getCellVoltage(i));
         Serial2.print(",");
