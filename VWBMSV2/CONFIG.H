@@ -95,4 +95,5 @@ typedef struct {
   uint8_t tripcont;
   uint16_t triptime;
   float DischHys;
+  int16_t chargecurrentcold;
 } EEPROMSettings;

@@ -864,7 +864,7 @@ void loop()
 
     resetwdog();
   }
-  if (millis() - cleartime > 30000)
+  if (millis() - cleartime > 3000)
   {
     //bms.clearmodules(); // Not functional
     if (bms.checkcomms())
@@ -2114,7 +2114,7 @@ void menu()
 
       case '5': //1 Over Voltage Setpoint
         settings.chargertype = settings.chargertype + 1;
-        if (settings.chargertype > 6)
+        if (settings.chargertype > 7)
         {
           settings.chargertype = 0;
         }
@@ -2144,9 +2144,33 @@ void menu()
         incomingByte = 'e';
         break;
 
+      case '9':
+        if (Serial.available() > 0)
+        {
+          settings.ChargeTSetpoint = Serial.parseInt();
+          if (settings.ChargeTSetpoint < settings.UnderTSetpoint)
+          {
+            settings.ChargeTSetpoint = settings.UnderTSetpoint;
+          }
+          menuload = 1;
+          incomingByte = 'e';
+        }
+        break;
+      case '0':
+        if (Serial.available() > 0)
+        {
+          settings.chargecurrentcold = Serial.parseInt() * 10;
+          if (settings.chargecurrentcold > settings.chargecurrentmax)
+          {
+            settings.chargecurrentcold = settings.chargecurrentmax;
+          }
+          menuload = 1;
+          incomingByte = 'e';
+        }
+        break;
+
     }
   }
-
   if (menuload == 5)
   {
     switch (incomingByte)
@@ -2509,6 +2533,10 @@ void menu()
           case 6:
             SERIALCONSOLE.print("Coda");
             break;
+            break;
+          case 7:
+            SERIALCONSOLE.print("Eltek PC Charger");
+            break;
         }
         SERIALCONSOLE.println();
         if (settings.chargertype > 0)
@@ -2534,6 +2562,14 @@ void menu()
             break;
         }
         SERIALCONSOLE.println();
+
+        SERIALCONSOLE.print("9 - Charge Current derate Low: ");
+        SERIALCONSOLE.print(settings.ChargeTSetpoint);
+        SERIALCONSOLE.println(" C");
+        SERIALCONSOLE.print("0 - Pack Cold Charge Current: ");
+        SERIALCONSOLE.print(settings.chargecurrentcold * 0.1);
+        SERIALCONSOLE.println("A");
+
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 6;
         break;
@@ -2939,7 +2975,7 @@ void currentlimit()
     if (bms.getLowTemperature() < settings.UnderTSetpoint)
     {
       //discurrent = 0; Request Daniel
-      chargecurrent = 0;
+      chargecurrent = settings.chargecurrentcold;
     }
     if (bms.getHighTemperature() > settings.OverTSetpoint)
     {
@@ -2966,28 +3002,27 @@ void currentlimit()
     {
       //Temperature based///
 
-      if (bms.getLowTemperature() > settings.DisTSetpoint)
+      if (bms.getHighTemperature() > settings.DisTSetpoint)
       {
-        discurrent = discurrent - map(bms.getLowTemperature(), settings.DisTSetpoint, settings.OverTSetpoint, 0, settings.discurrentmax);
+        discurrent = discurrent - map(bms.getHighTemperature(), settings.DisTSetpoint, settings.OverTSetpoint, 0, settings.discurrentmax);
       }
       //Voltagee based///
-      if (bms.getLowCellVolt() > settings.UnderVSetpoint || bms.getLowCellVolt() > settings.DischVsetpoint)
+      if (bms.getLowCellVolt() < (settings.DischVsetpoint + settings.DisTaper))
       {
-        if (bms.getLowCellVolt() < (settings.DischVsetpoint + settings.DisTaper))
-        {
-          discurrent = discurrent - map(bms.getLowCellVolt(), settings.DischVsetpoint, (settings.DischVsetpoint + settings.DisTaper), settings.chargecurrentmax, 0);
-        }
+        discurrent = discurrent - map(bms.getLowCellVolt(), settings.DischVsetpoint, (settings.DischVsetpoint + settings.DisTaper), settings.discurrentmax, 0);
       }
 
     }
 
     //Modifying Charge current///
-    if (chargecurrent > 0)
+    if (chargecurrent > settings.chargecurrentcold)
     {
       //Temperature based///
-      if (bms.getHighTemperature() < settings.ChargeTSetpoint)
+      if (bms.getLowTemperature() < settings.ChargeTSetpoint)
       {
-        chargecurrent = chargecurrent - map(bms.getHighTemperature(), settings.UnderTSetpoint, settings.ChargeTSetpoint, settings.chargecurrentmax, 0);
+
+        chargecurrent = chargecurrent - map(bms.getLowTemperature(), settings.UnderTSetpoint, settings.ChargeTSetpoint, (settings.chargecurrentmax - settings.chargecurrentcold), 0);
+
       }
       //Voltagee based///
       if (storagemode == 1)
@@ -3001,7 +3036,7 @@ void currentlimit()
       {
         if (bms.getHighCellVolt() > (settings.ChargeVsetpoint - settings.ChargeHys))
         {
-          chargecurrent = chargecurrent - map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, settings.chargecurrentend, settings.chargecurrentmax);
+          chargecurrent = chargecurrent - map(bms.getHighCellVolt(), (settings.ChargeVsetpoint - settings.ChargeHys), settings.ChargeVsetpoint, 0, (settings.chargecurrentmax - settings.chargecurrentend));
         }
       }
     }
