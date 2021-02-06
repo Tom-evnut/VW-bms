@@ -74,22 +74,28 @@ void BMSModuleManager::clearmodules()
 void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
 {
   int CMU = (msg.id & 0xFF);
-  if (CMU > 32 && CMU < 60)
+  if (debug == 1)
   {
-    CMU = (CMU*0.5)-15;
+    Serial.println();
+    Serial.print(CMU);
+    Serial.print(" | ");
+  }
+  if (CMU > 10 && CMU < 60)
+  {
+    CMU = (CMU * 0.5) - 15;
   }
   /*
-  if (CMU > 64 && CMU < 73)
-  {
+    if (CMU > 64 && CMU < 73)
+    {
     CMU = CMU - 48;
-  }
-  if (CMU > 97 && CMU < 104)
-  {
+    }
+    if (CMU > 97 && CMU < 104)
+    {
     CMU = CMU - 72;
-  }
+    }
   */
   modules[CMU].decodetemp(msg);
-  if (debug == 1 && CMU > 0 && CMU < 9)
+  if (debug == 1 && CMU > 0 && CMU < 15)
   {
     Serial.println();
     Serial.print(CMU);
@@ -103,217 +109,217 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
   switch (msg.id)
   {
     /*
-    ///////////////// Two extender increment//////////
-    case (0x210):
+      ///////////////// Two extender increment//////////
+      case (0x210):
       CMU = 25;
       Id = 0;
       break;
-    case (0x211):
+      case (0x211):
       CMU = 25;
       Id = 1;
       break;
-    case (0x212):
+      case (0x212):
       CMU = 25;
       Id = 2;
       break;
 
-    case (0x214):
+      case (0x214):
       CMU = 26;
       Id = 0;
       break;
-    case (0x215):
+      case (0x215):
       CMU = 26;
       Id = 1;
       break;
-    case (0x216):
+      case (0x216):
       CMU = 26;
       Id = 2;
       break;
-    case (0x218):
+      case (0x218):
       CMU = 27;
       Id = 0;
       break;
-    case (0x219):
+      case (0x219):
       CMU = 27;
       Id = 1;
       break;
-    case (0x21A):
+      case (0x21A):
       CMU = 27;
       Id = 2;
       break;
-    case (0x21C):
+      case (0x21C):
       CMU = 28;
       Id = 0;
       break;
-    case (0x21D):
+      case (0x21D):
       CMU = 28;
       Id = 1;
       break;
-    case (0x21E):
+      case (0x21E):
       CMU = 28;
       Id = 2;
       break;
 
-    case (0x220):
+      case (0x220):
       CMU = 29;
       Id = 0;
       break;
-    case (0x221):
+      case (0x221):
       CMU = 29;
       Id = 1;
       break;
-    case (0x222):
+      case (0x222):
       CMU = 29;
       Id = 2;
       break;
 
-    case (0x224):
+      case (0x224):
       CMU = 30;
       Id = 0;
       break;
-    case (0x225):
+      case (0x225):
       CMU = 30;
       Id = 1;
       break;
-    case (0x226):
+      case (0x226):
       CMU = 30;
       Id = 2;
       break;
 
-    case (0x228):
+      case (0x228):
       CMU = 31;
       Id = 0;
       break;
-    case (0x229):
+      case (0x229):
       CMU = 31;
       Id = 1;
       break;
-    case (0x22A):
+      case (0x22A):
       CMU = 31;
       Id = 2;
       break;
 
-    case (0x22C):
+      case (0x22C):
       CMU = 32;
       Id = 0;
       break;
-    case (0x22D):
+      case (0x22D):
       CMU = 32;
       Id = 1;
       break;
-    case (0x22E):
+      case (0x22E):
       CMU = 32;
       Id = 2;
       break;
 
 
-    ///////////////// Two extender increment//////////
-    case (0x1F0):
+      ///////////////// Two extender increment//////////
+      case (0x1F0):
       CMU = 17;
       Id = 0;
       break;
-    case (0x1F1):
+      case (0x1F1):
       CMU = 17;
       Id = 1;
       break;
-    case (0x1F2):
+      case (0x1F2):
       CMU = 17;
       Id = 2;
       break;
 
-    case (0x1F4):
+      case (0x1F4):
       CMU = 18;
       Id = 0;
       break;
-    case (0x1F5):
+      case (0x1F5):
       CMU = 18;
       Id = 1;
       break;
-    case (0x1F6):
+      case (0x1F6):
       CMU = 18;
       Id = 2;
       break;
 
-    case (0x1F8):
+      case (0x1F8):
       CMU = 19;
       Id = 0;
       break;
-    case (0x1F9):
+      case (0x1F9):
       CMU = 19;
       Id = 1;
       break;
-    case (0x1FA):
+      case (0x1FA):
       CMU = 19;
       Id = 2;
       break;
 
-    case (0x1FC):
+      case (0x1FC):
       CMU = 20;
       Id = 0;
       break;
-    case (0x1FD):
+      case (0x1FD):
       CMU = 20;
       Id = 1;
       break;
-    case (0x1FE):
+      case (0x1FE):
       CMU = 20;
       Id = 2;
       break;
 
-    case (0x200):
+      case (0x200):
       CMU = 21;
       Id = 0;
       break;
-    case (0x201):
+      case (0x201):
       CMU = 21;
       Id = 1;
       break;
-    case (0x202):
+      case (0x202):
       CMU = 21;
       Id = 2;
       break;
 
-    case (0x204):
+      case (0x204):
       CMU = 22;
       Id = 0;
       break;
-    case (0x205):
+      case (0x205):
       CMU = 22;
       Id = 1;
       break;
-    case (0x206):
+      case (0x206):
       CMU = 22;
       Id = 2;
       break;
 
-    case (0x208):
+      case (0x208):
       CMU = 23;
       Id = 0;
       break;
-    case (0x209):
+      case (0x209):
       CMU = 23;
       Id = 1;
       break;
-    case (0x20A):
+      case (0x20A):
       CMU = 23;
       Id = 2;
       break;
 
-    case (0x20C):
+      case (0x20C):
       CMU = 24;
       Id = 0;
       break;
-    case (0x20D):
+      case (0x20D):
       CMU = 24;
       Id = 1;
       break;
-    case (0x20E):
+      case (0x20E):
       CMU = 24;
       Id = 2;
       break;
-*/
+    */
     ///////////////// one extender increment//////////
-   
+
     case (0x1D0):
       CMU = 9;
       Id = 0;
@@ -326,7 +332,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 9;
       Id = 2;
       break;
-         case (0x1D3):
+    case (0x1D3):
       CMU = 9;
       Id = 3;
       break;
@@ -422,7 +428,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
 
 
     ///////////////////////standard ids////////////////
-    
+
 
     case (0x1B0):
       CMU = 1;
@@ -436,7 +442,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 1;
       Id = 2;
       break;
-          case (0x1B3):
+    case (0x1B3):
       CMU = 1;
       Id = 3;
       break;
@@ -474,7 +480,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
       CMU = 3;
       Id = 3;
       break;
-      
+
     case (0x1BC):
       CMU = 4;
       Id = 0;
