@@ -42,22 +42,32 @@ void BMSModule::clearmodule()
 
 void BMSModule::decodetemp(CAN_message_t &msg)
 {
-  temperatures[0] = (msg.buf[0] * 0.5) - 43;
-  if (msg.buf[4] < 0xF0)
+  if (msg.buf[7] == 0xFD)
   {
-    temperatures[1] = (msg.buf[4] * 0.5) - 43;
+    if (msg.buf[2] != 0xFD)
+    {
+      temperatures[0] = (msg.buf[2] * 0.5) - 40;
+    }
   }
   else
   {
-    temperatures[1] = 0;
-  }
-  if (msg.buf[5] < 0xF0)
-  {
-    temperatures[2] = (msg.buf[5] * 0.5) - 43;
-  }
-  else
-  {
-    temperatures[2] = 0;
+    temperatures[0] = (msg.buf[0] * 0.5) - 43;
+    if (msg.buf[4] < 0xF0)
+    {
+      temperatures[1] = (msg.buf[4] * 0.5) - 43;
+    }
+    else
+    {
+      temperatures[1] = 0;
+    }
+    if (msg.buf[5] < 0xF0)
+    {
+      temperatures[2] = (msg.buf[5] * 0.5) - 43;
+    }
+    else
+    {
+      temperatures[2] = 0;
+    }
   }
 }
 
@@ -193,13 +203,13 @@ void BMSModule::decodecan(int Id, CAN_message_t &msg)
       */
       break;
 
- case 3:
+    case 3:
       cmuerror = 0;
       cellVolt[12] = (uint16_t(msg.buf[1] >> 4) + uint16_t(msg.buf[2] << 4) + 1000) * 0.001;
       break;
 
     default:
-break;
+      break;
 
   }
   if (getLowTemp() < lowestTemperature) lowestTemperature = getLowTemp();

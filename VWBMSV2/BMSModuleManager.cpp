@@ -78,6 +78,10 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
   {
     CMU = CMU - 24;
   }
+    if (CMU > 9 && CMU < 18)
+  {
+    CMU = CMU - 9;
+  }
   /*
   if (CMU > 64 && CMU < 73)
   {
@@ -89,7 +93,7 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
   }
   */
   modules[CMU].decodetemp(msg);
-  if (debug == 1 && CMU > 0)
+  if (debug == 1 && CMU > 0 && CMU < 9)
   {
     Serial.println();
     Serial.print(CMU);
