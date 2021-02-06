@@ -631,7 +631,7 @@ void loop()
           }
           if (bms.getLowCellVolt() > settings.UnderVSetpoint || bms.getHighCellVolt() < settings.OverVSetpoint || bms.getHighTemperature() < settings.OverTSetpoint)
           {
-            bmsstatus = Boot;
+            //bmsstatus = Boot;
           }
         }
       }
