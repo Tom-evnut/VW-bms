@@ -631,7 +631,10 @@ void loop()
           }
           if (bms.getLowCellVolt() > settings.UnderVSetpoint || bms.getHighCellVolt() < settings.OverVSetpoint || bms.getHighTemperature() < settings.OverTSetpoint)
           {
-            //bmsstatus = Boot;
+            if (ErrorReason & 0x0C == 0)
+            {
+              bmsstatus = Boot;
+            }
           }
         }
       }
@@ -789,7 +792,11 @@ void loop()
             SERIALCONSOLE.println("  ");
           }
           bmsstatus = Error;
-          ErrorReason = 1;
+          ErrorReason = ErrorReason & 0x01;
+        }
+        else
+        {
+          ErrorReason = ErrorReason & ~0x01;
         }
       }
     }
@@ -800,12 +807,13 @@ void loop()
         if (UnderTime > millis()) //check is last time not undervoltage is longer thatn UnderDur ago
         {
           bmsstatus = Error;
-          ErrorReason = 2;
+          ErrorReason = ErrorReason & 0x02;
         }
       }
       else
       {
         UnderTime = millis() + settings.UnderDur;
+        ErrorReason = ErrorReason & ~0x02;
       }
     }
 
@@ -853,7 +861,11 @@ void loop()
           SERIALCONSOLE.println("  ");
         }
         bmsstatus = Error;
-        ErrorReason = 3;
+        ErrorReason = ErrorReason & 0x04;
+      }
+      else
+      {
+        ErrorReason = ErrorReason & ~0x04;
       }
     }
     alarmupdate();
@@ -866,7 +878,7 @@ void loop()
   }
   if (millis() - cleartime > 3000)
   {
-    //bms.clearmodules(); // Not functional
+    bms.clearmodules(); // Not functional
     if (bms.checkcomms())
     {
       //no missing modules
@@ -875,10 +887,7 @@ void loop()
         SERIALCONSOLE.print(" ALL OK NO MODULE MISSING :) ");
         SERIALCONSOLE.println("  ");
       */
-      if (  bmsstatus == Error)
-      {
-        bmsstatus = Boot;
-      }
+      ErrorReason = ErrorReason & ~0x08;
     }
     else
     {
@@ -890,7 +899,7 @@ void loop()
         SERIALCONSOLE.println("  ");
       }
       bmsstatus = Error;
-      ErrorReason = 4;
+      ErrorReason = ErrorReason & 0x08;
     }
     cleartime = millis();
   }
@@ -1051,6 +1060,8 @@ void printbmsstat()
         }
       }
     }
+    SERIALCONSOLE.print("ErrSt: ");
+    SERIALCONSOLE.print(ErrorReason);
   }
   else
   {
