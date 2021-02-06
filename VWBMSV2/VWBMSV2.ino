@@ -379,11 +379,11 @@ void setup()
   ////Calculate fixed numbers
   pwmcurmin = (pwmcurmid / 50 * pwmcurmax * -1);
   ////
-  if (settings.Serialexp == 1)
-  {
-    delay(300);//wait for all other boards to boot
-    Serialslaveinit();
-  }
+  //if (settings.Serialexp == 1)
+  //{
+  //  delay(300);//wait for all other boards to boot
+  //Serialslaveinit();
+  // }
 
 
   ///precharge timer kickers
@@ -1638,31 +1638,51 @@ void VEcan() //communication with Victron system over CAN
   msg.buf[7] = bmsmanu[7];
   Can0.write(msg);
 
-  if (balancecells == 1)
-  {
-    if (bms.getLowCellVolt() + settings.balanceHyst < bms.getHighCellVolt())
-    {
-      msg.id  = 0x3c3;
-      msg.len = 8;
-      if (bms.getLowCellVolt() < settings.balanceVoltage)
-      {
-        msg.buf[0] = highByte(uint16_t(settings.balanceVoltage * 1000));
-        msg.buf[1] = lowByte(uint16_t(settings.balanceVoltage * 1000));
-      }
-      else
-      {
-        msg.buf[0] = highByte(uint16_t(bms.getLowCellVolt() * 1000));
-        msg.buf[1] = lowByte(uint16_t(bms.getLowCellVolt() * 1000));
-      }
-      msg.buf[2] =  0x01;
-      msg.buf[3] =  0x04;
-      msg.buf[4] =  0x03;
-      msg.buf[5] =  0x00;
-      msg.buf[6] =  0x00;
-      msg.buf[7] = 0x00;
-      Can0.write(msg);
-    }
-  }
+  delay(2);
+  msg.id  = 0x373;
+  msg.len = 8;
+  msg.buf[0] = lowByte(uint16_t(bms.getLowCellVolt() * 1000));
+  msg.buf[1] = highByte(uint16_t(bms.getLowCellVolt() * 1000));
+  msg.buf[2] = lowByte(uint16_t(bms.getHighCellVolt() * 1000));
+  msg.buf[3] = highByte(uint16_t(bms.getHighCellVolt() * 1000));
+  msg.buf[4] = lowByte(uint16_t(bms.getLowTemperature() + 273.15));
+  msg.buf[5] = highByte(uint16_t(bms.getLowTemperature() + 273.15));
+  msg.buf[6] = lowByte(uint16_t(bms.getHighTemperature() + 273.15));
+  msg.buf[7] = highByte(uint16_t(bms.getHighTemperature() + 273.15));
+  Can0.write(msg);
+
+  delay(2);
+  msg.id  = 0x379; //Installed capacity
+  msg.len = 2;
+  msg.buf[0] = lowByte(uint16_t(settings.Pstrings * settings.CAP));
+  msg.buf[1] = highByte(uint16_t(settings.Pstrings * settings.CAP));
+  /*
+      delay(2);
+    msg.id  = 0x378; //Installed capacity
+    msg.len = 2;
+    //energy in 100wh/unit
+    msg.buf[0] =
+    msg.buf[1] =
+    msg.buf[2] =
+    msg.buf[3] =
+    //energy out 100wh/unit
+    msg.buf[4] =
+    msg.buf[5] =
+    msg.buf[6] =
+    msg.buf[7] =
+  */
+  delay(2);
+  msg.id  = 0x372;
+  msg.len = 8;
+  msg.buf[0] = lowByte(bms.getNumModules());
+  msg.buf[1] = highByte(bms.getNumModules());
+  msg.buf[2] = 0x00;
+  msg.buf[3] = 0x00;
+  msg.buf[4] = 0x00;
+  msg.buf[5] = 0x00;
+  msg.buf[6] = 0x00;
+  msg.buf[7] = 0x00;
+  Can0.write(msg);
 
 }
 
@@ -2024,7 +2044,7 @@ void menu()
         }
         break;
 
-case '4':
+      case '4':
         if (Serial.available() > 0)
         {
           settings.triptime = Serial.parseInt();
@@ -2305,7 +2325,7 @@ case '4':
           incomingByte = 'b';
         }
         break;
-        
+
       case 'j':
         if (Serial.available() > 0)
         {
@@ -2538,9 +2558,9 @@ case '4':
         SERIALCONSOLE.print(settings.WarnToff);
         SERIALCONSOLE.println(" C");
         /*
-        SERIALCONSOLE.print("4 - Temp Warning Offset: ");
-        SERIALCONSOLE.print(settings.UnderDur);
-        SERIALCONSOLE.println(" mS");
+          SERIALCONSOLE.print("4 - Temp Warning Offset: ");
+          SERIALCONSOLE.print(settings.UnderDur);
+          SERIALCONSOLE.println(" mS");
         */
         SERIALCONSOLE.print("4 - Over and Under Voltage Delay: ");
         SERIALCONSOLE.print(settings.triptime);
@@ -2841,7 +2861,7 @@ void canread()
       bms.decodetemp(inMsg, 0);
     }
   }
-  
+
   if (candebug == 1)
   {
     Serial.print(millis());
@@ -3239,11 +3259,11 @@ void dashupdate()
   Serial2.write(0xff);
   Serial2.write(0xff);
   /*
-  Serial2.print("cellbal.val=");
-  Serial2.print(bms.getBalancing());
-  Serial2.write(0xff);  // We always have to send this three lines after each command sent to the nextion display.
-  Serial2.write(0xff);
-  Serial2.write(0xff);
+    Serial2.print("cellbal.val=");
+    Serial2.print(bms.getBalancing());
+    Serial2.write(0xff);  // We always have to send this three lines after each command sent to the nextion display.
+    Serial2.write(0xff);
+    Serial2.write(0xff);
   */
 }
 

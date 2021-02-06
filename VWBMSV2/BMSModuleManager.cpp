@@ -652,6 +652,11 @@ float BMSModuleManager::getPackVoltage()
   return packVolt;
 }
 
+int BMSModuleManager::getNumModules()
+{
+  return numFoundModules;
+}
+
 float BMSModuleManager::getLowVoltage()
 {
   return lowestPackVolt;
