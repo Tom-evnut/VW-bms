@@ -792,7 +792,7 @@ void loop()
             SERIALCONSOLE.println("  ");
           }
           bmsstatus = Error;
-          ErrorReason = ErrorReason & 0x01;
+          ErrorReason = ErrorReason | 0x01;
         }
         else
         {
@@ -807,7 +807,7 @@ void loop()
         if (UnderTime > millis()) //check is last time not undervoltage is longer thatn UnderDur ago
         {
           bmsstatus = Error;
-          ErrorReason = ErrorReason & 0x02;
+          ErrorReason = ErrorReason | 0x02;
         }
       }
       else
@@ -861,7 +861,7 @@ void loop()
           SERIALCONSOLE.println("  ");
         }
         bmsstatus = Error;
-        ErrorReason = ErrorReason & 0x04;
+        ErrorReason = ErrorReason | 0x04;
       }
       else
       {
@@ -878,7 +878,6 @@ void loop()
   }
   if (millis() - cleartime > 3000)
   {
-    bms.clearmodules(); // Not functional
     if (bms.checkcomms())
     {
       //no missing modules
@@ -899,8 +898,9 @@ void loop()
         SERIALCONSOLE.println("  ");
       }
       bmsstatus = Error;
-      ErrorReason = ErrorReason & 0x08;
+      ErrorReason = ErrorReason | 0x08;
     }
+    bms.clearmodules(); // Not functional
     cleartime = millis();
   }
   if (millis() - looptime1 > settings.chargerspd)
