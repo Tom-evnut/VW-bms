@@ -887,6 +887,10 @@ void loop()
         SERIALCONSOLE.println("  ");
       */
       ErrorReason = ErrorReason & ~0x08;
+      if(ErrorReason == 0)
+      {
+        bmsstatus = Boot;
+      }
     }
     else
     {
@@ -900,7 +904,7 @@ void loop()
       bmsstatus = Error;
       ErrorReason = ErrorReason | 0x08;
     }
-    bms.clearmodules(); // Not functional
+    //bms.clearmodules(); // Not functional
     cleartime = millis();
   }
   if (millis() - looptime1 > settings.chargerspd)

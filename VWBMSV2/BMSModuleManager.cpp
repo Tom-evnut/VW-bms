@@ -32,6 +32,7 @@ bool BMSModuleManager::checkcomms()
       }
       else
       {
+         modules[y].setExists(false);
         return false;
       }
     }
