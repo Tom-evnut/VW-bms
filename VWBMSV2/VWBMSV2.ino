@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 210206;
+int firmver = 210311;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -887,7 +887,7 @@ void loop()
         SERIALCONSOLE.println("  ");
       */
       ErrorReason = ErrorReason & ~0x08;
-      if(ErrorReason == 0)
+      if(bmsstatus == Error && ErrorReason == 0)
       {
         bmsstatus = Boot;
       }
@@ -3035,9 +3035,7 @@ void currentlimit()
       //Temperature based///
       if (bms.getLowTemperature() < settings.ChargeTSetpoint)
       {
-
         chargecurrent = chargecurrent - map(bms.getLowTemperature(), settings.UnderTSetpoint, settings.ChargeTSetpoint, (settings.chargecurrentmax - settings.chargecurrentcold), 0);
-
       }
       //Voltagee based///
       if (storagemode == 1)
