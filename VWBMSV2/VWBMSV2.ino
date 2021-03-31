@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 210311;
+int firmver = 210331;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -2883,10 +2883,20 @@ void canread()
 {
   Can0.read(inMsg);
   // Read data: len = data length, buf = data byte(s)
-  if (inMsg.id == 0x3c2)
-  {
-    CAB300();
-  }
+    switch (inMsg.id)
+    {
+      case 0x3c1:
+        CAB500();
+        break;
+
+      case 0x3c2:
+        CAB300();
+        break;
+
+      default:
+        break;
+    }
+  
 
   if (inMsg.id < 0x300)//do VW BMS magic if ids are ones identified to be modules
   {
@@ -2964,6 +2974,41 @@ void CAB300()
     Serial.print("mA ");
   }
 }
+
+void CAB500()
+{
+  inbox = 0;
+  for (int i = 1; i < 4; i++)
+  {
+    inbox = (inbox << 8) | inMsg.buf[i];
+  }
+  CANmilliamps = inbox;
+  if (candebug == 1)
+  {
+    Serial.println();
+    Serial.print(CANmilliamps, HEX);
+  }
+  if (CANmilliamps > 0x800000)
+  {
+    CANmilliamps -= 0x800000;
+  }
+  else
+  {
+    CANmilliamps = (0x800000 - CANmilliamps) * -1;
+  }
+  if ( settings.cursens == Canbus)
+  {
+    RawCur = CANmilliamps;
+    getcurrent();
+  }
+  if (candebug == 1)
+  {
+    Serial.println();
+    Serial.print(CANmilliamps);
+    Serial.print("mA ");
+  }
+}
+
 
 void currentlimit()
 {
