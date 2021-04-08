@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 210331;
+int firmver = 210408;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -876,7 +876,7 @@ void loop()
 
     resetwdog();
   }
-  if (millis() - cleartime > 3000)
+  if (millis() - cleartime > 10000)
   {
     if (bms.checkcomms())
     {
