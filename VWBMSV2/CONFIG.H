@@ -96,4 +96,5 @@ typedef struct {
   uint16_t triptime;
   float DischHys;
   int16_t chargecurrentcold;
+  int curcan;
 } EEPROMSettings;

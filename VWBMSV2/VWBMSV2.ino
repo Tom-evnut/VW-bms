@@ -79,6 +79,14 @@ byte bmsstatus = 0;
 #define Canbus 2
 #define Analoguesing 3
 //
+
+// Can current sensor values
+#define LemCAB300 1
+#define IsaScale 3
+#define VictronLynx 4
+#define LemCAB500 2
+#define CurCanMax 4 // max value
+
 //Charger Types
 #define NoCharger 0
 #define BrusaNLG5 1
@@ -123,7 +131,7 @@ byte rxBuf[8];
 char msgString[128];                        // Array to store serial string
 uint32_t inbox;
 signed long CANmilliamps;
-
+signed long voltage1, voltage2, voltage3 = 0; //mV only with ISAscale sensor
 //struct can_frame canMsg;
 //MCP2515 CAN1(10); //set CS pin for can controlelr
 
@@ -226,6 +234,7 @@ void loadSettings()
   settings.socvolt[3] = 90; //Voltage and SOC curve for voltage based SOC calc
   settings.invertcur = 0; //Invert current sensor direction
   settings.cursens = 2;
+   settings.curcan = LemCAB300;
   settings.voltsoc = 0; //SOC purely voltage based
   settings.Pretime = 5000; //ms of precharge time
   settings.conthold = 50; //holding duty cycle for contactor 0-255
@@ -887,7 +896,7 @@ void loop()
         SERIALCONSOLE.println("  ");
       */
       ErrorReason = ErrorReason & ~0x08;
-      if(bmsstatus == Error && ErrorReason == 0)
+      if (bmsstatus == Error && ErrorReason == 0)
       {
         bmsstatus = Boot;
       }
@@ -1978,6 +1987,14 @@ void menu()
         incomingByte = 'c';
         break;
 
+      case '7': //s for switch sensor
+        settings.curcan++;
+        if (settings.curcan > CurCanMax) {
+          settings.curcan = 1;
+        }
+        menuload = 1;
+        incomingByte = 'c';
+        break;
 
       default:
         // if nothing else matches, do the default
@@ -2755,6 +2772,26 @@ void menu()
           SERIALCONSOLE.print(settings.changecur * 0.001);
           SERIALCONSOLE.println(" A");
         }
+        if ( settings.cursens == Canbus)
+        {
+          SERIALCONSOLE.print("7 -Can Current Sensor :");
+          if (settings.curcan == LemCAB300)
+          {
+            SERIALCONSOLE.println(" LEM CAB300/500 series ");
+          }
+          else  if (settings.curcan == LemCAB500)
+          {
+            SERIALCONSOLE.println(" LEM CAB500 Special ");
+          }
+          else if (settings.curcan == IsaScale)
+          {
+            SERIALCONSOLE.println(" IsaScale IVT-S ");
+          }
+          else if (settings.curcan == VictronLynx)
+          {
+            SERIALCONSOLE.println(" Victron Lynx VE.CAN Shunt");
+          }
+        }
         SERIALCONSOLE.println("q - Go back to menu");
         menuload = 2;
         break;
@@ -2883,20 +2920,66 @@ void canread()
 {
   Can0.read(inMsg);
   // Read data: len = data length, buf = data byte(s)
-    switch (inMsg.id)
+  if ( settings.cursens == Canbus)
+  {
+    if (settings.curcan == 1)
     {
-      case 0x3c1:
-        CAB500();
-        break;
+      switch (inMsg.id)
+      {
+        case 0x3c1:
+          CAB500();
+          break;
 
-      case 0x3c2:
-        CAB300();
-        break;
+        case 0x3c2:
+          CAB300();
+          break;
 
-      default:
-        break;
+        default:
+          break;
+      }
     }
-  
+    if (settings.curcan == 2)
+    {
+      switch (inMsg.id)
+      {
+        case 0x3c1:
+          CAB500();
+          break;
+
+        case 0x3c2:
+          CAB500();
+          break;
+
+        default:
+          break;
+      }
+    }
+    if (settings.curcan == 3)
+    {
+      switch (inMsg.id)
+      {
+        case 0x521: //
+          CANmilliamps = rxBuf[5] + (rxBuf[4] << 8) + (rxBuf[3] << 16) + (rxBuf[2] << 24);
+          break;
+        case 0x522: //
+          voltage1 = rxBuf[5] + (rxBuf[4] << 8) + (rxBuf[3] << 16) + (rxBuf[2] << 24);
+          break;
+        case 0x523: //
+          voltage2 = rxBuf[5] + (rxBuf[4] << 8) + (rxBuf[3] << 16) + (rxBuf[2] << 24);
+          break;
+        default:
+          break;
+      }
+    }
+    if (settings.curcan == 4)
+    {
+      if (pgnFromCANId(inMsg.id) == 0x1F214 && inMsg.buf[0] == 0) // Check PGN and only use the first packet of each sequence
+      {
+        handleVictronLynx();
+      }
+    }
+  }
+
 
   if (inMsg.id < 0x300)//do VW BMS magic if ids are ones identified to be modules
   {
@@ -2997,6 +3080,25 @@ void CAB500()
     CANmilliamps = (0x800000 - CANmilliamps) * -1;
   }
   if ( settings.cursens == Canbus)
+  {
+    RawCur = CANmilliamps;
+    getcurrent();
+  }
+  if (candebug == 1)
+  {
+    Serial.println();
+    Serial.print(CANmilliamps);
+    Serial.print("mA ");
+  }
+}
+
+void handleVictronLynx()
+{
+  if (inMsg.buf[4] == 0xff && inMsg.buf[3] == 0xff) return;
+  int16_t current = (int)inMsg.buf[4] << 8; // in 0.1A increments
+  current |= inMsg.buf[3];
+  CANmilliamps = current * 100;
+  if (settings.cursens == Canbus)
   {
     RawCur = CANmilliamps;
     getcurrent();
@@ -3612,4 +3714,17 @@ void chargercomms()
     Can0.write(msg);
   }
 }
+
+int pgnFromCANId(int canId)
+{
+  if ((canId & 0x10000000) == 0x10000000)
+  {
+    return (canId & 0x03FFFF00) >> 8;
+  }
+  else
+  {
+    return canId; // not sure if this is really right?
+  }
+}
+
 ////////END///////////
