@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 270408;
+int firmver = 280408;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -883,6 +883,7 @@ if (settings.ESSmode == 1)
     VEcan();
 
     sendcommand();
+    
     if (cellspresent == 0 && SOCset == 1)
     {
       cellspresent = bms.seriescells();
@@ -914,7 +915,7 @@ if (settings.ESSmode == 1)
 
     resetwdog();
   }
-  if (millis() - cleartime > 10000)
+  if (millis() - cleartime > 20000)
   {
     if (bms.checkcomms())
     {
@@ -945,6 +946,7 @@ if (settings.ESSmode == 1)
     //bms.clearmodules(); // Not functional
     cleartime = millis();
   }
+  
   if (millis() - looptime1 > settings.chargerspd)
   {
     looptime1 = millis();
@@ -2041,7 +2043,7 @@ void menu()
         {
           settings.IgnoreTemp = Serial.parseInt();
         }
-        if (settings.IgnoreTemp > 2)
+        if (settings.IgnoreTemp > 3)
         {
           settings.IgnoreTemp = 0;
         }

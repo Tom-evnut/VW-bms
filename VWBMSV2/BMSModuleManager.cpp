@@ -32,7 +32,7 @@ bool BMSModuleManager::checkcomms()
       }
       else
       {
-         modules[y].setExists(false);
+        modules[y].setExists(false);
         return false;
       }
     }
@@ -95,12 +95,18 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
     CMU = CMU - 72;
     }
   */
-  modules[CMU].decodetemp(msg);
-  if (debug == 1 && CMU > 0 && CMU < 15)
+  if (CMU > 0 && CMU < 15);
   {
-    Serial.println();
-    Serial.print(CMU);
-    Serial.print(" Temp Found");
+    modules[CMU].setExists(true);
+    modules[CMU].setReset(true);
+    modules[CMU].decodetemp(msg);
+    if (debug == 1)
+    {
+      Serial.println();
+      Serial.print(CMU);
+      Serial.print(" Temp Found");
+
+    }
   }
 }
 
