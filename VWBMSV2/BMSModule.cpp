@@ -51,7 +51,14 @@ void BMSModule::decodetemp(CAN_message_t &msg)
   }
   else
   {
-    temperatures[0] = (msg.buf[0] * 0.5) - 43;
+    if (msg.buf[0] < 0xDF)
+    {
+      temperatures[0] = (msg.buf[0] * 0.5) - 43;
+    }
+    else
+    {
+      temperatures[0] = (msg.buf[3] * 0.5) - 43;
+    }
     if (msg.buf[4] < 0xF0)
     {
       temperatures[1] = (msg.buf[4] * 0.5) - 43;

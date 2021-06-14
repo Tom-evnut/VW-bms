@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 280408;
+int firmver = 210614;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -234,7 +234,7 @@ void loadSettings()
   settings.socvolt[3] = 90; //Voltage and SOC curve for voltage based SOC calc
   settings.invertcur = 0; //Invert current sensor direction
   settings.cursens = 2;
-   settings.curcan = LemCAB300;
+  settings.curcan = LemCAB300;
   settings.voltsoc = 0; //SOC purely voltage based
   settings.Pretime = 5000; //ms of precharge time
   settings.conthold = 50; //holding duty cycle for contactor 0-255
@@ -417,7 +417,7 @@ void loop()
   if (outputcheck != 1)
   {
     contcon();
-if (settings.ESSmode == 1)
+    if (settings.ESSmode == 1)
     {
       if (bmsstatus != Error && bmsstatus != Boot)
       {
@@ -883,7 +883,7 @@ if (settings.ESSmode == 1)
     VEcan();
 
     sendcommand();
-    
+
     if (cellspresent == 0 && SOCset == 1)
     {
       cellspresent = bms.seriescells();
@@ -946,7 +946,7 @@ if (settings.ESSmode == 1)
     //bms.clearmodules(); // Not functional
     cleartime = millis();
   }
-  
+
   if (millis() - looptime1 > settings.chargerspd)
   {
     looptime1 = millis();
@@ -2991,6 +2991,11 @@ void canread()
       {
         case 0x521: //
           CANmilliamps = rxBuf[5] + (rxBuf[4] << 8) + (rxBuf[3] << 16) + (rxBuf[2] << 24);
+          if (settings.cursens == Canbus)
+          {
+            RawCur = CANmilliamps;
+            getcurrent();
+          }
           break;
         case 0x522: //
           voltage1 = rxBuf[5] + (rxBuf[4] << 8) + (rxBuf[3] << 16) + (rxBuf[2] << 24);
