@@ -1,0 +1,421 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: BMC CMC_01 CMC_02 CMC_03 CMC_04 CMC_05 CMC_06 CMC_07 CMC_08
+
+
+BO_ 2589283338 BMC_CMC_01_01: 8 BMC
+ SG_ BMC_CMC_01_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_01
+
+BO_ 2589283339 BMC_CMC_01_02: 8 BMC
+ SG_ BMC_CMC_01_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_01
+ SG_ BMC_CMC_01_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_01
+
+BO_ 2589283340 BMC_CMC_02_01: 8 BMC
+ SG_ BMC_CMC_02_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_02
+
+BO_ 2589283341 BMC_CMC_02_02: 8 BMC
+ SG_ BMC_CMC_02_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_02
+ SG_ BMC_CMC_02_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_02
+
+BO_ 2589283342 BMC_CMC_03_01: 8 BMC
+ SG_ BMC_CMC_03_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_03
+
+BO_ 2589283343 BMC_CMC_03_02: 8 BMC
+ SG_ BMC_CMC_03_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_03
+ SG_ BMC_CMC_03_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_03
+
+BO_ 2589283344 BMC_CMC_04_01: 8 BMC
+ SG_ BMC_CMC_04_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_04
+
+BO_ 2589283345 BMC_CMC_04_02: 8 BMC
+ SG_ BMC_CMC_04_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_04
+ SG_ BMC_CMC_04_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_04
+
+BO_ 2589283346 BMC_CMC_05_01: 8 BMC
+ SG_ BMC_CMC_05_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_05
+
+BO_ 2589283347 BMC_CMC_05_02: 8 BMC
+ SG_ BMC_CMC_05_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_05
+ SG_ BMC_CMC_05_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_05
+
+BO_ 2589283348 BMC_CMC_06_01: 8 BMC
+ SG_ BMC_CMC_06_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_06
+
+BO_ 2589283349 BMC_CMC_06_02: 8 BMC
+ SG_ BMC_CMC_06_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_06
+ SG_ BMC_CMC_06_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_06
+
+BO_ 2589283350 BMC_CMC_07_01: 8 BMC
+ SG_ BMC_CMC_07_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_07
+
+BO_ 2589283351 BMC_CMC_07_02: 8 BMC
+ SG_ BMC_CMC_07_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_07
+ SG_ BMC_CMC_07_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_07
+
+BO_ 2589283352 BMC_CMC_08_01: 8 BMC
+ SG_ BMC_CMC_08_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_04 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_05 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_06 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_07 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_08 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_08
+
+BO_ 2589283353 BMC_CMC_08_02: 8 BMC
+ SG_ BMC_CMC_08_BalCommand_09 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_10 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_11 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_12 : 24|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_13 : 32|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_14 : 40|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_15 : 48|8@1+ (2,0) [0|506] "Minute"  CMC_08
+ SG_ BMC_CMC_08_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_08
+
+BO_ 432 CMC_01_01: 8 CMC_01
+ SG_ CMC_01_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_01_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 433 CMC_01_02: 8 CMC_01
+ SG_ CMC_01_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_01_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 434 CMC_01_03: 8 CMC_01
+ SG_ CMC_01_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_01_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_01_03_Messzeit : 60|4@1+ (1,0) [0|14] "Unit_None"  BMC
+
+BO_ 2589283329 CMC_01_05: 8 CMC_01
+ SG_ CMC_01_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_01_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_01_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_01_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+BO_ 436 CMC_02_01: 8 CMC_02
+ SG_ CMC_02_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_02_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 437 CMC_02_02: 8 CMC_02
+ SG_ CMC_02_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_02_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 438 CMC_02_03: 8 CMC_02
+ SG_ CMC_02_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_02_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_02_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 2589283330 CMC_02_05: 8 CMC_02
+ SG_ CMC_02_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_02_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_02_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_02_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+BO_ 440 CMC_03_01: 8 CMC_03
+ SG_ CMC_03_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_03_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 441 CMC_03_02: 8 CMC_03
+ SG_ CMC_03_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_03_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 442 CMC_03_03: 8 CMC_03
+ SG_ CMC_03_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_03_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_03_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 2589283331 CMC_03_05: 8 CMC_03
+ SG_ CMC_03_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_03_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_03_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_03_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+BO_ 444 CMC_04_01: 8 CMC_04
+ SG_ CMC_04_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_04_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 445 CMC_04_02: 8 CMC_04
+ SG_ CMC_04_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_04_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 446 CMC_04_03: 8 CMC_04
+ SG_ CMC_04_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_04_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_04_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 2589283332 CMC_04_05: 8 CMC_04
+ SG_ CMC_04_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_04_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_04_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_04_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+BO_ 448 CMC_05_01: 8 CMC_05
+ SG_ CMC_05_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_05_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 449 CMC_05_02: 8 CMC_05
+ SG_ CMC_05_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_05_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 450 CMC_05_03: 8 CMC_05
+ SG_ CMC_05_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_05_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_05_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 2589283333 CMC_05_05: 8 CMC_05
+ SG_ CMC_05_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_05_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_05_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_05_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+BO_ 452 CMC_06_01: 8 CMC_06
+ SG_ CMC_06_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_06_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 453 CMC_06_02: 8 CMC_06
+ SG_ CMC_06_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_06_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 454 CMC_06_03: 8 CMC_06
+ SG_ CMC_06_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_06_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_06_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 2589283334 CMC_06_05: 8 CMC_06
+ SG_ CMC_06_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_06_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_06_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_06_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+BO_ 456 CMC_07_01: 8 CMC_07
+ SG_ CMC_07_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_07_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 457 CMC_07_02: 8 CMC_07
+ SG_ CMC_07_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_07_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 458 CMC_07_03: 8 CMC_07
+ SG_ CMC_07_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_07_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_07_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 2589283335 CMC_07_05: 8 CMC_07
+ SG_ CMC_07_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_07_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_07_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_07_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+BO_ 460 CMC_08_01: 8 CMC_08
+ SG_ CMC_08_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_08_CellVoltage_01 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_02 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_03 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_04 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 461 CMC_08_02: 8 CMC_08
+ SG_ CMC_08_02_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_08_CellVoltage_05 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_06 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_07 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_08 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 462 CMC_08_03: 8 CMC_08
+ SG_ CMC_08_03_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
+ SG_ CMC_08_03_BZ : 8|4@1+ (1,0) [0|15] ""  BMC
+ SG_ CMC_08_CellVoltage_09 : 12|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_10 : 24|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_11 : 36|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+ SG_ CMC_08_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
+
+BO_ 2589283336 CMC_08_05: 8 CMC_08
+ SG_ CMC_08_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_08_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_08_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+ SG_ CMC_08_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
+
+
+
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "BusType" "CAN";
+
