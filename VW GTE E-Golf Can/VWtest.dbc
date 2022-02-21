@@ -222,8 +222,6 @@ BO_ 434 CMC_01_03: 8 CMC_01
 BO_ 2589283329 CMC_01_05: 8 CMC_01
  SG_ CMC_01_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_01_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_01_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_01_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 BO_ 436 CMC_02_01: 8 CMC_02
  SG_ CMC_02_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
@@ -249,8 +247,6 @@ BO_ 438 CMC_02_03: 8 CMC_02
 BO_ 2589283330 CMC_02_05: 8 CMC_02
  SG_ CMC_02_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_02_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_02_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_02_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 BO_ 440 CMC_03_01: 8 CMC_03
  SG_ CMC_03_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
@@ -277,7 +273,6 @@ BO_ 2589283331 CMC_03_05: 8 CMC_03
  SG_ CMC_03_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_03_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_03_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_03_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 BO_ 444 CMC_04_01: 8 CMC_04
  SG_ CMC_04_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
@@ -303,8 +298,6 @@ BO_ 446 CMC_04_03: 8 CMC_04
 BO_ 2589283332 CMC_04_05: 8 CMC_04
  SG_ CMC_04_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_04_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_04_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_04_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 BO_ 448 CMC_05_01: 8 CMC_05
  SG_ CMC_05_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
@@ -330,8 +323,6 @@ BO_ 450 CMC_05_03: 8 CMC_05
 BO_ 2589283333 CMC_05_05: 8 CMC_05
  SG_ CMC_05_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_05_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_05_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_05_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 BO_ 452 CMC_06_01: 8 CMC_06
  SG_ CMC_06_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
@@ -357,8 +348,6 @@ BO_ 454 CMC_06_03: 8 CMC_06
 BO_ 2589283334 CMC_06_05: 8 CMC_06
  SG_ CMC_06_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_06_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_06_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_06_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 BO_ 456 CMC_07_01: 8 CMC_07
  SG_ CMC_07_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
@@ -384,8 +373,6 @@ BO_ 458 CMC_07_03: 8 CMC_07
 BO_ 2589283335 CMC_07_05: 8 CMC_07
  SG_ CMC_07_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_07_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_07_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_07_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 BO_ 460 CMC_08_01: 8 CMC_08
  SG_ CMC_08_01_CRC : 0|8@1+ (1,0) [0|255] ""  BMC
@@ -410,22 +397,20 @@ BO_ 462 CMC_08_03: 8 CMC_08
  SG_ CMC_08_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
 
 BO_ 2589283336 CMC_08_05: 8 CMC_08
- SG_ CMC_08_Cell01Balance : 32|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell12Balance : 43|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell11Balance : 42|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell10Balance : 41|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell09Balance : 40|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell08Balance : 39|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell07Balance : 38|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell06Balance : 37|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell05Balance : 36|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell04Balance : 35|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell03Balance : 34|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CMC_08_Cell02Balance : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell01Balance : 16|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell12Balance : 27|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell11Balance : 26|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell10Balance : 25|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell09Balance : 24|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell08Balance : 23|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell07Balance : 22|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell06Balance : 21|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell05Balance : 20|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell04Balance : 19|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell03Balance : 18|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell02Balance : 17|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ CMC_08_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_08_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_08_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
- SG_ CMC_08_Temperature_4 : 24|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
 
 
 
