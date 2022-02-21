@@ -177,6 +177,7 @@ BO_ 2589283351 BMC_CMC_07_02: 8 BMC
  SG_ BMC_CMC_07_BalCommand_16 : 56|8@1+ (2,0) [0|506] "Minute"  CMC_07
 
 BO_ 2589283352 BMC_CMC_08_01: 8 BMC
+ SG_ CMC_08_Cell01Balance : 63|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ BMC_CMC_08_BalCommand_01 : 0|8@1+ (2,0) [0|506] "Minute"  CMC_08
  SG_ BMC_CMC_08_BalCommand_02 : 8|8@1+ (2,0) [0|506] "Minute"  CMC_08
  SG_ BMC_CMC_08_BalCommand_03 : 16|8@1+ (2,0) [0|506] "Minute"  CMC_08
@@ -409,6 +410,18 @@ BO_ 462 CMC_08_03: 8 CMC_08
  SG_ CMC_08_CellVoltage_12 : 48|12@1+ (1,1000) [1000|5091] "MilliVolt"  BMC
 
 BO_ 2589283336 CMC_08_05: 8 CMC_08
+ SG_ CMC_08_Cell01Balance : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell12Balance : 43|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell11Balance : 42|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell10Balance : 41|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell09Balance : 40|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell08Balance : 39|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell07Balance : 38|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell06Balance : 37|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell05Balance : 36|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell04Balance : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell03Balance : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CMC_08_Cell02Balance : 33|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ CMC_08_Temperature_1 : 0|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_08_Temperature_2 : 8|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC
  SG_ CMC_08_Temperature_3 : 16|8@1+ (0.5,-40) [-40|86] "DegreeCelcius"  BMC

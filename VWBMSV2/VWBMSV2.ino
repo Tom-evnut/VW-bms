@@ -182,6 +182,10 @@ int moduleidstart = 0x1CC;
 int SerialID = 0; //ID assigned over serialbus
 int SerialSlaves = 0; //number of slaves present
 
+//Balance testing
+int balinit = 0;
+int balon = 0;
+int balcycle = 0;
 
 //Debugging modes//////////////////
 int debug = 1;
@@ -880,9 +884,10 @@ void loop()
 
     updateSOC();
     currentlimit();
-    VEcan();
+    //VEcan(); //Commented for testing only.
 
     sendcommand();
+    sendbalancingtest();
 
     if (cellspresent == 0 && SOCset == 1)
     {
@@ -1903,6 +1908,13 @@ void menu()
         incomingByte = 'd';
         break;
 
+
+      case 'b':
+        menuload = 1;
+        balon = !balon;
+        incomingByte = 'd';
+        break;
+        
       case 113: //q for quite menu
 
         menuload = 0;
@@ -3348,6 +3360,167 @@ void sendcommand()
   msg.buf[6] = 0x00;
   msg.buf[7] = 0x30;
   Can0.write(msg);
+}
+
+
+void sendbalancingtest()
+{
+  if (balinit == 0)
+  {
+    msg.id  = 0x1A555418;
+    msg.len = 8;
+    msg.ext = 1;
+    msg.buf[0] = 0xFE;
+    msg.buf[1] = 0xFE;
+    msg.buf[2] = 0xFE;
+    msg.buf[3] = 0xFE;
+    msg.buf[4] = 0xFE;
+    msg.buf[5] = 0xFE;
+    msg.buf[6] = 0xFE;
+    msg.buf[7] = 0xFE;
+    Can0.write(msg);
+    delay(1);
+
+    msg.id  = 0x1A555419;
+    Can0.write(msg);
+    delay(1);
+
+    msg.id  = 0x1A555416;
+    Can0.write(msg);
+    delay(1);
+
+    msg.id  = 0x1A555417;
+    Can0.write(msg);
+    delay(1);
+    balinit = 1;
+  }
+
+  if (balcycle == 1)
+  {
+    if (balon == 1)
+    {
+      msg.id  = 0x1A555418;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x08;
+      msg.buf[1] = 0x00;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x00;
+      msg.buf[4] = 0x00;
+      msg.buf[5] = 0x00;
+      msg.buf[6] = 0x00;
+      msg.buf[7] = 0x00;
+      Can0.write(msg);
+      delay(1);
+      msg.id  = 0x1A555419;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x00;
+      msg.buf[1] = 0x00;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x00;
+      msg.buf[4] = 0xFE;
+      msg.buf[5] = 0xFE;
+      msg.buf[6] = 0xFE;
+      msg.buf[7] = 0xFE;
+      Can0.write(msg);
+      delay(1);
+
+      msg.id  = 0x1A555416;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x00;
+      msg.buf[1] = 0x08;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x08;
+      msg.buf[4] = 0x00;
+      msg.buf[5] = 0x08;
+      msg.buf[6] = 0x00;
+      msg.buf[7] = 0x08;
+      Can0.write(msg);
+      delay(1);
+      msg.id  = 0x1A555417;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x00;
+      msg.buf[1] = 0x08;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x08;
+      msg.buf[4] = 0xFE;
+      msg.buf[5] = 0xFE;
+      msg.buf[6] = 0xFE;
+      msg.buf[7] = 0xFE;
+      Can0.write(msg);
+      delay(1);
+    }
+    else
+    {
+      msg.id  = 0x1A555418;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x00;
+      msg.buf[1] = 0x00;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x00;
+      msg.buf[4] = 0x00;
+      msg.buf[5] = 0x00;
+      msg.buf[6] = 0x00;
+      msg.buf[7] = 0x00;
+      Can0.write(msg);
+      delay(1);
+      msg.id  = 0x1A555419;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x00;
+      msg.buf[1] = 0x00;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x00;
+      msg.buf[4] = 0xFE;
+      msg.buf[5] = 0xFE;
+      msg.buf[6] = 0xFE;
+      msg.buf[7] = 0xFE;
+      Can0.write(msg);
+      delay(1);
+
+      msg.id  = 0x1A555416;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x00;
+      msg.buf[1] = 0x00;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x00;
+      msg.buf[4] = 0x00;
+      msg.buf[5] = 0x00;
+      msg.buf[6] = 0x00;
+      msg.buf[7] = 0x00;
+      Can0.write(msg);
+      delay(1);
+      msg.id  = 0x1A555417;
+      msg.len = 8;
+      msg.ext = 1;
+      msg.buf[0] = 0x00;
+      msg.buf[1] = 0x00;
+      msg.buf[2] = 0x00;
+      msg.buf[3] = 0x00;
+      msg.buf[4] = 0xFE;
+      msg.buf[5] = 0xFE;
+      msg.buf[6] = 0xFE;
+      msg.buf[7] = 0xFE;
+      Can0.write(msg);
+      delay(1);
+    }
+  }
+
+
+
+  balcycle++;
+
+  if ( balcycle > 10)
+  {
+    balcycle = 0;
+  }
+
+  msg.ext = 0;
 }
 
 void resetwdog()
