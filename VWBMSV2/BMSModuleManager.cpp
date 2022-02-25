@@ -4,6 +4,7 @@
 #include "Logger.h"
 
 extern EEPROMSettings settings;
+CAN_message_t OUTmsg;
 
 BMSModuleManager::BMSModuleManager()
 {
@@ -45,6 +46,147 @@ bool BMSModuleManager::checkcomms()
   }
   return true;
 }
+
+void BMSModuleManager::setBalanceHyst(float newVal)
+{
+  BalHys = newVal;
+  Serial.println();
+  Serial.println(BalHys, 3);
+}
+
+void BMSModuleManager::balanceCells(int debug)
+{
+  uint16_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
+  Serial.println();
+  Serial.println(LowCellVolt + BalHys, 3);
+  for (int y = 1; y < 63; y++)
+  {
+    if (modules[y].isExisting() == 1)
+    {
+      balance = 0;
+      for (int i = 0; i < 12; i++)
+      {
+        if ((LowCellVolt + BalHys) < modules[y].getCellVoltage(i))
+        {
+          balance = balance | (1 << i);
+        }
+        /*
+        else
+        {
+          Serial.print(" | ");
+          Serial.print(i);
+        }
+        */
+      }
+      if (debug == 1)
+      {
+        Serial.println();
+        Serial.print("Module ");
+        Serial.print(y);
+        Serial.print(" | ");
+        Serial.println(balance, HEX);
+
+      }
+      for (int i = 0; i < 8; i++)
+      {
+        if (bitRead(balance, i) == 1)
+        {
+          OUTmsg.buf[i] = 0x08;
+        }
+        else
+        {
+          OUTmsg.buf[i] = 0x00;
+        }
+      }
+      switch (y)
+      {
+        case (1):
+            OUTmsg.id  = 0x1A55540A;
+          break;
+        case (2):
+            OUTmsg.id  = 0x1A55540C;
+          break;
+        case (3):
+            OUTmsg.id  = 0x1A55540E;
+          break;
+        case (4):
+            OUTmsg.id  = 0x1A555410;
+          break;
+        case (5):
+            OUTmsg.id  = 0x1A555412;
+          break;
+        case (6):
+            OUTmsg.id  = 0x1A555414;
+          break;
+        case (7):
+            OUTmsg.id  = 0x1A555416;
+          break;
+        case (8):
+            OUTmsg.id  = 0x1A555418;
+          break;
+
+        default:
+          return;
+          break;
+      }
+      OUTmsg.len = 8;
+      OUTmsg.ext = 1;
+      Can0.write(OUTmsg);
+      for (int i = 8; i < 13; i++)
+      {
+        if (bitRead(balance, i) == 1)
+        {
+          OUTmsg.buf[i] = 0x08;
+        }
+        else
+        {
+          OUTmsg.buf[i] = 0x00;
+        }
+      }
+      OUTmsg.buf[4] = 0xFE;
+      OUTmsg.buf[5] = 0xFE;
+      OUTmsg.buf[6] = 0xFE;
+      OUTmsg.buf[7] = 0xFE;
+      switch (y)
+      {
+        case (1):
+            OUTmsg.id  = 0x1A55540B;
+          break;
+        case (2):
+            OUTmsg.id  = 0x1A55540D;
+          break;
+        case (3):
+            OUTmsg.id  = 0x1A55540F;
+          break;
+        case (4):
+            OUTmsg.id  = 0x1A555411;
+          break;
+        case (5):
+            OUTmsg.id  = 0x1A555413;
+          break;
+        case (6):
+            OUTmsg.id  = 0x1A555415;
+          break;
+        case (7):
+            OUTmsg.id  = 0x1A555417;
+          break;
+        case (8):
+            OUTmsg.id  = 0x1A555419;
+          break;
+
+        default:
+          return;
+          break;
+      }
+      OUTmsg.len = 8;
+      OUTmsg.ext = 1;
+      Can0.write(OUTmsg);
+    }
+  }
+  OUTmsg.ext = 0;
+}
+
+
 
 int BMSModuleManager::seriescells()
 {
@@ -912,8 +1054,8 @@ void BMSModuleManager::printPackDetails(int digits)
       SERIALCONSOLE.print(modules[y].getTemperature(1));
       SERIALCONSOLE.print("C Temp 3: ");
       SERIALCONSOLE.print(modules[y].getTemperature(2));
-      SERIALCONSOLE.println("C");
-
+      SERIALCONSOLE.print("C | Bal Stat: ");
+      SERIALCONSOLE.println(modules[y].getBalStat(), HEX);
     }
   }
 }

@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 210614;
+int firmver = 220225;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -388,6 +388,7 @@ void setup()
   digitalWrite(led, HIGH);
   bms.setPstrings(settings.Pstrings);
   bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
+  bms.setBalanceHyst(settings.balanceHyst);
 
   ////Calculate fixed numbers
   pwmcurmin = (pwmcurmid / 50 * pwmcurmax * -1);
@@ -476,6 +477,7 @@ void loop()
         }
         if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
         {
+          //bms.balanceCells(1);
           balancecells = 1;
         }
         else
@@ -706,8 +708,8 @@ void loop()
           contctrl = 0; //turn off out 5 and 6
           if (bms.getHighCellVolt() > settings.balanceVoltage && bms.getHighCellVolt() > bms.getLowCellVolt() + settings.balanceHyst)
           {
-            //bms.balanceCells();
-            //balancecells = 1;
+            //bms.balanceCells(1);
+            balancecells = 1;
           }
           else
           {
@@ -757,8 +759,8 @@ void loop()
           digitalWrite(OUT3, HIGH);//enable charger
           if (bms.getHighCellVolt() > settings.balanceVoltage)
           {
-            //bms.balanceCells();
-            //balancecells = 1;
+            //bms.balanceCells(1);
+            balancecells = 1;
           }
           else
           {
@@ -821,6 +823,11 @@ void loop()
     looptime = millis();
     bms.getAllVoltTemp();
     //UV  check
+      if (SOCset != 0 && balancecells == 1)
+      {
+        bms.balanceCells(0);//1 is debug
+      }
+    
     if (settings.ESSmode == 1)
     {
       if (SOCset != 0)
@@ -2507,6 +2514,7 @@ void menu()
           settings.balanceHyst = Serial.parseInt();
           settings.balanceHyst =  settings.balanceHyst / 1000;
           menuload = 1;
+          bms.setBalanceHyst(settings.balanceHyst);
           incomingByte = 'b';
         }
         break;

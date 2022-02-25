@@ -21,6 +21,7 @@ class BMSModuleManager
     void setBalanceV(float newVal);
     void setBalanceHyst(float newVal);
     void setSensors(int sensor, float Ignore, float VoltDelta);
+    void balanceCells(int debug);
     float getPackVoltage();
     float getAvgTemperature();
     float getHighTemperature();
@@ -50,6 +51,7 @@ int getNumModules();
     float highestPackTemp;
     float highTemp;
     float lowTemp;
+    float BalHys;
     BMSModule modules[MAX_MODULE_ADDR + 1]; // store data for as many modules as we've configured for.
     int batteryID;
     int numFoundModules;                    // The number of modules that seem to exist
