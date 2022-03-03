@@ -57,8 +57,8 @@ void BMSModuleManager::setBalanceHyst(float newVal)
 void BMSModuleManager::balanceCells(int debug)
 {
   uint16_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
-  Serial.println();
-  Serial.println(LowCellVolt + BalHys, 3);
+  //Serial.println();
+ // Serial.println(LowCellVolt + BalHys, 3);
   for (int y = 1; y < 63; y++)
   {
     if (modules[y].isExisting() == 1)
