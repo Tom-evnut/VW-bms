@@ -79,7 +79,7 @@ void BMSModule::decodetemp(CAN_message_t &msg)
       temperatures[2] = 0;
     }
   }
-  
+
 }
 
 void BMSModule::decodecan(int Id, CAN_message_t &msg)
@@ -327,6 +327,12 @@ float BMSModule::getAverageV()
 
   scells = x;
   avgVal /= x;
+
+  if (scells == 0)
+  {
+    avgVal = 0;
+  }
+
   return avgVal;
 }
 

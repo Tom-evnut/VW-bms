@@ -58,7 +58,7 @@ void BMSModuleManager::balanceCells(int debug)
 {
   uint16_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
   //Serial.println();
- // Serial.println(LowCellVolt + BalHys, 3);
+  // Serial.println(LowCellVolt + BalHys, 3);
   for (int y = 1; y < 63; y++)
   {
     if (modules[y].isExisting() == 1)
@@ -71,11 +71,11 @@ void BMSModuleManager::balanceCells(int debug)
           balance = balance | (1 << i);
         }
         /*
-        else
-        {
+          else
+          {
           Serial.print(" | ");
           Serial.print(i);
-        }
+          }
         */
       }
       if (debug == 1)
@@ -101,28 +101,28 @@ void BMSModuleManager::balanceCells(int debug)
       switch (y)
       {
         case (1):
-            OUTmsg.id  = 0x1A55540A;
+          OUTmsg.id  = 0x1A55540A;
           break;
         case (2):
-            OUTmsg.id  = 0x1A55540C;
+          OUTmsg.id  = 0x1A55540C;
           break;
         case (3):
-            OUTmsg.id  = 0x1A55540E;
+          OUTmsg.id  = 0x1A55540E;
           break;
         case (4):
-            OUTmsg.id  = 0x1A555410;
+          OUTmsg.id  = 0x1A555410;
           break;
         case (5):
-            OUTmsg.id  = 0x1A555412;
+          OUTmsg.id  = 0x1A555412;
           break;
         case (6):
-            OUTmsg.id  = 0x1A555414;
+          OUTmsg.id  = 0x1A555414;
           break;
         case (7):
-            OUTmsg.id  = 0x1A555416;
+          OUTmsg.id  = 0x1A555416;
           break;
         case (8):
-            OUTmsg.id  = 0x1A555418;
+          OUTmsg.id  = 0x1A555418;
           break;
 
         default:
@@ -150,28 +150,28 @@ void BMSModuleManager::balanceCells(int debug)
       switch (y)
       {
         case (1):
-            OUTmsg.id  = 0x1A55540B;
+          OUTmsg.id  = 0x1A55540B;
           break;
         case (2):
-            OUTmsg.id  = 0x1A55540D;
+          OUTmsg.id  = 0x1A55540D;
           break;
         case (3):
-            OUTmsg.id  = 0x1A55540F;
+          OUTmsg.id  = 0x1A55540F;
           break;
         case (4):
-            OUTmsg.id  = 0x1A555411;
+          OUTmsg.id  = 0x1A555411;
           break;
         case (5):
-            OUTmsg.id  = 0x1A555413;
+          OUTmsg.id  = 0x1A555413;
           break;
         case (6):
-            OUTmsg.id  = 0x1A555415;
+          OUTmsg.id  = 0x1A555415;
           break;
         case (7):
-            OUTmsg.id  = 0x1A555417;
+          OUTmsg.id  = 0x1A555417;
           break;
         case (8):
-            OUTmsg.id  = 0x1A555419;
+          OUTmsg.id  = 0x1A555419;
           break;
 
         default:
@@ -845,12 +845,10 @@ float BMSModuleManager::getAvgTemperature()
   lowTemp = 999.0f;
   highTemp = -999.0f;
   int y = 0; //counter for modules below -70 (no sensors connected)
-  numFoundModules = 0;
   for (int x = 1; x <= MAX_MODULE_ADDR; x++)
   {
     if (modules[x].isExisting())
     {
-      numFoundModules++;
       if (modules[x].getAvgTemp() > -70)
       {
         avg += modules[x].getAvgTemp();
@@ -886,10 +884,18 @@ float BMSModuleManager::getLowTemperature()
 
 float BMSModuleManager::getAvgCellVolt()
 {
+  numFoundModules = 0;
   float avg = 0.0f;
   for (int x = 1; x <= MAX_MODULE_ADDR; x++)
   {
-    if (modules[x].isExisting()) avg += modules[x].getAverageV();
+    if (modules[x].isExisting())
+    {
+      if (modules[x].getAverageV() > 0)
+      {
+        avg += modules[x].getAverageV();
+        numFoundModules++;
+      }
+    }
   }
   avg = avg / (float)numFoundModules;
 
