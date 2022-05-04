@@ -136,11 +136,11 @@ void BMSModuleManager::balanceCells(int debug)
       {
         if (bitRead(balance, i) == 1)
         {
-          OUTmsg.buf[i] = 0x08;
+          OUTmsg.buf[i-8] = 0x08;
         }
         else
         {
-          OUTmsg.buf[i] = 0x00;
+          OUTmsg.buf[i-8] = 0x00;
         }
       }
       OUTmsg.buf[4] = 0xFE;
