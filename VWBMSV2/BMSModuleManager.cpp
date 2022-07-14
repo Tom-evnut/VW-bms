@@ -136,11 +136,11 @@ void BMSModuleManager::balanceCells(int debug)
       {
         if (bitRead(balance, i) == 1)
         {
-          OUTmsg.buf[i-8] = 0x08;
+          OUTmsg.buf[i - 8] = 0x08;
         }
         else
         {
-          OUTmsg.buf[i-8] = 0x00;
+          OUTmsg.buf[i - 8] = 0x00;
         }
       }
       OUTmsg.buf[4] = 0xFE;
@@ -214,40 +214,58 @@ void BMSModuleManager::clearmodules()
   }
 }
 
-void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
+void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
 {
-  int CMU = (msg.id & 0xFF);
-  if (debug == 1)
+  int CMU = 0;
+  if (type == 1)
   {
-    Serial.println();
-    Serial.print(CMU);
-    Serial.print(" | ");
-  }
-  if (CMU > 10 && CMU < 60)
-  {
-    CMU = (CMU * 0.5) - 15;
-  }
-  /*
-    if (CMU > 64 && CMU < 73)
-    {
-    CMU = CMU - 48;
-    }
-    if (CMU > 97 && CMU < 104)
-    {
-    CMU = CMU - 72;
-    }
-  */
-  if (CMU > 0 && CMU < 15);
-  {
-    modules[CMU].setExists(true);
-    modules[CMU].setReset(true);
-    modules[CMU].decodetemp(msg);
-    if (debug == 1)
-    {
-      Serial.println();
-      Serial.print(CMU);
-      Serial.print(" Temp Found");
+    CMU = (msg.id & 0x0F);
+    /*
+      if (CMU > 10 && CMU < 60)
+      {
+      CMU = (CMU * 0.5) - 15;
+      }
 
+      if (CMU > 64 && CMU < 73)
+      {
+      CMU = CMU - 48;
+      }
+      if (CMU > 97 && CMU < 104)
+      {
+      CMU = CMU - 72;
+      }
+    */
+    if (CMU > 0 && CMU < 15);
+    {
+      modules[CMU].setExists(true);
+      modules[CMU].setReset(true);
+      modules[CMU].decodetemp(msg);
+      if (debug == 1)
+      {
+        Serial.println();
+        Serial.print(CMU);
+        Serial.print(" | Temp Found");
+      }
+    }
+  }
+  if (type == 2)
+  {
+    CMU = (msg.id & 0x0F);
+    if (CMU > 0 && CMU < 15);
+    {
+      CMU++;
+      if (msg.buf[5] != 0xDF) //Check module is not initializing OR a "spoof module"
+      {
+        modules[CMU].setExists(true);
+        modules[CMU].setReset(true);
+        modules[CMU].decodetemp(msg);
+        if (debug == 1)
+        {
+          Serial.println();
+          Serial.print(CMU);
+          Serial.print("|  Temp Found");
+        }
+      }
     }
   }
 }
@@ -255,483 +273,276 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug)
 void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
 {
   int CMU, Id = 0;
-  switch (msg.id)
+  if (msg.buf[2] != 0xFF && msg.buf[5] != 0xFF && msg.buf[7] != 0xFF) //Check module is not initializing OR a "spoof module"
   {
-    /*
-      ///////////////// Two extender increment//////////
-      case (0x210):
-      CMU = 25;
-      Id = 0;
-      break;
-      case (0x211):
-      CMU = 25;
-      Id = 1;
-      break;
-      case (0x212):
-      CMU = 25;
-      Id = 2;
-      break;
-
-      case (0x214):
-      CMU = 26;
-      Id = 0;
-      break;
-      case (0x215):
-      CMU = 26;
-      Id = 1;
-      break;
-      case (0x216):
-      CMU = 26;
-      Id = 2;
-      break;
-      case (0x218):
-      CMU = 27;
-      Id = 0;
-      break;
-      case (0x219):
-      CMU = 27;
-      Id = 1;
-      break;
-      case (0x21A):
-      CMU = 27;
-      Id = 2;
-      break;
-      case (0x21C):
-      CMU = 28;
-      Id = 0;
-      break;
-      case (0x21D):
-      CMU = 28;
-      Id = 1;
-      break;
-      case (0x21E):
-      CMU = 28;
-      Id = 2;
-      break;
-
-      case (0x220):
-      CMU = 29;
-      Id = 0;
-      break;
-      case (0x221):
-      CMU = 29;
-      Id = 1;
-      break;
-      case (0x222):
-      CMU = 29;
-      Id = 2;
-      break;
-
-      case (0x224):
-      CMU = 30;
-      Id = 0;
-      break;
-      case (0x225):
-      CMU = 30;
-      Id = 1;
-      break;
-      case (0x226):
-      CMU = 30;
-      Id = 2;
-      break;
-
-      case (0x228):
-      CMU = 31;
-      Id = 0;
-      break;
-      case (0x229):
-      CMU = 31;
-      Id = 1;
-      break;
-      case (0x22A):
-      CMU = 31;
-      Id = 2;
-      break;
-
-      case (0x22C):
-      CMU = 32;
-      Id = 0;
-      break;
-      case (0x22D):
-      CMU = 32;
-      Id = 1;
-      break;
-      case (0x22E):
-      CMU = 32;
-      Id = 2;
-      break;
-
-
-      ///////////////// Two extender increment//////////
-      case (0x1F0):
-      CMU = 17;
-      Id = 0;
-      break;
-      case (0x1F1):
-      CMU = 17;
-      Id = 1;
-      break;
-      case (0x1F2):
-      CMU = 17;
-      Id = 2;
-      break;
-
-      case (0x1F4):
-      CMU = 18;
-      Id = 0;
-      break;
-      case (0x1F5):
-      CMU = 18;
-      Id = 1;
-      break;
-      case (0x1F6):
-      CMU = 18;
-      Id = 2;
-      break;
-
-      case (0x1F8):
-      CMU = 19;
-      Id = 0;
-      break;
-      case (0x1F9):
-      CMU = 19;
-      Id = 1;
-      break;
-      case (0x1FA):
-      CMU = 19;
-      Id = 2;
-      break;
-
-      case (0x1FC):
-      CMU = 20;
-      Id = 0;
-      break;
-      case (0x1FD):
-      CMU = 20;
-      Id = 1;
-      break;
-      case (0x1FE):
-      CMU = 20;
-      Id = 2;
-      break;
-
-      case (0x200):
-      CMU = 21;
-      Id = 0;
-      break;
-      case (0x201):
-      CMU = 21;
-      Id = 1;
-      break;
-      case (0x202):
-      CMU = 21;
-      Id = 2;
-      break;
-
-      case (0x204):
-      CMU = 22;
-      Id = 0;
-      break;
-      case (0x205):
-      CMU = 22;
-      Id = 1;
-      break;
-      case (0x206):
-      CMU = 22;
-      Id = 2;
-      break;
-
-      case (0x208):
-      CMU = 23;
-      Id = 0;
-      break;
-      case (0x209):
-      CMU = 23;
-      Id = 1;
-      break;
-      case (0x20A):
-      CMU = 23;
-      Id = 2;
-      break;
-
-      case (0x20C):
-      CMU = 24;
-      Id = 0;
-      break;
-      case (0x20D):
-      CMU = 24;
-      Id = 1;
-      break;
-      case (0x20E):
-      CMU = 24;
-      Id = 2;
-      break;
-    */
-    ///////////////// one extender increment//////////
-
-    case (0x1D0):
-      CMU = 9;
-      Id = 0;
-      break;
-    case (0x1D1):
-      CMU = 9;
-      Id = 1;
-      break;
-    case (0x1D2):
-      CMU = 9;
-      Id = 2;
-      break;
-    case (0x1D3):
-      CMU = 9;
-      Id = 3;
-      break;
-
-    case (0x1D4):
-      CMU = 10;
-      Id = 0;
-      break;
-    case (0x1D5):
-      CMU = 10;
-      Id = 1;
-      break;
-    case (0x1D6):
-      CMU = 10;
-      Id = 2;
-      break;
-    case (0x1D8):
-      CMU = 11;
-      Id = 0;
-      break;
-    case (0x1D9):
-      CMU = 11;
-      Id = 1;
-      break;
-    case (0x1DA):
-      CMU = 11;
-      Id = 2;
-      break;
-    case (0x1DC):
-      CMU = 12;
-      Id = 0;
-      break;
-    case (0x1DD):
-      CMU = 12;
-      Id = 1;
-      break;
-    case (0x1DE):
-      CMU = 12;
-      Id = 2;
-      break;
-
-    case (0x1E0):
-      CMU = 13;
-      Id = 0;
-      break;
-    case (0x1E1):
-      CMU = 13;
-      Id = 1;
-      break;
-    case (0x1E2):
-      CMU = 13;
-      Id = 2;
-      break;
-
-    case (0x1E4):
-      CMU = 14;
-      Id = 0;
-      break;
-    case (0x1E5):
-      CMU = 14;
-      Id = 1;
-      break;
-    case (0x1E6):
-      CMU = 14;
-      Id = 2;
-      break;
-
-    case (0x1E8):
-      CMU = 15;
-      Id = 0;
-      break;
-    case (0x1E9):
-      CMU = 15;
-      Id = 1;
-      break;
-    case (0x1EA):
-      CMU = 15;
-      Id = 2;
-      break;
-
-    case (0x1EC):
-      CMU = 16;
-      Id = 0;
-      break;
-    case (0x1ED):
-      CMU = 16;
-      Id = 1;
-      break;
-    case (0x1EE):
-      CMU = 16;
-      Id = 2;
-      break;
-
-
-    ///////////////////////standard ids////////////////
-
-
-    case (0x1B0):
-      CMU = 1;
-      Id = 0;
-      break;
-    case (0x1B1):
-      CMU = 1;
-      Id = 1;
-      break;
-    case (0x1B2):
-      CMU = 1;
-      Id = 2;
-      break;
-    case (0x1B3):
-      CMU = 1;
-      Id = 3;
-      break;
-
-    case (0x1B4):
-      CMU = 2;
-      Id = 0;
-      break;
-    case (0x1B5):
-      CMU = 2;
-      Id = 1;
-      break;
-    case (0x1B6):
-      CMU = 2;
-      Id = 2;
-      break;
-    case (0x1B7):
-      CMU = 2;
-      Id = 3;
-      break;
-
-    case (0x1B8):
-      CMU = 3;
-      Id = 0;
-      break;
-    case (0x1B9):
-      CMU = 3;
-      Id = 1;
-      break;
-    case (0x1BA):
-      CMU = 3;
-      Id = 2;
-      break;
-    case (0x1BB):
-      CMU = 3;
-      Id = 3;
-      break;
-
-    case (0x1BC):
-      CMU = 4;
-      Id = 0;
-      break;
-    case (0x1BD):
-      CMU = 4;
-      Id = 1;
-      break;
-    case (0x1BE):
-      CMU = 4;
-      Id = 2;
-      break;
-    case (0x1BF):
-      CMU = 4;
-      Id = 3;
-      break;
-
-    case (0x1C0):
-      CMU = 5;
-      Id = 0;
-      break;
-    case (0x1C1):
-      CMU = 5;
-      Id = 1;
-      break;
-    case (0x1C2):
-      CMU = 5;
-      Id = 2;
-      break;
-    case (0x1C3):
-      CMU = 5;
-      Id = 3;
-      break;
-
-    case (0x1C4):
-      CMU = 6;
-      Id = 0;
-      break;
-    case (0x1C5):
-      CMU = 6;
-      Id = 1;
-      break;
-    case (0x1C6):
-      CMU = 6;
-      Id = 2;
-      break;
-    case (0x1C7):
-      CMU = 6;
-      Id = 3;
-      break;
-
-    case (0x1C8):
-      CMU = 7;
-      Id = 0;
-      break;
-    case (0x1C9):
-      CMU = 7;
-      Id = 1;
-      break;
-    case (0x1CA):
-      CMU = 7;
-      Id = 2;
-      break;
-    case (0x1CB):
-      CMU = 7;
-      Id = 3;
-      break;
-
-    case (0x1CC):
-      CMU = 8;
-      Id = 0;
-      break;
-    case (0x1CD):
-      CMU = 8;
-      Id = 1;
-      break;
-    case (0x1CE):
-      CMU = 8;
-      Id = 2;
-      break;
-    case (0x1CF):
-      CMU = 8;
-      Id = 3;
-      break;
-
-    default:
-      return;
-      break;
-  }
-  if (CMU > 0 && CMU < 64)
-  {
-    if (debug == 1)
+    switch (msg.id)
     {
-      Serial.println();
-      Serial.print(CMU);
-      Serial.print(",");
-      Serial.print(Id);
-      Serial.println();
+      ///////////////// one extender increment//////////
+
+      case (0x1D0):
+        CMU = 9;
+        Id = 0;
+        break;
+      case (0x1D1):
+        CMU = 9;
+        Id = 1;
+        break;
+      case (0x1D2):
+        CMU = 9;
+        Id = 2;
+        break;
+      case (0x1D3):
+        CMU = 9;
+        Id = 3;
+        break;
+
+      case (0x1D4):
+        CMU = 10;
+        Id = 0;
+        break;
+      case (0x1D5):
+        CMU = 10;
+        Id = 1;
+        break;
+      case (0x1D6):
+        CMU = 10;
+        Id = 2;
+        break;
+      case (0x1D8):
+        CMU = 11;
+        Id = 0;
+        break;
+      case (0x1D9):
+        CMU = 11;
+        Id = 1;
+        break;
+      case (0x1DA):
+        CMU = 11;
+        Id = 2;
+        break;
+      case (0x1DC):
+        CMU = 12;
+        Id = 0;
+        break;
+      case (0x1DD):
+        CMU = 12;
+        Id = 1;
+        break;
+      case (0x1DE):
+        CMU = 12;
+        Id = 2;
+        break;
+
+      case (0x1E0):
+        CMU = 13;
+        Id = 0;
+        break;
+      case (0x1E1):
+        CMU = 13;
+        Id = 1;
+        break;
+      case (0x1E2):
+        CMU = 13;
+        Id = 2;
+        break;
+
+      case (0x1E4):
+        CMU = 14;
+        Id = 0;
+        break;
+      case (0x1E5):
+        CMU = 14;
+        Id = 1;
+        break;
+      case (0x1E6):
+        CMU = 14;
+        Id = 2;
+        break;
+
+      case (0x1E8):
+        CMU = 15;
+        Id = 0;
+        break;
+      case (0x1E9):
+        CMU = 15;
+        Id = 1;
+        break;
+      case (0x1EA):
+        CMU = 15;
+        Id = 2;
+        break;
+
+      case (0x1EC):
+        CMU = 16;
+        Id = 0;
+        break;
+      case (0x1ED):
+        CMU = 16;
+        Id = 1;
+        break;
+      case (0x1EE):
+        CMU = 16;
+        Id = 2;
+        break;
+
+
+      ///////////////////////standard ids////////////////
+
+
+      case (0x1B0):
+        CMU = 1;
+        Id = 0;
+        break;
+      case (0x1B1):
+        CMU = 1;
+        Id = 1;
+        break;
+      case (0x1B2):
+        CMU = 1;
+        Id = 2;
+        break;
+      case (0x1B3):
+        CMU = 1;
+        Id = 3;
+        break;
+
+      case (0x1B4):
+        CMU = 2;
+        Id = 0;
+        break;
+      case (0x1B5):
+        CMU = 2;
+        Id = 1;
+        break;
+      case (0x1B6):
+        CMU = 2;
+        Id = 2;
+        break;
+      case (0x1B7):
+        CMU = 2;
+        Id = 3;
+        break;
+
+      case (0x1B8):
+        CMU = 3;
+        Id = 0;
+        break;
+      case (0x1B9):
+        CMU = 3;
+        Id = 1;
+        break;
+      case (0x1BA):
+        CMU = 3;
+        Id = 2;
+        break;
+      case (0x1BB):
+        CMU = 3;
+        Id = 3;
+        break;
+
+      case (0x1BC):
+        CMU = 4;
+        Id = 0;
+        break;
+      case (0x1BD):
+        CMU = 4;
+        Id = 1;
+        break;
+      case (0x1BE):
+        CMU = 4;
+        Id = 2;
+        break;
+      case (0x1BF):
+        CMU = 4;
+        Id = 3;
+        break;
+
+      case (0x1C0):
+        CMU = 5;
+        Id = 0;
+        break;
+      case (0x1C1):
+        CMU = 5;
+        Id = 1;
+        break;
+      case (0x1C2):
+        CMU = 5;
+        Id = 2;
+        break;
+      case (0x1C3):
+        CMU = 5;
+        Id = 3;
+        break;
+
+      case (0x1C4):
+        CMU = 6;
+        Id = 0;
+        break;
+      case (0x1C5):
+        CMU = 6;
+        Id = 1;
+        break;
+      case (0x1C6):
+        CMU = 6;
+        Id = 2;
+        break;
+      case (0x1C7):
+        CMU = 6;
+        Id = 3;
+        break;
+
+      case (0x1C8):
+        CMU = 7;
+        Id = 0;
+        break;
+      case (0x1C9):
+        CMU = 7;
+        Id = 1;
+        break;
+      case (0x1CA):
+        CMU = 7;
+        Id = 2;
+        break;
+      case (0x1CB):
+        CMU = 7;
+        Id = 3;
+        break;
+
+      case (0x1CC):
+        CMU = 8;
+        Id = 0;
+        break;
+      case (0x1CD):
+        CMU = 8;
+        Id = 1;
+        break;
+      case (0x1CE):
+        CMU = 8;
+        Id = 2;
+        break;
+      case (0x1CF):
+        CMU = 8;
+        Id = 3;
+        break;
+
+      default:
+        return;
+        break;
     }
-    modules[CMU].setExists(true);
-    modules[CMU].setReset(true);
-    modules[CMU].decodecan(Id, msg);
+    if (CMU > 0 && CMU < 64)
+    {
+      if (debug == 1)
+      {
+        Serial.println();
+        Serial.print(CMU);
+        Serial.print(",");
+        Serial.print(Id);
+        Serial.println();
+      }
+      modules[CMU].setExists(true);
+      modules[CMU].setReset(true);
+      modules[CMU].decodecan(Id, msg);
+    }
   }
 }
 
@@ -1054,14 +865,24 @@ void BMSModuleManager::printPackDetails(int digits)
         SERIALCONSOLE.print("V");
       }
       SERIALCONSOLE.println();
-      SERIALCONSOLE.print(" Temp 1: ");
-      SERIALCONSOLE.print(modules[y].getTemperature(0));
-      SERIALCONSOLE.print("C Temp 2: ");
-      SERIALCONSOLE.print(modules[y].getTemperature(1));
-      SERIALCONSOLE.print("C Temp 3: ");
-      SERIALCONSOLE.print(modules[y].getTemperature(2));
-      SERIALCONSOLE.print("C | Bal Stat: ");
-      SERIALCONSOLE.println(modules[y].getBalStat(), HEX);
+      if (modules[y].getType() == 1)
+      {
+        SERIALCONSOLE.print(" Temp 1: ");
+        SERIALCONSOLE.print(modules[y].getTemperature(0));
+        SERIALCONSOLE.print("C Temp 2: ");
+        SERIALCONSOLE.print(modules[y].getTemperature(1));
+        SERIALCONSOLE.print("C Temp 3: ");
+        SERIALCONSOLE.print(modules[y].getTemperature(2));
+        SERIALCONSOLE.print("C | Bal Stat: ");
+        SERIALCONSOLE.println(modules[y].getBalStat(), HEX);
+      }
+      else
+      {
+        SERIALCONSOLE.print(" Temp 1: ");
+        SERIALCONSOLE.print(modules[y].getTemperature(0));
+        SERIALCONSOLE.print("C | Bal Stat: ");
+        SERIALCONSOLE.println(modules[y].getBalStat(), HEX);
+      }
     }
   }
 }
@@ -1109,12 +930,19 @@ void BMSModuleManager::printAllCSV(unsigned long timestamp, float current, int S
         Serial2.print(modules[y].getCellVoltage(i));
         Serial2.print(",");
       }
-      Serial2.print(modules[y].getTemperature(0));
-      Serial2.print(",");
-      Serial2.print(modules[y].getTemperature(1));
-      Serial2.print(",");
-      Serial2.print(modules[y].getTemperature(2));
-      Serial2.println();
+      if (modules[y].getType() == 1)
+      {
+        Serial2.print(modules[y].getTemperature(0));
+        Serial2.print(",");
+        Serial2.print(modules[y].getTemperature(1));
+        Serial2.print(",");
+        Serial2.print(modules[y].getTemperature(2));
+        Serial2.println();
+      }
+      else
+      {
+        Serial2.print(modules[y].getTemperature(0));
+      }
     }
   }
 }

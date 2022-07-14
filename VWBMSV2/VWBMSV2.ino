@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 220706;
+int firmver = 220714;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -842,11 +842,11 @@ void loop()
     looptime = millis();
     bms.getAllVoltTemp();
     //UV  check
-      if (SOCset != 0 && balancecells == 1)
-      {
-        bms.balanceCells(0);//1 is debug
-      }
-    
+    if (SOCset != 0 && balancecells == 1)
+    {
+      bms.balanceCells(0);//1 is debug
+    }
+
     if (settings.ESSmode == 1)
     {
       if (SOCset != 0)
@@ -1940,7 +1940,7 @@ void menu()
         balon = !balon;
         incomingByte = 'd';
         break;
-        
+
       case 113: //q for quite menu
 
         menuload = 0;
@@ -3068,16 +3068,27 @@ void canread()
     }
   }
 
-  if ((inMsg.id & 0x1FFFFFFF) < 0x1A5554F0 && (inMsg.id & 0x1FFFFFFF) > 0x1A555400)   // Determine if ID is Temperature CAN-ID
+  if ((inMsg.id & 0x1FFFFFFF) < 0x1A555420 && (inMsg.id & 0x1FFFFFFF) > 0x1A555400)   // Determine if ID is Temperature CAN-ID
   {
     if (candebug == 1)
     {
-      bms.decodetemp(inMsg, 1);
-
+      bms.decodetemp(inMsg, 1, 1);
     }
     else
     {
-      bms.decodetemp(inMsg, 0);
+      bms.decodetemp(inMsg, 0, 1);
+    }
+  }
+
+  if ((inMsg.id & 0x1FFFFFFF) < 0x1A5555FF && (inMsg.id & 0x1FFFFFFF) > 0x1A5555EF)   // Determine if ID is Temperature CAN-ID FOR MEB
+  {
+    if (candebug == 1)
+    {
+      bms.decodetemp(inMsg, 1, 2);
+    }
+    else
+    {
+      bms.decodetemp(inMsg, 0, 2);
     }
   }
 

@@ -24,6 +24,7 @@ BMSModule::BMSModule()
   reset = false;
   moduleAddress = 0;
   timeout = 30000; //milliseconds before comms timeout;
+  type = 1;
 }
 
 void BMSModule::clearmodule()
@@ -44,42 +45,50 @@ void BMSModule::clearmodule()
 
 void BMSModule::decodetemp(CAN_message_t &msg)
 {
-  if (msg.buf[7] == 0xFD)
+  if (msg.buf[2] != 0x00) //0x00 in byte 2 means its an MEB message
   {
-    if (msg.buf[2] != 0xFD)
+    type = 1;
+    if (msg.buf[7] == 0xFD)
     {
-      temperatures[0] = (msg.buf[2] * 0.5) - 40;
+      if (msg.buf[2] != 0xFD)
+      {
+        temperatures[0] = (msg.buf[2] * 0.5) - 40;
+      }
+    }
+    else
+    {
+      if (msg.buf[0] < 0xDF)
+      {
+        temperatures[0] = (msg.buf[0] * 0.5) - 43;
+        balstat = msg.buf[2] + (msg.buf[3] << 8);
+      }
+      else
+      {
+        temperatures[0] = (msg.buf[3] * 0.5) - 43;
+      }
+      if (msg.buf[4] < 0xF0)
+      {
+        temperatures[1] = (msg.buf[4] * 0.5) - 43;
+      }
+      else
+      {
+        temperatures[1] = 0;
+      }
+      if (msg.buf[5] < 0xF0)
+      {
+        temperatures[2] = (msg.buf[5] * 0.5) - 43;
+      }
+      else
+      {
+        temperatures[2] = 0;
+      }
     }
   }
   else
   {
-    if (msg.buf[0] < 0xDF)
-    {
-      temperatures[0] = (msg.buf[0] * 0.5) - 43;
-      balstat = msg.buf[2] + (msg.buf[3] << 8);
-    }
-    else
-    {
-      temperatures[0] = (msg.buf[3] * 0.5) - 43;
-    }
-    if (msg.buf[4] < 0xF0)
-    {
-      temperatures[1] = (msg.buf[4] * 0.5) - 43;
-    }
-    else
-    {
-      temperatures[1] = 0;
-    }
-    if (msg.buf[5] < 0xF0)
-    {
-      temperatures[2] = (msg.buf[5] * 0.5) - 43;
-    }
-    else
-    {
-      temperatures[2] = 0;
-    }
+    type = 2;
+    temperatures[0] = ((uint16_t(((msg.buf[5] & 0x0F) << 4) | ((msg.buf[4] & 0xF0) >> 4))) * 0.5) - 40; //MEB Bits 36-44
   }
-
 }
 
 void BMSModule::decodecan(int Id, CAN_message_t &msg)
@@ -375,94 +384,115 @@ float BMSModule::getLowestTemp()
 
 float BMSModule::getLowTemp()
 {
-  if (sensor == 0)
+  if (type == 1)
   {
-    if (getAvgTemp() > 0.5)
+    if (sensor == 0)
     {
-      if (temperatures[0] > 0.5)
+      if (getAvgTemp() > 0.5)
       {
-        if (temperatures[0] < temperatures[1] && temperatures[0] < temperatures[2])
+        if (temperatures[0] > 0.5)
         {
-          return (temperatures[0]);
+          if (temperatures[0] < temperatures[1] && temperatures[0] < temperatures[2])
+          {
+            return (temperatures[0]);
+          }
+        }
+        if (temperatures[1] > 0.5)
+        {
+          if (temperatures[1] < temperatures[0] && temperatures[1] < temperatures[2])
+          {
+            return (temperatures[1]);
+          }
+        }
+        if (temperatures[2] > 0.5)
+        {
+          if (temperatures[2] < temperatures[1] && temperatures[2] < temperatures[0])
+          {
+            return (temperatures[2]);
+          }
         }
       }
-      if (temperatures[1] > 0.5)
-      {
-        if (temperatures[1] < temperatures[0] && temperatures[1] < temperatures[2])
-        {
-          return (temperatures[1]);
-        }
-      }
-      if (temperatures[2] > 0.5)
-      {
-        if (temperatures[2] < temperatures[1] && temperatures[2] < temperatures[0])
-        {
-          return (temperatures[2]);
-        }
-      }
+    }
+    else
+    {
+      return temperatures[sensor - 1];
     }
   }
   else
   {
-    return temperatures[sensor - 1];
+    return temperatures[0];
   }
 }
 
 float BMSModule::getHighTemp()
 {
-  if (sensor == 0)
+  if (type == 1)
   {
-    return (temperatures[0] < temperatures[1]) ? temperatures[1] : temperatures[0];
+    if (sensor == 0)
+    {
+      return (temperatures[0] < temperatures[1]) ? temperatures[1] : temperatures[0];
+    }
+    else
+    {
+      return temperatures[sensor - 1];
+    }
   }
   else
   {
-    return temperatures[sensor - 1];
+    return temperatures[0];
   }
 }
 
 float BMSModule::getAvgTemp()
 {
-  if (sensor == 0)
+  if (type == 1)
   {
-    if ((temperatures[0] + temperatures[1] + temperatures[2]) / 3.0f > 0.5)
+    if (sensor == 0)
     {
-      if (temperatures[0] > 0.5 && temperatures[1] > 0.5 && temperatures[2] > 0.5)
+      if ((temperatures[0] + temperatures[1] + temperatures[2]) / 3.0f > 0.5)
       {
-        return (temperatures[0] + temperatures[1] + temperatures[2]) / 3.0f;
+        if (temperatures[0] > 0.5 && temperatures[1] > 0.5 && temperatures[2] > 0.5)
+        {
+          return (temperatures[0] + temperatures[1] + temperatures[2]) / 3.0f;
+        }
+        if (temperatures[0] < 0.5 && temperatures[1] > 0.5 && temperatures[2] > 0.5)
+        {
+          return (temperatures[1] + temperatures[2]) / 2.0f;
+        }
+        if (temperatures[0] > 0.5 && temperatures[1] < 0.5 && temperatures[2] > 0.5)
+        {
+          return (temperatures[0] + temperatures[2]) / 2.0f;
+        }
+        if (temperatures[0] > 0.5 && temperatures[1] > 0.5 && temperatures[2] < 0.5)
+        {
+          return (temperatures[0] + temperatures[1]) / 2.0f;
+        }
+        if (temperatures[0] > 0.5 && temperatures[1] < 0.5 && temperatures[2] < 0.5)
+        {
+          return (temperatures[0]);
+        }
+        if (temperatures[0] < 0.5 && temperatures[1] > 0.5 && temperatures[2] < 0.5)
+        {
+          return (temperatures[1]);
+        }
+        if (temperatures[0] < 0.5 && temperatures[1] < 0.5 && temperatures[2] > 0.5)
+        {
+          return (temperatures[2]);
+        }
+        if (temperatures[0] < 0.5 && temperatures[1] < 0.5 && temperatures[2] < 0.5)
+        {
+          return (-80);
+        }
       }
-      if (temperatures[0] < 0.5 && temperatures[1] > 0.5 && temperatures[2] > 0.5)
-      {
-        return (temperatures[1] + temperatures[2]) / 2.0f;
-      }
-      if (temperatures[0] > 0.5 && temperatures[1] < 0.5 && temperatures[2] > 0.5)
-      {
-        return (temperatures[0] + temperatures[2]) / 2.0f;
-      }
-      if (temperatures[0] > 0.5 && temperatures[1] > 0.5 && temperatures[2] < 0.5)
-      {
-        return (temperatures[0] + temperatures[1]) / 2.0f;
-      }
-      if (temperatures[0] > 0.5 && temperatures[1] < 0.5 && temperatures[2] < 0.5)
-      {
-        return (temperatures[0]);
-      }
-      if (temperatures[0] < 0.5 && temperatures[1] > 0.5 && temperatures[2] < 0.5)
-      {
-        return (temperatures[1]);
-      }
-      if (temperatures[0] < 0.5 && temperatures[1] < 0.5 && temperatures[2] > 0.5)
-      {
-        return (temperatures[2]);
-      }
-      if (temperatures[0] < 0.5 && temperatures[1] < 0.5 && temperatures[2] < 0.5)
-      {
-        return (-80);
-      }
+    }
+    else
+    {
+      return temperatures[sensor - 1];
     }
   }
   else
   {
-    return temperatures[sensor - 1];
+    return temperatures[0];
   }
 }
 
@@ -494,6 +524,11 @@ void BMSModule::setAddress(int newAddr)
 int BMSModule::getAddress()
 {
   return moduleAddress;
+}
+
+int BMSModule::getType()
+{
+  return type;
 }
 
 int BMSModule::getBalStat()

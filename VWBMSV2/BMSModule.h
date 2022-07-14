@@ -30,6 +30,7 @@ class BMSModule
     uint8_t getCUVCells();
     void setAddress(int newAddr);
     int getAddress();
+    int getType();
     int getBalStat();
     bool isExisting();
     bool isReset();
@@ -65,6 +66,6 @@ class BMSModule
     uint32_t lasterror;
     uint8_t cmuerror;
     uint32_t timeout;
-    
+    int type;
 
 };
