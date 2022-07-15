@@ -56,6 +56,8 @@ int getNumModules();
     int batteryID;
     int numFoundModules;                    // The number of modules that seem to exist
     bool isFaulted;
+     bool balancing;
+     uint8_t balcnt;
     int spack;
     /*
       void sendBatterySummary();

@@ -17,6 +17,8 @@ BMSModuleManager::BMSModuleManager()
   lowestPackTemp = 200.0f;
   highestPackTemp = -100.0f;
   isFaulted = false;
+  balancing = false;
+  balcnt = 0;//counter to stop balancing for cell measurement
 }
 
 bool BMSModuleManager::checkcomms()
@@ -56,133 +58,165 @@ void BMSModuleManager::setBalanceHyst(float newVal)
 
 void BMSModuleManager::balanceCells(int debug)
 {
+
+  balancing = false;
   uint16_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
   //Serial.println();
   // Serial.println(LowCellVolt + BalHys, 3);
-  for (int y = 1; y < 63; y++)
+
+  Serial.println();
+  Serial.println();
+  Serial.print("Balcnt:");
+  Serial.println(balcnt);
+
+  if (balcnt < 50)
   {
-    if (modules[y].isExisting() == 1)
+    for (int y = 1; y < 63; y++)
     {
-      balance = 0;
-      for (int i = 0; i < 12; i++)
+      if (modules[y].isExisting() == 1)
       {
-        if ((LowCellVolt + BalHys) < modules[y].getCellVoltage(i))
+        balance = 0;
+        for (int i = 0; i < 12; i++)
         {
-          balance = balance | (1 << i);
+          if ((LowCellVolt + BalHys) < modules[y].getCellVoltage(i))
+          {
+            balance = balance | (1 << i);
+          }
+          /*
+            else
+            {
+            Serial.print(" | ");
+            Serial.print(i);
+            }
+          */
         }
-        /*
+        if (balance > 0)
+        {
+          balancing = true;
+        }
+        if (debug == 1)
+        {
+          Serial.println();
+          Serial.print("Module ");
+          Serial.print(y);
+          Serial.print(" | ");
+          Serial.println(balance, HEX);
+
+        }
+        for (int i = 0; i < 8; i++)
+        {
+          if (bitRead(balance, i) == 1)
+          {
+            OUTmsg.buf[i] = 0x08;
+          }
           else
           {
-          Serial.print(" | ");
-          Serial.print(i);
+            OUTmsg.buf[i] = 0x00;
           }
-        */
-      }
-      if (debug == 1)
-      {
-        Serial.println();
-        Serial.print("Module ");
-        Serial.print(y);
-        Serial.print(" | ");
-        Serial.println(balance, HEX);
+        }
+        switch (y)
+        {
+          case (1):
+            OUTmsg.id  = 0x1A55540A;
+            break;
+          case (2):
+            OUTmsg.id  = 0x1A55540C;
+            break;
+          case (3):
+            OUTmsg.id  = 0x1A55540E;
+            break;
+          case (4):
+            OUTmsg.id  = 0x1A555410;
+            break;
+          case (5):
+            OUTmsg.id  = 0x1A555412;
+            break;
+          case (6):
+            OUTmsg.id  = 0x1A555414;
+            break;
+          case (7):
+            OUTmsg.id  = 0x1A555416;
+            break;
+          case (8):
+            OUTmsg.id  = 0x1A555418;
+            break;
 
-      }
-      for (int i = 0; i < 8; i++)
-      {
-        if (bitRead(balance, i) == 1)
-        {
-          OUTmsg.buf[i] = 0x08;
+          default:
+            break;
         }
-        else
+        OUTmsg.len = 8;
+        OUTmsg.ext = 1;
+        Can0.write(OUTmsg);
+        for (int i = 8; i < 13; i++)
         {
-          OUTmsg.buf[i] = 0x00;
+          if (bitRead(balance, i) == 1)
+          {
+            OUTmsg.buf[i - 8] = 0x08;
+          }
+          else
+          {
+            OUTmsg.buf[i - 8] = 0x00;
+          }
         }
-      }
-      switch (y)
-      {
-        case (1):
-          OUTmsg.id  = 0x1A55540A;
-          break;
-        case (2):
-          OUTmsg.id  = 0x1A55540C;
-          break;
-        case (3):
-          OUTmsg.id  = 0x1A55540E;
-          break;
-        case (4):
-          OUTmsg.id  = 0x1A555410;
-          break;
-        case (5):
-          OUTmsg.id  = 0x1A555412;
-          break;
-        case (6):
-          OUTmsg.id  = 0x1A555414;
-          break;
-        case (7):
-          OUTmsg.id  = 0x1A555416;
-          break;
-        case (8):
-          OUTmsg.id  = 0x1A555418;
-          break;
+        OUTmsg.buf[4] = 0xFE;
+        OUTmsg.buf[5] = 0xFE;
+        OUTmsg.buf[6] = 0xFE;
+        OUTmsg.buf[7] = 0xFE;
+        switch (y)
+        {
+          case (1):
+            OUTmsg.id  = 0x1A55540B;
+            break;
+          case (2):
+            OUTmsg.id  = 0x1A55540D;
+            break;
+          case (3):
+            OUTmsg.id  = 0x1A55540F;
+            break;
+          case (4):
+            OUTmsg.id  = 0x1A555411;
+            break;
+          case (5):
+            OUTmsg.id  = 0x1A555413;
+            break;
+          case (6):
+            OUTmsg.id  = 0x1A555415;
+            break;
+          case (7):
+            OUTmsg.id  = 0x1A555417;
+            break;
+          case (8):
+            OUTmsg.id  = 0x1A555419;
+            break;
 
-        default:
-          return;
-          break;
-      }
-      OUTmsg.len = 8;
-      OUTmsg.ext = 1;
-      Can0.write(OUTmsg);
-      for (int i = 8; i < 13; i++)
-      {
-        if (bitRead(balance, i) == 1)
-        {
-          OUTmsg.buf[i - 8] = 0x08;
+          default:
+            break;
         }
-        else
-        {
-          OUTmsg.buf[i - 8] = 0x00;
-        }
+        OUTmsg.len = 8;
+        OUTmsg.ext = 1;
+        Can0.write(OUTmsg);
       }
-      OUTmsg.buf[4] = 0xFE;
-      OUTmsg.buf[5] = 0xFE;
-      OUTmsg.buf[6] = 0xFE;
-      OUTmsg.buf[7] = 0xFE;
-      switch (y)
-      {
-        case (1):
-          OUTmsg.id  = 0x1A55540B;
-          break;
-        case (2):
-          OUTmsg.id  = 0x1A55540D;
-          break;
-        case (3):
-          OUTmsg.id  = 0x1A55540F;
-          break;
-        case (4):
-          OUTmsg.id  = 0x1A555411;
-          break;
-        case (5):
-          OUTmsg.id  = 0x1A555413;
-          break;
-        case (6):
-          OUTmsg.id  = 0x1A555415;
-          break;
-        case (7):
-          OUTmsg.id  = 0x1A555417;
-          break;
-        case (8):
-          OUTmsg.id  = 0x1A555419;
-          break;
+    }
 
-        default:
-          return;
-          break;
-      }
-      OUTmsg.len = 8;
-      OUTmsg.ext = 1;
-      Can0.write(OUTmsg);
+    if (balancing == false)
+    {
+      balcnt = 0;
+    }
+    else
+    {
+      balcnt++;
     }
   }
+  else
+  {
+    balcnt++;
+    if (balcnt > 60)
+    {
+      balcnt = 0;
+    }
+  }
+  Serial.print("Bal:");
+  Serial.print(balancing);
   OUTmsg.ext = 0;
 }
 
@@ -273,275 +307,278 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
 void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
 {
   int CMU, Id = 0;
-  if (msg.buf[2] != 0xFF && msg.buf[5] != 0xFF && msg.buf[7] != 0xFF) //Check module is not initializing OR a "spoof module"
+  if (balancing == false)
   {
-    switch (msg.id)
+    if (msg.buf[2] != 0xFF && msg.buf[5] != 0xFF && msg.buf[7] != 0xFF) //Check module is not initializing OR a "spoof module"
     {
-      ///////////////// one extender increment//////////
-
-      case (0x1D0):
-        CMU = 9;
-        Id = 0;
-        break;
-      case (0x1D1):
-        CMU = 9;
-        Id = 1;
-        break;
-      case (0x1D2):
-        CMU = 9;
-        Id = 2;
-        break;
-      case (0x1D3):
-        CMU = 9;
-        Id = 3;
-        break;
-
-      case (0x1D4):
-        CMU = 10;
-        Id = 0;
-        break;
-      case (0x1D5):
-        CMU = 10;
-        Id = 1;
-        break;
-      case (0x1D6):
-        CMU = 10;
-        Id = 2;
-        break;
-      case (0x1D8):
-        CMU = 11;
-        Id = 0;
-        break;
-      case (0x1D9):
-        CMU = 11;
-        Id = 1;
-        break;
-      case (0x1DA):
-        CMU = 11;
-        Id = 2;
-        break;
-      case (0x1DC):
-        CMU = 12;
-        Id = 0;
-        break;
-      case (0x1DD):
-        CMU = 12;
-        Id = 1;
-        break;
-      case (0x1DE):
-        CMU = 12;
-        Id = 2;
-        break;
-
-      case (0x1E0):
-        CMU = 13;
-        Id = 0;
-        break;
-      case (0x1E1):
-        CMU = 13;
-        Id = 1;
-        break;
-      case (0x1E2):
-        CMU = 13;
-        Id = 2;
-        break;
-
-      case (0x1E4):
-        CMU = 14;
-        Id = 0;
-        break;
-      case (0x1E5):
-        CMU = 14;
-        Id = 1;
-        break;
-      case (0x1E6):
-        CMU = 14;
-        Id = 2;
-        break;
-
-      case (0x1E8):
-        CMU = 15;
-        Id = 0;
-        break;
-      case (0x1E9):
-        CMU = 15;
-        Id = 1;
-        break;
-      case (0x1EA):
-        CMU = 15;
-        Id = 2;
-        break;
-
-      case (0x1EC):
-        CMU = 16;
-        Id = 0;
-        break;
-      case (0x1ED):
-        CMU = 16;
-        Id = 1;
-        break;
-      case (0x1EE):
-        CMU = 16;
-        Id = 2;
-        break;
-
-
-      ///////////////////////standard ids////////////////
-
-
-      case (0x1B0):
-        CMU = 1;
-        Id = 0;
-        break;
-      case (0x1B1):
-        CMU = 1;
-        Id = 1;
-        break;
-      case (0x1B2):
-        CMU = 1;
-        Id = 2;
-        break;
-      case (0x1B3):
-        CMU = 1;
-        Id = 3;
-        break;
-
-      case (0x1B4):
-        CMU = 2;
-        Id = 0;
-        break;
-      case (0x1B5):
-        CMU = 2;
-        Id = 1;
-        break;
-      case (0x1B6):
-        CMU = 2;
-        Id = 2;
-        break;
-      case (0x1B7):
-        CMU = 2;
-        Id = 3;
-        break;
-
-      case (0x1B8):
-        CMU = 3;
-        Id = 0;
-        break;
-      case (0x1B9):
-        CMU = 3;
-        Id = 1;
-        break;
-      case (0x1BA):
-        CMU = 3;
-        Id = 2;
-        break;
-      case (0x1BB):
-        CMU = 3;
-        Id = 3;
-        break;
-
-      case (0x1BC):
-        CMU = 4;
-        Id = 0;
-        break;
-      case (0x1BD):
-        CMU = 4;
-        Id = 1;
-        break;
-      case (0x1BE):
-        CMU = 4;
-        Id = 2;
-        break;
-      case (0x1BF):
-        CMU = 4;
-        Id = 3;
-        break;
-
-      case (0x1C0):
-        CMU = 5;
-        Id = 0;
-        break;
-      case (0x1C1):
-        CMU = 5;
-        Id = 1;
-        break;
-      case (0x1C2):
-        CMU = 5;
-        Id = 2;
-        break;
-      case (0x1C3):
-        CMU = 5;
-        Id = 3;
-        break;
-
-      case (0x1C4):
-        CMU = 6;
-        Id = 0;
-        break;
-      case (0x1C5):
-        CMU = 6;
-        Id = 1;
-        break;
-      case (0x1C6):
-        CMU = 6;
-        Id = 2;
-        break;
-      case (0x1C7):
-        CMU = 6;
-        Id = 3;
-        break;
-
-      case (0x1C8):
-        CMU = 7;
-        Id = 0;
-        break;
-      case (0x1C9):
-        CMU = 7;
-        Id = 1;
-        break;
-      case (0x1CA):
-        CMU = 7;
-        Id = 2;
-        break;
-      case (0x1CB):
-        CMU = 7;
-        Id = 3;
-        break;
-
-      case (0x1CC):
-        CMU = 8;
-        Id = 0;
-        break;
-      case (0x1CD):
-        CMU = 8;
-        Id = 1;
-        break;
-      case (0x1CE):
-        CMU = 8;
-        Id = 2;
-        break;
-      case (0x1CF):
-        CMU = 8;
-        Id = 3;
-        break;
-
-      default:
-        return;
-        break;
-    }
-    if (CMU > 0 && CMU < 64)
-    {
-      if (debug == 1)
+      switch (msg.id)
       {
-        Serial.println();
-        Serial.print(CMU);
-        Serial.print(",");
-        Serial.print(Id);
-        Serial.println();
+        ///////////////// one extender increment//////////
+
+        case (0x1D0):
+          CMU = 9;
+          Id = 0;
+          break;
+        case (0x1D1):
+          CMU = 9;
+          Id = 1;
+          break;
+        case (0x1D2):
+          CMU = 9;
+          Id = 2;
+          break;
+        case (0x1D3):
+          CMU = 9;
+          Id = 3;
+          break;
+
+        case (0x1D4):
+          CMU = 10;
+          Id = 0;
+          break;
+        case (0x1D5):
+          CMU = 10;
+          Id = 1;
+          break;
+        case (0x1D6):
+          CMU = 10;
+          Id = 2;
+          break;
+        case (0x1D8):
+          CMU = 11;
+          Id = 0;
+          break;
+        case (0x1D9):
+          CMU = 11;
+          Id = 1;
+          break;
+        case (0x1DA):
+          CMU = 11;
+          Id = 2;
+          break;
+        case (0x1DC):
+          CMU = 12;
+          Id = 0;
+          break;
+        case (0x1DD):
+          CMU = 12;
+          Id = 1;
+          break;
+        case (0x1DE):
+          CMU = 12;
+          Id = 2;
+          break;
+
+        case (0x1E0):
+          CMU = 13;
+          Id = 0;
+          break;
+        case (0x1E1):
+          CMU = 13;
+          Id = 1;
+          break;
+        case (0x1E2):
+          CMU = 13;
+          Id = 2;
+          break;
+
+        case (0x1E4):
+          CMU = 14;
+          Id = 0;
+          break;
+        case (0x1E5):
+          CMU = 14;
+          Id = 1;
+          break;
+        case (0x1E6):
+          CMU = 14;
+          Id = 2;
+          break;
+
+        case (0x1E8):
+          CMU = 15;
+          Id = 0;
+          break;
+        case (0x1E9):
+          CMU = 15;
+          Id = 1;
+          break;
+        case (0x1EA):
+          CMU = 15;
+          Id = 2;
+          break;
+
+        case (0x1EC):
+          CMU = 16;
+          Id = 0;
+          break;
+        case (0x1ED):
+          CMU = 16;
+          Id = 1;
+          break;
+        case (0x1EE):
+          CMU = 16;
+          Id = 2;
+          break;
+
+
+        ///////////////////////standard ids////////////////
+
+
+        case (0x1B0):
+          CMU = 1;
+          Id = 0;
+          break;
+        case (0x1B1):
+          CMU = 1;
+          Id = 1;
+          break;
+        case (0x1B2):
+          CMU = 1;
+          Id = 2;
+          break;
+        case (0x1B3):
+          CMU = 1;
+          Id = 3;
+          break;
+
+        case (0x1B4):
+          CMU = 2;
+          Id = 0;
+          break;
+        case (0x1B5):
+          CMU = 2;
+          Id = 1;
+          break;
+        case (0x1B6):
+          CMU = 2;
+          Id = 2;
+          break;
+        case (0x1B7):
+          CMU = 2;
+          Id = 3;
+          break;
+
+        case (0x1B8):
+          CMU = 3;
+          Id = 0;
+          break;
+        case (0x1B9):
+          CMU = 3;
+          Id = 1;
+          break;
+        case (0x1BA):
+          CMU = 3;
+          Id = 2;
+          break;
+        case (0x1BB):
+          CMU = 3;
+          Id = 3;
+          break;
+
+        case (0x1BC):
+          CMU = 4;
+          Id = 0;
+          break;
+        case (0x1BD):
+          CMU = 4;
+          Id = 1;
+          break;
+        case (0x1BE):
+          CMU = 4;
+          Id = 2;
+          break;
+        case (0x1BF):
+          CMU = 4;
+          Id = 3;
+          break;
+
+        case (0x1C0):
+          CMU = 5;
+          Id = 0;
+          break;
+        case (0x1C1):
+          CMU = 5;
+          Id = 1;
+          break;
+        case (0x1C2):
+          CMU = 5;
+          Id = 2;
+          break;
+        case (0x1C3):
+          CMU = 5;
+          Id = 3;
+          break;
+
+        case (0x1C4):
+          CMU = 6;
+          Id = 0;
+          break;
+        case (0x1C5):
+          CMU = 6;
+          Id = 1;
+          break;
+        case (0x1C6):
+          CMU = 6;
+          Id = 2;
+          break;
+        case (0x1C7):
+          CMU = 6;
+          Id = 3;
+          break;
+
+        case (0x1C8):
+          CMU = 7;
+          Id = 0;
+          break;
+        case (0x1C9):
+          CMU = 7;
+          Id = 1;
+          break;
+        case (0x1CA):
+          CMU = 7;
+          Id = 2;
+          break;
+        case (0x1CB):
+          CMU = 7;
+          Id = 3;
+          break;
+
+        case (0x1CC):
+          CMU = 8;
+          Id = 0;
+          break;
+        case (0x1CD):
+          CMU = 8;
+          Id = 1;
+          break;
+        case (0x1CE):
+          CMU = 8;
+          Id = 2;
+          break;
+        case (0x1CF):
+          CMU = 8;
+          Id = 3;
+          break;
+
+        default:
+          return;
+          break;
       }
-      modules[CMU].setExists(true);
-      modules[CMU].setReset(true);
-      modules[CMU].decodecan(Id, msg);
+      if (CMU > 0 && CMU < 64)
+      {
+        if (debug == 1)
+        {
+          Serial.println();
+          Serial.print(CMU);
+          Serial.print(",");
+          Serial.print(Id);
+          Serial.println();
+        }
+        modules[CMU].setExists(true);
+        modules[CMU].setReset(true);
+        modules[CMU].decodecan(Id, msg);
+      }
     }
   }
 }
