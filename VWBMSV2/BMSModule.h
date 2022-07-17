@@ -6,7 +6,7 @@ class BMSModule
   public:
     BMSModule();
     void decodecan(int Id, CAN_message_t &msg);
-    void decodetemp(CAN_message_t &msg);
+    void decodetemp(CAN_message_t &msg, int y);
     void clearmodule();
     int getscells();
     float getCellVoltage(int cell);

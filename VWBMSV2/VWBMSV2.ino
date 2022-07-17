@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 220715;
+int firmver = 220717;
 
 //Curent filter//
 float filterFrequency = 5.0 ;

@@ -43,9 +43,9 @@ void BMSModule::clearmodule()
   moduleAddress = 0;
 }
 
-void BMSModule::decodetemp(CAN_message_t &msg)
+void BMSModule::decodetemp(CAN_message_t &msg, int y)
 {
-  if (msg.buf[2] != 0x00) //0x00 in byte 2 means its an MEB message
+  if (y==1) //0x00 in byte 2 means its an MEB message
   {
     type = 1;
     if (msg.buf[7] == 0xFD)

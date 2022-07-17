@@ -273,7 +273,7 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
     {
       modules[CMU].setExists(true);
       modules[CMU].setReset(true);
-      modules[CMU].decodetemp(msg);
+      modules[CMU].decodetemp(msg,1);
       if (debug == 1)
       {
         Serial.println();
@@ -292,7 +292,7 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
       {
         modules[CMU].setExists(true);
         modules[CMU].setReset(true);
-        modules[CMU].decodetemp(msg);
+        modules[CMU].decodetemp(msg,2);
         if (debug == 1)
         {
           Serial.println();
