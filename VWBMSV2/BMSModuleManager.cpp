@@ -214,6 +214,91 @@ void BMSModuleManager::balanceCells(int debug)
     {
       balcnt = 0;
     }
+
+    OUTmsg.buf[0] = 0X00;
+    OUTmsg.buf[1] = 0X00;
+    OUTmsg.buf[2] = 0X00;
+    OUTmsg.buf[3] = 0X00;
+    OUTmsg.buf[4] = 0X00;
+    OUTmsg.buf[5] = 0X00;
+    OUTmsg.buf[6] = 0X00;
+    OUTmsg.buf[7] = 0X00;
+
+    OUTmsg.len = 8;
+    OUTmsg.ext = 1;
+
+    OUTmsg.id  = 0x1A55540A;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A55540C;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A55540E;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555410;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555412;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555414;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555416;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555418;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.buf[0] = 0X00;
+    OUTmsg.buf[1] = 0X00;
+    OUTmsg.buf[2] = 0X00;
+    OUTmsg.buf[3] = 0X00;
+    OUTmsg.buf[4] = 0xFE;
+    OUTmsg.buf[5] = 0xFE;
+    OUTmsg.buf[6] = 0xFE;
+    OUTmsg.buf[7] = 0xFE;
+
+    OUTmsg.id  = 0x1A55540A;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A55540C;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A55540E;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555410;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555412;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555414;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555416;
+    Can0.write(OUTmsg);
+    delay(1);
+
+    OUTmsg.id  = 0x1A555418;
+    Can0.write(OUTmsg);
+    delay(1);
   }
   Serial.print("Bal:");
   Serial.print(balancing);
@@ -273,7 +358,7 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
     {
       modules[CMU].setExists(true);
       modules[CMU].setReset(true);
-      modules[CMU].decodetemp(msg,1);
+      modules[CMU].decodetemp(msg, 1);
       if (debug == 1)
       {
         Serial.println();
@@ -292,7 +377,7 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
       {
         modules[CMU].setExists(true);
         modules[CMU].setReset(true);
-        modules[CMU].decodetemp(msg,2);
+        modules[CMU].decodetemp(msg, 2);
         if (debug == 1)
         {
           Serial.println();
