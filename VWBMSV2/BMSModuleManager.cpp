@@ -59,7 +59,7 @@ void BMSModuleManager::setBalanceHyst(float newVal)
 void BMSModuleManager::balanceCells(int debug)
 {
 
-  balancing = false;
+
   uint16_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
   //Serial.println();
   // Serial.println(LowCellVolt + BalHys, 3);
@@ -69,241 +69,321 @@ void BMSModuleManager::balanceCells(int debug)
   Serial.print("Balcnt:");
   Serial.println(balcnt);
 
-  if (balcnt < 50)
+  if (balcnt > 60)
   {
-    for (int y = 1; y < 63; y++)
+    balcnt = 0;
+  }
+
+
+  if (balcnt > 10)
+  {
+    if (balcnt == 11 || balcnt == 35)
     {
-      if (modules[y].isExisting() == 1)
+      balancing = false;
+      for (int y = 1; y < 63; y++)
       {
-        balance = 0;
-        for (int i = 0; i < 12; i++)
+        if (modules[y].isExisting() == 1)
         {
-          if ((LowCellVolt + BalHys) < modules[y].getCellVoltage(i))
+          balance = 0;
+          for (int i = 0; i < 12; i++)
           {
-            balance = balance | (1 << i);
+            if ((LowCellVolt + BalHys) < modules[y].getCellVoltage(i))
+            {
+              balance = balance | (1 << i);
+            }
+            /*
+              else
+              {
+              Serial.print(" | ");
+              Serial.print(i);
+              }
+            */
           }
-          /*
+          if (balance > 0)
+          {
+            balancing = true;
+          }
+          if (debug == 1)
+          {
+            Serial.println();
+            Serial.print("Module ");
+            Serial.print(y);
+            Serial.print(" | ");
+            Serial.println(balance, HEX);
+
+          }
+
+          OUTmsg.buf[0] = 0X00;
+          OUTmsg.buf[1] = 0X00;
+          OUTmsg.buf[2] = 0X00;
+          OUTmsg.buf[3] = 0X00;
+          OUTmsg.buf[4] = 0X00;
+          OUTmsg.buf[5] = 0X00;
+          OUTmsg.buf[6] = 0X00;
+          OUTmsg.buf[7] = 0X00;
+
+          for (int i = 0; i < 8; i++)
+          {
+            if (bitRead(balance, i) == 1)
+            {
+              OUTmsg.buf[i] = 0x08;
+            }
             else
             {
-            Serial.print(" | ");
-            Serial.print(i);
+              OUTmsg.buf[i] = 0x00;
             }
-          */
-        }
-        if (balance > 0)
-        {
-          balancing = true;
-        }
-        if (debug == 1)
-        {
-          Serial.println();
-          Serial.print("Module ");
-          Serial.print(y);
-          Serial.print(" | ");
-          Serial.println(balance, HEX);
+          }
 
-        }
-        for (int i = 0; i < 8; i++)
-        {
-          if (bitRead(balance, i) == 1)
+          switch (y)
           {
-            OUTmsg.buf[i] = 0x08;
-          }
-          else
-          {
-            OUTmsg.buf[i] = 0x00;
-          }
-        }
-        switch (y)
-        {
-          case (1):
-            OUTmsg.id  = 0x1A55540A;
-            break;
-          case (2):
-            OUTmsg.id  = 0x1A55540C;
-            break;
-          case (3):
-            OUTmsg.id  = 0x1A55540E;
-            break;
-          case (4):
-            OUTmsg.id  = 0x1A555410;
-            break;
-          case (5):
-            OUTmsg.id  = 0x1A555412;
-            break;
-          case (6):
-            OUTmsg.id  = 0x1A555414;
-            break;
-          case (7):
-            OUTmsg.id  = 0x1A555416;
-            break;
-          case (8):
-            OUTmsg.id  = 0x1A555418;
-            break;
+            case (1):
+              OUTmsg.id  = 0x1A55540A;
+              break;
+            case (2):
+              OUTmsg.id  = 0x1A55540C;
+              break;
+            case (3):
+              OUTmsg.id  = 0x1A55540E;
+              break;
+            case (4):
+              OUTmsg.id  = 0x1A555410;
+              break;
+            case (5):
+              OUTmsg.id  = 0x1A555412;
+              break;
+            case (6):
+              OUTmsg.id  = 0x1A555414;
+              break;
+            case (7):
+              OUTmsg.id  = 0x1A555416;
+              break;
+            case (8):
+              OUTmsg.id  = 0x1A555418;
+              break;
+            case (9):
+              OUTmsg.id  = 0x1A55541A;
+              break;
+            case (10):
+              OUTmsg.id  = 0x1A5554AB;
+              break;
+            case (11):
+              OUTmsg.id  = 0x1A5554AD;
+              break;
+            case (12):
+              OUTmsg.id  = 0x1A5554AF;
+              break;
 
-          default:
-            break;
-        }
-        OUTmsg.len = 8;
-        OUTmsg.ext = 1;
-        Can0.write(OUTmsg);
-        for (int i = 8; i < 13; i++)
-        {
-          if (bitRead(balance, i) == 1)
-          {
-            OUTmsg.buf[i - 8] = 0x08;
+            default:
+              break;
           }
-          else
-          {
-            OUTmsg.buf[i - 8] = 0x00;
-          }
-        }
-        OUTmsg.buf[4] = 0xFE;
-        OUTmsg.buf[5] = 0xFE;
-        OUTmsg.buf[6] = 0xFE;
-        OUTmsg.buf[7] = 0xFE;
-        switch (y)
-        {
-          case (1):
-            OUTmsg.id  = 0x1A55540B;
-            break;
-          case (2):
-            OUTmsg.id  = 0x1A55540D;
-            break;
-          case (3):
-            OUTmsg.id  = 0x1A55540F;
-            break;
-          case (4):
-            OUTmsg.id  = 0x1A555411;
-            break;
-          case (5):
-            OUTmsg.id  = 0x1A555413;
-            break;
-          case (6):
-            OUTmsg.id  = 0x1A555415;
-            break;
-          case (7):
-            OUTmsg.id  = 0x1A555417;
-            break;
-          case (8):
-            OUTmsg.id  = 0x1A555419;
-            break;
+          OUTmsg.len = 8;
+          OUTmsg.ext = 1;
+          Can0.write(OUTmsg);
 
-          default:
-            break;
+          delay(1);
+
+          for (int i = 8; i < 13; i++)
+          {
+            if (bitRead(balance, i) == 1)
+            {
+              OUTmsg.buf[i - 8] = 0x08;
+            }
+            else
+            {
+              OUTmsg.buf[i - 8] = 0x00;
+            }
+          }
+          OUTmsg.buf[4] = 0xFE;
+          OUTmsg.buf[5] = 0xFE;
+          OUTmsg.buf[6] = 0xFE;
+          OUTmsg.buf[7] = 0xFE;
+
+          switch (y)
+          {
+            case (1):
+              OUTmsg.id  = 0x1A55540B;
+              break;
+            case (2):
+              OUTmsg.id  = 0x1A55540D;
+              break;
+            case (3):
+              OUTmsg.id  = 0x1A55540F;
+              break;
+            case (4):
+              OUTmsg.id  = 0x1A555411;
+              break;
+            case (5):
+              OUTmsg.id  = 0x1A555413;
+              break;
+            case (6):
+              OUTmsg.id  = 0x1A555415;
+              break;
+            case (7):
+              OUTmsg.id  = 0x1A555417;
+              break;
+            case (8):
+              OUTmsg.id  = 0x1A555419;
+              break;
+            case (9):
+              OUTmsg.id  = 0x1A55541B;
+              break;
+            case (10):
+              OUTmsg.id  = 0x1A5554AC;
+              break;
+            case (11):
+              OUTmsg.id  = 0x1A5554AE;
+              break;
+            case (12):
+              OUTmsg.id  = 0x1A5554B0;
+              break;
+
+            default:
+              break;
+          }
+          OUTmsg.len = 8;
+          OUTmsg.ext = 1;
+          Can0.write(OUTmsg);
         }
-        OUTmsg.len = 8;
-        OUTmsg.ext = 1;
-        Can0.write(OUTmsg);
       }
-    }
 
-    if (balancing == false)
-    {
-      balcnt = 0;
-    }
-    else
-    {
-      balcnt++;
+      if (balancing == false)
+      {
+        balcnt = 0;
+      }
     }
   }
   else
   {
-    balcnt++;
-    if (balcnt > 60)
+    if (balcnt == 1)
     {
-      balcnt = 0;
+      OUTmsg.buf[0] = 0X00;
+      OUTmsg.buf[1] = 0X00;
+      OUTmsg.buf[2] = 0X00;
+      OUTmsg.buf[3] = 0X00;
+      OUTmsg.buf[4] = 0X00;
+      OUTmsg.buf[5] = 0X00;
+      OUTmsg.buf[6] = 0X00;
+      OUTmsg.buf[7] = 0X00;
+
+      OUTmsg.len = 8;
+      OUTmsg.ext = 1;
+
+      OUTmsg.id  = 0x1A55540A;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A55540C;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A55540E;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555410;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555412;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555414;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555416;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555418;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A55541A;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A5554AB;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A5554AD;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A5554AF;
+      Can0.write(OUTmsg);
+      delay(1);
+
+
+      OUTmsg.buf[0] = 0X00;
+      OUTmsg.buf[1] = 0X00;
+      OUTmsg.buf[2] = 0X00;
+      OUTmsg.buf[3] = 0X00;
+      OUTmsg.buf[4] = 0xFE;
+      OUTmsg.buf[5] = 0xFE;
+      OUTmsg.buf[6] = 0xFE;
+      OUTmsg.buf[7] = 0xFE;
+
+      OUTmsg.id  = 0x1A55540B;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A55540D;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A55540F;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555411;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555413;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555415;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555417;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A555419;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A55541B;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A5554AC;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A5554AE;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      OUTmsg.id  = 0x1A5554B0;
+      Can0.write(OUTmsg);
+      delay(1);
+
+      balancing = false;
     }
-
-    OUTmsg.buf[0] = 0X00;
-    OUTmsg.buf[1] = 0X00;
-    OUTmsg.buf[2] = 0X00;
-    OUTmsg.buf[3] = 0X00;
-    OUTmsg.buf[4] = 0X00;
-    OUTmsg.buf[5] = 0X00;
-    OUTmsg.buf[6] = 0X00;
-    OUTmsg.buf[7] = 0X00;
-
-    OUTmsg.len = 8;
-    OUTmsg.ext = 1;
-
-    OUTmsg.id  = 0x1A55540A;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A55540C;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A55540E;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555410;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555412;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555414;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555416;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555418;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.buf[0] = 0X00;
-    OUTmsg.buf[1] = 0X00;
-    OUTmsg.buf[2] = 0X00;
-    OUTmsg.buf[3] = 0X00;
-    OUTmsg.buf[4] = 0xFE;
-    OUTmsg.buf[5] = 0xFE;
-    OUTmsg.buf[6] = 0xFE;
-    OUTmsg.buf[7] = 0xFE;
-
-    OUTmsg.id  = 0x1A55540A;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A55540C;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A55540E;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555410;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555412;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555414;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555416;
-    Can0.write(OUTmsg);
-    delay(1);
-
-    OUTmsg.id  = 0x1A555418;
-    Can0.write(OUTmsg);
-    delay(1);
   }
+  balcnt++;
   Serial.print("Bal:");
   Serial.print(balancing);
+
   OUTmsg.ext = 0;
 }
+
 
 
 

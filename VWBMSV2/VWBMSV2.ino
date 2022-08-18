@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 220721;
+int firmver = 220818;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -930,7 +930,6 @@ void loop()
     VEcan();
 
     sendcommand();
-    sendbalancingtest();
 
     if (cellspresent == 0 && SOCset == 1)
     {
