@@ -77,7 +77,7 @@ void BMSModuleManager::balanceCells(int debug)
 
   if (balcnt > 10)
   {
-    if (balcnt == 11 || balcnt == 35)
+    if (balcnt == 11 || balcnt == 15 || balcnt == 20 || balcnt == 25 || balcnt == 30 || balcnt == 35 || balcnt == 40 || balcnt == 45 || balcnt == 50 || balcnt == 55)
     {
       balancing = false;
       for (int y = 1; y < 63; y++)
