@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 220907;
+int firmver = 220908;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -3099,7 +3099,7 @@ void canread()
     }
   }
 
-  if ((inMsg.id & 0x1FFFFFFF) < 0x1A555420 && (inMsg.id & 0x1FFFFFFF) > 0x1A555400)   // Determine if ID is Temperature CAN-ID
+  if ((inMsg.id & 0x1FFFFFFF) < 0x1A555440 && (inMsg.id & 0x1FFFFFFF) > 0x1A555400)   // Determine if ID is Temperature CAN-ID
   {
     if (candebug == 1)
     {
