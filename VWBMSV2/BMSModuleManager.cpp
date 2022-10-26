@@ -52,8 +52,8 @@ bool BMSModuleManager::checkcomms()
 void BMSModuleManager::setBalanceHyst(float newVal)
 {
   BalHys = newVal;
-  Serial.println();
-  Serial.println(BalHys, 3);
+  //Serial.println();
+  //Serial.println(BalHys, 3);
 }
 
 void BMSModuleManager::balanceCells(int debug)
@@ -63,12 +63,12 @@ void BMSModuleManager::balanceCells(int debug)
   uint16_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
   //Serial.println();
   // Serial.println(LowCellVolt + BalHys, 3);
-
-  Serial.println();
-  Serial.println();
-  Serial.print("Balcnt:");
-  Serial.println(balcnt);
-
+  /*
+    Serial.println();
+    Serial.println();
+    Serial.print("Balcnt:");
+    Serial.println(balcnt);
+  */
   if (balcnt > 60)
   {
     balcnt = 0;
@@ -378,9 +378,10 @@ void BMSModuleManager::balanceCells(int debug)
     }
   }
   balcnt++;
-  Serial.print("Bal:");
-  Serial.print(balancing);
-
+  /*
+    Serial.print("Bal:");
+    Serial.print(balancing);
+  */
   OUTmsg.ext = 0;
 }
 
