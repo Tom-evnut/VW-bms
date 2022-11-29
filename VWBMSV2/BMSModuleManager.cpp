@@ -143,7 +143,7 @@ void BMSModuleManager::balanceCells(int debug)
               OUTmsg.id  = 0x1A55540C;
               break;
             case (3):
-              OUTmsg.id  = 0x1A55541E;
+              OUTmsg.id  = 0x1A55540E;
               break;
             case (4):
               OUTmsg.id  = 0x1A555410;
@@ -207,7 +207,7 @@ void BMSModuleManager::balanceCells(int debug)
               OUTmsg.id  = 0x1A55540D;
               break;
             case (3):
-              OUTmsg.id  = 0x1A55541F;
+              OUTmsg.id  = 0x1A55540F;
               break;
             case (4):
               OUTmsg.id  = 0x1A555411;
@@ -276,7 +276,7 @@ void BMSModuleManager::balanceCells(int debug)
       Can0.write(OUTmsg);
       delay(1);
 
-      OUTmsg.id  = 0x1A55541E;
+      OUTmsg.id  = 0x1A55540E;
       Can0.write(OUTmsg);
       delay(1);
 
@@ -334,7 +334,7 @@ void BMSModuleManager::balanceCells(int debug)
       Can0.write(OUTmsg);
       delay(1);
 
-      OUTmsg.id  = 0x1A55541F;
+      OUTmsg.id  = 0x1A55540F;
       Can0.write(OUTmsg);
       delay(1);
 
