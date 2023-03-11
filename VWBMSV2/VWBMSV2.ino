@@ -96,6 +96,8 @@ byte bmsstatus = 0;
 #define Victron 5
 #define Coda 6
 #define Pylon 7 //testing only
+#define Outlander 8
+
 //
 
 int Discharge;
@@ -2330,7 +2332,7 @@ void menu()
 
       case '5': //1 Over Voltage Setpoint
         settings.chargertype = settings.chargertype + 1;
-        if (settings.chargertype > 7)
+        if (settings.chargertype > 8)
         {
           settings.chargertype = 0;
         }
@@ -2752,6 +2754,9 @@ void menu()
             break;
           case 7:
             SERIALCONSOLE.print("Pylon - TESTING ONLY");
+            break;
+          case 7:
+            SERIALCONSOLE.print("Outlander Charger");
             break;
         }
         SERIALCONSOLE.println();
@@ -4072,6 +4077,33 @@ void chargercomms()
       msg.buf[6] = 0x96;
     }
     msg.buf[7] = 0x01; //HV charging
+    Can0.write(msg);
+  }
+
+  if (settings.chargertype == Outlander)
+  {
+
+    msg.id = 0x285;
+    msg.len = 8;
+    msg.buf[0] = 0x0;
+    msg.buf[1] = 0x0;
+    msg.buf[2] = 0xb6;
+    msg.buf[3] = 0x0;
+    msg.buf[4] = 0x0;
+    msg.buf[5] = 0x0;
+    msg.buf[6] = 0x0;
+    Can0.write(msg);
+    delay(2);
+
+    msg.id  = 0x286;
+    msg.len = 8;
+    msg.buf[0] = highByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));//volage
+    msg.buf[1] = lowByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
+    msg.buf[2] = lowByte(chargecurrent / ncharger);
+    msg.buf[3] = 0x0;
+    msg.buf[4] = 0x0;
+    msg.buf[5] = 0x0;
+    msg.buf[6] = 0x0;
     Can0.write(msg);
   }
 }
