@@ -2755,7 +2755,7 @@ void menu()
           case 7:
             SERIALCONSOLE.print("Pylon - TESTING ONLY");
             break;
-          case 7:
+          case 8:
             SERIALCONSOLE.print("Outlander Charger");
             break;
         }
