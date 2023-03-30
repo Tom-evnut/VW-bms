@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 221026;
+int firmver = 230330;
 
 //Curent filter//
 float filterFrequency = 5.0 ;
@@ -46,7 +46,7 @@ FilterOnePole lowpassFilter( LOWPASS, filterFrequency );
 
 
 //Simple BMS V2 wiring//
-const int ACUR2 = A0; // current 1
+const int ACUR2 = A0; // current 1o
 const int ACUR1 = A1; // current 2
 const int IN1 = 17; // input 1 - high active
 const int IN2 = 16; // input 2- high active
@@ -2755,7 +2755,7 @@ void menu()
           case 7:
             SERIALCONSOLE.print("Pylon - TESTING ONLY");
             break;
-          case 7:
+          case 8:
             SERIALCONSOLE.print("Outlander Charger");
             break;
         }
@@ -4099,7 +4099,14 @@ void chargercomms()
     msg.len = 8;
     msg.buf[0] = highByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));//volage
     msg.buf[1] = lowByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
-    msg.buf[2] = lowByte(chargecurrent / ncharger);
+    if (chargecurrent / ncharger > 120)
+    {
+      msg.buf[2] = 120;
+    }
+    else
+    {
+      msg.buf[2] = (chargecurrent / ncharger);
+    }
     msg.buf[3] = 0x0;
     msg.buf[4] = 0x0;
     msg.buf[5] = 0x0;
