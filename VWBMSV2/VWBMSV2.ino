@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 230510;
+int firmver = 230511;
 
 //Curent filter//
 float filterFrequency = 5.0;
@@ -775,27 +775,27 @@ void loop() {
     } else  //In 'vehicle' mode
     {
       if (SOCset != 0) {
-      if (bms.getLowCellVolt() < settings.UnderVSetpoint) {
-        if (UnderTime < millis())  //check is last time not undervoltage is longer thatn UnderDur ago
-        {
+        if (bms.getLowCellVolt() < settings.UnderVSetpoint) {
+          if (UnderTime < millis())  //check is last time not undervoltage is longer thatn UnderDur ago
+          {
+            bmsstatus = Error;
+          }
+        } else {
+          UnderTime = millis() + settings.triptime;
+        }
+
+        if (bms.getHighCellVolt() < settings.UnderVSetpoint || bms.getHighTemperature() > settings.OverTSetpoint) {
           bmsstatus = Error;
         }
-      } else {
-        UnderTime = millis() + settings.triptime;
-      }
 
-      if (bms.getHighCellVolt() < settings.UnderVSetpoint || bms.getHighTemperature() > settings.OverTSetpoint) {
-        bmsstatus = Error;
-      }
-
-      if (bms.getHighCellVolt() > settings.OverVSetpoint) {
-        if (OverTime < millis())  //check is last time not undervoltage is longer thatn UnderDur ago
-        {
-          bmsstatus = Error;
+        if (bms.getHighCellVolt() > settings.OverVSetpoint) {
+          if (OverTime < millis())  //check is last time not undervoltage is longer thatn UnderDur ago
+          {
+            bmsstatus = Error;
+          }
+        } else {
+          OverTime = millis() + settings.triptime;
         }
-      } else {
-        OverTime = millis() + settings.triptime;
-      }
       }
     }
 
@@ -1192,6 +1192,7 @@ void getcurrent() {
 }
 
 
+
 void updateSOC() {
   if (SOCreset == 1) {
     SOC = map(uint16_t(bms.getLowCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
@@ -1199,25 +1200,50 @@ void updateSOC() {
     SOCreset = 0;
   }
 
-  if (SOCset == 0) {
-    if (millis() > 8000) {
-      if (SOCmem == 0) {
-        SOC = map(uint16_t(bms.getLowCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
-        ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778;
-        if (debug != 0) {
-          SERIALCONSOLE.println("  ");
-          SERIALCONSOLE.println("//////////////////////////////////////// SOC SET ////////////////////////////////////////");
-        }
-      }
+  if (SOCset == 0 && SOCmem == 0) {
+    if (millis() > 9000) {
+      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
+    }
+    if (millis() > 10000) {
+      SOC = map(uint16_t(bms.getLowCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
+
+      ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778;
       SOCset = 1;
+      if (debug != 0) {
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.println("//////////////////////////////////////// SOC SET ////////////////////////////////////////");
+      }
+      if (settings.ESSmode == 1) {
+        bmsstatus = Ready;
+      }
     }
   }
+
+  if (SOCset == 0 && SOCmem == 1) {
+    ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778;
+    if (millis() > 9000) {
+      bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
+    }
+    if (millis() > 10000) {
+      SOCset = 1;
+      if (debug != 0) {
+        SERIALCONSOLE.println("  ");
+        SERIALCONSOLE.println("//////////////////////////////////////// SOC SET ////////////////////////////////////////");
+      }
+      if (settings.ESSmode == 1) {
+        bmsstatus = Ready;
+      }
+    }
+  }
+
+  SOC = ((ampsecond * 0.27777777777778) / (settings.CAP * settings.Pstrings * 1000)) * 100;
+
   if (settings.voltsoc == 1 || settings.cursens == 0) {
     SOC = map(uint16_t(bms.getLowCellVolt() * 1000), settings.socvolt[0], settings.socvolt[2], settings.socvolt[1], settings.socvolt[3]);
 
     ampsecond = (SOC * settings.CAP * settings.Pstrings * 10) / 0.27777777777778;
   }
-  SOC = ((ampsecond * 0.27777777777778) / (settings.CAP * settings.Pstrings * 1000)) * 100;
+
   if (SOC >= 100) {
     ampsecond = (settings.CAP * settings.Pstrings * 1000) / 0.27777777777778;  //reset to full, dependant on given capacity. Need to improve with auto correction for capcity.
     SOC = 100;
@@ -1252,7 +1278,6 @@ void updateSOC() {
     SERIALCONSOLE.print("mAh");
   }
 }
-
 void SOCcharged(int y) {
   if (y == 1) {
     SOC = 95;
