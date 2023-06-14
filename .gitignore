@@ -1,0 +1,9 @@
+*.bak
+*.sch-bak
+*.kicad_pcb-bak
+*.zip
+*-cache$
+*-cache.lib
+fp-info-cache
+*.bck
+*_autosave-*
