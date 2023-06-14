@@ -7,3 +7,7 @@
 fp-info-cache
 *.bck
 *_autosave-*
+*.gbr
+*.drl
+*.gbrjob
+
