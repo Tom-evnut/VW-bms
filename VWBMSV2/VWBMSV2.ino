@@ -32,6 +32,8 @@
 
 #define CPU_REBOOT (_reboot_Teensyduino_());
 
+#define USING_TEENSY4
+
 BMSModuleManager bms;
 SerialConsole console;
 EEPROMSettings settings;
@@ -46,18 +48,34 @@ FilterOnePole lowpassFilter(LOWPASS, filterFrequency);
 
 
 //Simple BMS V2 wiring//
+#ifdef USING_TEENSY4
+// A0 and A1 are needed for serial3 used on the Tesla BMS
+// Take them on IN1 and IN2
+// Some pins must be cut on the adapter
+const int ACUR2 = A2;  // current 1
+const int ACUR1 = A3;  // current 2
+const int IN1 = 9;    // input 1 - high active
+const int IN2 = 10;    // input 2- high active
+#else
 const int ACUR2 = A0;  // current 1o
 const int ACUR1 = A1;  // current 2
 const int IN1 = 17;    // input 1 - high active
 const int IN2 = 16;    // input 2- high active
+#endif //USING_TEENSY4
 const int IN3 = 18;    // input 1 - high active
 const int IN4 = 19;    // input 2- high active
 const int OUT1 = 11;   // output 1 - high active
 const int OUT2 = 12;   // output 1 - high active
 const int OUT3 = 20;   // output 1 - high active
 const int OUT4 = 21;   // output 1 - high active
+#ifdef USING_TEENSY4
+// Swaped with Teensy 4.0 CAN1
+const int OUT5 = 3;   // output 1 - high active
+const int OUT6 = 4;   // output 1 - high active
+#else
 const int OUT5 = 22;   // output 1 - high active
 const int OUT6 = 23;   // output 1 - high active
+#endif //USING_TEENSY4
 const int OUT7 = 5;    // output 1 - high active
 const int OUT8 = 6;    // output 1 - high active
 const int led = 13;
