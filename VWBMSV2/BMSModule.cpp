@@ -422,6 +422,7 @@ float BMSModule::getLowTemp()
   {
     return temperatures[0];
   }
+  return 0.0f;
 }
 
 float BMSModule::getHighTemp()
@@ -494,6 +495,7 @@ float BMSModule::getAvgTemp()
   {
     return temperatures[0];
   }
+  return 0.0f;
 }
 
 float BMSModule::getModuleVoltage()

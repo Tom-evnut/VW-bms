@@ -18,9 +18,9 @@
   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+#include "config.h"
 #include "BMSModuleManager.h"
 #include <Arduino.h>
-#include "config.h"
 #include "SerialConsole.h"
 #include "Logger.h"
 #include <ADC.h>  //https://github.com/pedvide/ADC
@@ -32,9 +32,13 @@
 
 #define CPU_REBOOT (_reboot_Teensyduino_());
 
-#define USING_TEENSY4
 #ifdef USING_TEENSY4
 #include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4
+#include <circular_buffer.h>
+#include <imxrt_flexcan.h>
+#include <isotp.h>
+#include <isotp_server.h>
+#include <kinetis_flexcan.h>
 /********************************
  Port notes:
  WDOG_TOVALL The bare metal watchdog register acces must be replaced

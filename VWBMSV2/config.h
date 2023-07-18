@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#define USING_TEENSY4
+
 //Set to the proper port for your USB connection - SerialUSB on Due (Native) or Serial for Due (Programming) or Teensy
 #define SERIALCONSOLE   Serial
 

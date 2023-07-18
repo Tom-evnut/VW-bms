@@ -1,6 +1,9 @@
 #pragma once
+#ifdef USING_TEENSY4
+#include <FlexCAN_T4.h>
+#else
 #include <FlexCAN.h>
-
+#endif
 class BMSModule
 {
   public:
