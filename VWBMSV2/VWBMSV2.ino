@@ -25,7 +25,7 @@
 #include "Logger.h"
 #include <ADC.h>  //https://github.com/pedvide/ADC
 #include <EEPROM.h>
-#include <FlexCAN.h>  //https://github.com/collin80/FlexCAN_Library
+
 #include <SPI.h>
 #include <Filters.h>  //https://github.com/JonHub/Filters
 #include "BMSUtil.h"
@@ -33,6 +33,18 @@
 #define CPU_REBOOT (_reboot_Teensyduino_());
 
 #define USING_TEENSY4
+#ifdef USING_TEENSY4
+#include <FlexCAN.h>  //https://github.com/collin80/FlexCAN_Library
+#else
+#include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4
+/*
+#include <circular_buffer.h>
+#include <imxrt_flexcan.h>
+#include <isotp.h>
+#include <isotp_server.h>
+#include <kinetis_flexcan.h>
+*/
+#endif //USING_TEENSY4
 
 BMSModuleManager bms;
 SerialConsole console;
@@ -133,7 +145,7 @@ int16_t pwmcurmin = 0;  //DONOT fill in, calculated later based on other values
 
 
 //variables for VE driect bus comms
-char* myStrings[] = { "V", "14674", "I", "0", "CE", "-1", "SOC", "800", "TTG", "-1", "Alarm", "OFF", "Relay", "OFF", "AR", "0", "BMV", "600S", "FW", "212", "H1", "-3", "H2", "-3", "H3", "0", "H4", "0", "H5", "0", "H6", "-7", "H7", "13180", "H8", "14774", "H9", "137", "H10", "0", "H11", "0", "H12", "0" };
+const char* myStrings[] = { "V", "14674", "I", "0", "CE", "-1", "SOC", "800", "TTG", "-1", "Alarm", "OFF", "Relay", "OFF", "AR", "0", "BMV", "600S", "FW", "212", "H1", "-3", "H2", "-3", "H3", "0", "H4", "0", "H5", "0", "H6", "-7", "H7", "13180", "H8", "14774", "H9", "137", "H10", "0", "H11", "0", "H12", "0" };
 
 //variables for VE can
 uint16_t chargevoltage = 49100;  //max charge voltage in mv

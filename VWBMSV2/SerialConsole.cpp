@@ -78,13 +78,14 @@ void SerialConsole::printMenu() {
     Logger::console("   d = Toggle output of pack details every 3 seconds");
   
     Logger::console("   LOGLEVEL=%i - set log level (0=debug, 1=info, 2=warn, 3=error, 4=off)", Logger::getLogLevel());
-
+/*
     float OverVSetpoint;
     float UnderVSetpoint;
     float OverTSetpoint;
     float UnderTSetpoint;
     float balanceVoltage;
     float balanceHyst;
+*/
 }
 
 /*	There is a help menu (press H or h or ?)
@@ -121,8 +122,6 @@ void SerialConsole::handleConsoleCmd() {
 
 void SerialConsole::handleShortCmd() 
 {
-    uint8_t val;
-
     switch (cmdBuffer[0]) 
     {
     case 'h':
