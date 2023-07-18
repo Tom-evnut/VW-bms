@@ -35,6 +35,11 @@
 #define USING_TEENSY4
 #ifdef USING_TEENSY4
 #include <FlexCAN.h>  //https://github.com/collin80/FlexCAN_Library
+/********************************
+ Port notes:
+ WDOG_TOVALL The bare metal watchdog register acces must be replaced
+ PMC_LVDSC2  The bare metal low voltage irq must be replaced. 
+ */
 #else
 #include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4
 /*
@@ -375,7 +380,9 @@ void setup() {
   // Display reason the Teensy was last reset
   Serial.println();
   Serial.println("Reason for last Reset: ");
-
+#ifdef USING_TEENSY4
+  // Reset cause regisgter not avialable on Teensy 4
+#else
   if (RCM_SRS1 & RCM_SRS1_SACKERR) Serial.println("Stop Mode Acknowledge Error Reset");
   if (RCM_SRS1 & RCM_SRS1_MDM_AP) Serial.println("MDM-AP Reset");
   if (RCM_SRS1 & RCM_SRS1_SW) Serial.println("Software Reset");  // reboot with SCB_AIRCR = 0x05FA0004
@@ -387,6 +394,7 @@ void setup() {
   if (RCM_SRS0 & RCM_SRS0_LOL) Serial.println("Loss of Lock in PLL Reset");
   if (RCM_SRS0 & RCM_SRS0_LVD) Serial.println("Low-voltage Detect Reset");
   Serial.println();
+#endif
   ///////////////////
 
 
@@ -1159,7 +1167,7 @@ void getcurrent() {
         SERIALCONSOLE.print(settings.offset2);
       }
       RawCur = int16_t((value * 3300 / adc->adc0->getMaxValue()) - settings.offset2) / (settings.convhigh * 0.00001);
-      if (value < 100 || value > (adc->adc0->getMaxValue() - 100)) {
+      if (value < 100 || value > (int)(adc->adc0->getMaxValue() - 100)) {
         RawCur = 0;
       }
       if (debugCur != 0) {
@@ -1533,8 +1541,13 @@ void VEcan()  //communication with Victron system over CAN
 
     msg.id = 0x35E;
     msg.len = 2;
+   #ifdef USING_TEENSY4
+    msg.buf[0] = 'T';  //No idea how the naming works
+    msg.buf[1] = 'P';  //No idea how the naming works
+   #else
     msg.buf[0] = "T";  //No idea how the naming works
     msg.buf[1] = "P";  //No idea how the naming works
+  #endif
     Can0.write(msg);
   } else {
     msg.id = 0x351;
