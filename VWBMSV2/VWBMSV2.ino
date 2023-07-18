@@ -34,21 +34,14 @@
 
 #define USING_TEENSY4
 #ifdef USING_TEENSY4
-#include <FlexCAN.h>  //https://github.com/collin80/FlexCAN_Library
+#include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4
 /********************************
  Port notes:
  WDOG_TOVALL The bare metal watchdog register acces must be replaced
  PMC_LVDSC2  The bare metal low voltage irq must be replaced. 
  */
 #else
-#include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4
-/*
-#include <circular_buffer.h>
-#include <imxrt_flexcan.h>
-#include <isotp.h>
-#include <isotp_server.h>
-#include <kinetis_flexcan.h>
-*/
+#include <FlexCAN.h>  //https://github.com/collin80/FlexCAN_Library
 #endif //USING_TEENSY4
 
 BMSModuleManager bms;
