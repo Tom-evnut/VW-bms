@@ -52,7 +52,6 @@ BMSModuleManager bms;
 SerialConsole console;
 EEPROMSettings settings;
 
-
 /////Version Identifier/////////
 int firmver = 230511;
 
@@ -63,6 +62,8 @@ FilterOnePole lowpassFilter(LOWPASS, filterFrequency);
 
 //Simple BMS V2 wiring//
 #ifdef USING_TEENSY4
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can0;
+
 // A0 and A1 are needed for serial3 used on the Tesla BMS
 // Take them on IN1 and IN2
 // Some pins must be cut on the adapter
@@ -307,7 +308,9 @@ void loadSettings() {
 
 CAN_message_t msg;
 CAN_message_t inMsg;
+#ifndef USING_TEENSY4
 CAN_filter_t filter;
+#endif
 
 uint32_t lastUpdate;
 
@@ -343,6 +346,23 @@ void setup() {
   analogWriteFrequency(OUT7, pwmfreq);
   analogWriteFrequency(OUT8, pwmfreq);
 
+#ifdef USING_TEENSY4
+  Can0.begin();
+  Can0.setBaudRate(500000);
+
+  Can0.mailboxStatus();
+  //set filters for standard 11 bits ID on mailboxes 0 to 8
+  for (int i = 0; i < 8; i++) {
+    Can0.setMB(static_cast<FLEXCAN_MAILBOX>(i), RX, STD);
+  }
+  //set filters for extended 29 bits ID on mailboxes 9 to 13
+  for (int i = 9; i < 13; i++) {
+    Can0.setMB(static_cast<FLEXCAN_MAILBOX>(i), RX, EXT);
+  }
+  // MB 14 and 15 are TX
+
+  Can0.mailboxStatus();
+#else
   Can0.begin(500000);
 
   //set filters for standard
@@ -357,6 +377,7 @@ void setup() {
     filter.flags.extended = 1;
     Can0.setFilter(filter, i);
   }
+#endif //USING_TEENSY4
 
   //if using enable pins on a transceiver they need to be set on
 
@@ -3133,7 +3154,7 @@ void sendbalancingtest() {
   if (balinit == 0) {
     msg.id = 0x1A555418;
     msg.len = 8;
-    msg.ext = 1;
+    msg.flags.extended = 1;
     msg.buf[0] = 0xFE;
     msg.buf[1] = 0xFE;
     msg.buf[2] = 0xFE;
@@ -3163,7 +3184,7 @@ void sendbalancingtest() {
     if (balon == 1) {
       msg.id = 0x1A555418;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x08;
       msg.buf[1] = 0x00;
       msg.buf[2] = 0x00;
@@ -3176,7 +3197,7 @@ void sendbalancingtest() {
       delay(1);
       msg.id = 0x1A555419;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x00;
       msg.buf[1] = 0x00;
       msg.buf[2] = 0x00;
@@ -3190,7 +3211,7 @@ void sendbalancingtest() {
 
       msg.id = 0x1A555416;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x00;
       msg.buf[1] = 0x08;
       msg.buf[2] = 0x00;
@@ -3203,7 +3224,7 @@ void sendbalancingtest() {
       delay(1);
       msg.id = 0x1A555417;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x00;
       msg.buf[1] = 0x08;
       msg.buf[2] = 0x00;
@@ -3217,7 +3238,7 @@ void sendbalancingtest() {
     } else {
       msg.id = 0x1A555418;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x00;
       msg.buf[1] = 0x00;
       msg.buf[2] = 0x00;
@@ -3230,7 +3251,7 @@ void sendbalancingtest() {
       delay(1);
       msg.id = 0x1A555419;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x00;
       msg.buf[1] = 0x00;
       msg.buf[2] = 0x00;
@@ -3244,7 +3265,7 @@ void sendbalancingtest() {
 
       msg.id = 0x1A555416;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x00;
       msg.buf[1] = 0x00;
       msg.buf[2] = 0x00;
@@ -3257,7 +3278,7 @@ void sendbalancingtest() {
       delay(1);
       msg.id = 0x1A555417;
       msg.len = 8;
-      msg.ext = 1;
+      msg.flags.extended = 1;
       msg.buf[0] = 0x00;
       msg.buf[1] = 0x00;
       msg.buf[2] = 0x00;
@@ -3279,7 +3300,7 @@ void sendbalancingtest() {
     balcycle = 0;
   }
 
-  msg.ext = 0;
+  msg.flags.extended = 0;
 }
 
 void resetwdog() {
@@ -3522,7 +3543,7 @@ void chargercomms() {
   if (settings.chargertype == Elcon) {
     msg.id = 0x1806E5F4;  //broadcast to all Elteks
     msg.len = 8;
-    msg.ext = 1;
+    msg.flags.extended = 1;
     msg.buf[0] = highByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
     msg.buf[1] = lowByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
     msg.buf[2] = highByte(chargecurrent / ncharger);
@@ -3533,7 +3554,7 @@ void chargercomms() {
     msg.buf[7] = 0x00;
 
     Can0.write(msg);
-    msg.ext = 0;
+    msg.flags.extended = 0;
   }
 
   if (settings.chargertype == Eltek) {

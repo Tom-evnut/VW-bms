@@ -3,6 +3,9 @@
 #include "BMSUtil.h"
 #include "Logger.h"
 
+#ifdef USING_TEENSY4
+extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can0;
+#endif //USING_TEENSY4
 extern EEPROMSettings settings;
 CAN_message_t OUTmsg;
 
@@ -177,7 +180,7 @@ void BMSModuleManager::balanceCells(int debug)
               break;
           }
           OUTmsg.len = 8;
-          OUTmsg.ext = 1;
+          OUTmsg.flags.extended = 1;
           Can0.write(OUTmsg);
 
           delay(1);
@@ -241,7 +244,7 @@ void BMSModuleManager::balanceCells(int debug)
               break;
           }
           OUTmsg.len = 8;
-          OUTmsg.ext = 1;
+          OUTmsg.flags.extended = 1;
           Can0.write(OUTmsg);
         }
       }
@@ -266,7 +269,7 @@ void BMSModuleManager::balanceCells(int debug)
       OUTmsg.buf[7] = 0X00;
 
       OUTmsg.len = 8;
-      OUTmsg.ext = 1;
+      OUTmsg.flags.extended = 1;
 
       OUTmsg.id  = 0x1A55540A;
       Can0.write(OUTmsg);
@@ -382,7 +385,7 @@ void BMSModuleManager::balanceCells(int debug)
     Serial.print("Bal:");
     Serial.print(balancing);
   */
-  OUTmsg.ext = 0;
+  OUTmsg.flags.extended = 0;
 }
 
 

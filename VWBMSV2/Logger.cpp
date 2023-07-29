@@ -164,6 +164,8 @@ void Logger::log(LogLevel level, const char *format, va_list args) {
     case Error:
       SERIALCONSOLE.print("ERROR");
       break;
+    default:
+      break;
   }
   SERIALCONSOLE.print(": ");
 
