@@ -33,12 +33,14 @@
 #define CPU_REBOOT (_reboot_Teensyduino_());
 
 #ifdef USING_TEENSY4
-#include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4
+#include <FlexCAN_T4.h>  //https://github.com/tonton81/FlexCAN_T4
 #include <circular_buffer.h>
 #include <imxrt_flexcan.h>
 #include <isotp.h>
 #include <isotp_server.h>
 #include <kinetis_flexcan.h>
+#include "Watchdog_t4.h" //https://github.com/tonton81/WDT_T4
+WDT_T4<WDT1> wdt;
 /********************************
  Port notes:
  WDOG_TOVALL The bare metal watchdog register acces must be replaced
@@ -46,7 +48,7 @@
  */
 #else
 #include <FlexCAN.h>  //https://github.com/collin80/FlexCAN_Library
-#endif //USING_TEENSY4
+#endif                //USING_TEENSY4
 
 BMSModuleManager bms;
 SerialConsole console;
@@ -69,30 +71,30 @@ FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can0;
 // Some pins must be cut on the adapter
 const int ACUR2 = A2;  // current 1
 const int ACUR1 = A3;  // current 2
-const int IN1 = 9;    // input 1 - high active
+const int IN1 = 9;     // input 1 - high active
 const int IN2 = 10;    // input 2- high active
 #else
 const int ACUR2 = A0;  // current 1o
 const int ACUR1 = A1;  // current 2
 const int IN1 = 17;    // input 1 - high active
 const int IN2 = 16;    // input 2- high active
-#endif //USING_TEENSY4
-const int IN3 = 18;    // input 1 - high active
-const int IN4 = 19;    // input 2- high active
-const int OUT1 = 11;   // output 1 - high active
-const int OUT2 = 12;   // output 1 - high active
-const int OUT3 = 20;   // output 1 - high active
-const int OUT4 = 21;   // output 1 - high active
+#endif                //USING_TEENSY4
+const int IN3 = 18;   // input 1 - high active
+const int IN4 = 19;   // input 2- high active
+const int OUT1 = 11;  // output 1 - high active
+const int OUT2 = 12;  // output 1 - high active
+const int OUT3 = 20;  // output 1 - high active
+const int OUT4 = 21;  // output 1 - high active
 #ifdef USING_TEENSY4
 // Swaped with Teensy 4.0 CAN1
-const int OUT5 = 3;   // output 1 - high active
-const int OUT6 = 4;   // output 1 - high active
+const int OUT5 = 3;  // output 1 - high active
+const int OUT6 = 4;  // output 1 - high active
 #else
 const int OUT5 = 22;   // output 1 - high active
 const int OUT6 = 23;   // output 1 - high active
-#endif //USING_TEENSY4
-const int OUT7 = 5;    // output 1 - high active
-const int OUT8 = 6;    // output 1 - high active
+#endif               //USING_TEENSY4
+const int OUT7 = 5;  // output 1 - high active
+const int OUT8 = 6;  // output 1 - high active
 const int led = 13;
 const int BMBfault = 11;
 
@@ -310,6 +312,10 @@ CAN_message_t msg;
 CAN_message_t inMsg;
 #ifndef USING_TEENSY4
 CAN_filter_t filter;
+#else
+void myCallback() {
+  Serial.println("FEED THE DOG SOON, OR RESET!");
+}
 #endif
 
 uint32_t lastUpdate;
@@ -377,7 +383,7 @@ void setup() {
     filter.flags.extended = 1;
     Can0.setFilter(filter, i);
   }
-#endif //USING_TEENSY4
+#endif  //USING_TEENSY4
 
   //if using enable pins on a transceiver they need to be set on
 
@@ -415,7 +421,13 @@ void setup() {
 #endif
   ///////////////////
 
-
+#ifdef USING_TEENSY4
+  WDT_timings_t config;
+  config.trigger = 10;  /* in seconds, 0->128 */
+  config.timeout = 20; /* in seconds, 0->128 */
+  config.callback = myCallback;
+  wdt.begin(config);
+#else
   // enable WDT
   noInterrupts();                  // don't allow interrupts while setting up WDOG
   WDOG_UNLOCK = WDOG_UNLOCK_SEQ1;  // unlock access to WDOG registers
@@ -427,6 +439,7 @@ void setup() {
   WDOG_PRESC = 0;
   WDOG_STCTRLH |= WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_WDOGEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_CLKSRC;
   interrupts();
+#endif  //USING_TEENSY4
   /////////////////
   SERIALBMS.begin(115200);
   //SERIALBMS.begin(612500); //Tesla serial bus
@@ -1559,13 +1572,13 @@ void VEcan()  //communication with Victron system over CAN
 
     msg.id = 0x35E;
     msg.len = 2;
-   #ifdef USING_TEENSY4
+#ifdef USING_TEENSY4
     msg.buf[0] = 'T';  //No idea how the naming works
     msg.buf[1] = 'P';  //No idea how the naming works
-   #else
+#else
     msg.buf[0] = "T";  //No idea how the naming works
     msg.buf[1] = "P";  //No idea how the naming works
-  #endif
+#endif
     Can0.write(msg);
   } else {
     msg.id = 0x351;
@@ -3304,10 +3317,14 @@ void sendbalancingtest() {
 }
 
 void resetwdog() {
-  noInterrupts();  //   No - reset WDT
+#ifdef USING_TEENSY4
+  wdt.feed();
+#else
+  noInterrupts();      //   No - reset WDT
   WDOG_REFRESH = 0xA602;
   WDOG_REFRESH = 0xB480;
   interrupts();
+#endif  //USING_TEENSY4
 }
 
 void pwmcomms() {
