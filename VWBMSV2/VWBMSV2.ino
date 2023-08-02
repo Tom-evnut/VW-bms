@@ -505,9 +505,13 @@ void setup() {
 }
 
 void loop() {
+  #ifdef USING_TEENSY4
+  canread();
+  #else
   while (Can0.available()) {
     canread();
   }
+  #endif
 
   if (SERIALCONSOLE.available() > 0) {
     menu();
@@ -2830,7 +2834,13 @@ void menu() {
 }
 
 void canread() {
+#ifdef USING_TEENSY4
+  if (Can0.read(inMsg) = 0) {
+    return;
+  }
+#else
   Can0.read(inMsg);
+#endif
   // Read data: len = data length, buf = data byte(s)
   if (settings.cursens == Canbus) {
     if (settings.curcan == 1) {
