@@ -495,10 +495,12 @@ void setup() {
   //RISING/HIGH/CHANGE/LOW/FALLING
   attachInterrupt(IN4, isrCP, CHANGE);  // attach BUTTON 1 interrupt handler [ pin# 7 ]
 
+// TEESNY4 has no low voltage detector
+#ifndef USING_TEENSY4
   PMC_LVDSC1 = PMC_LVDSC1_LVDV(1);                     // enable hi v
   PMC_LVDSC2 = PMC_LVDSC2_LVWIE | PMC_LVDSC2_LVWV(3);  // 2.92-3.08v
   NVIC_ENABLE_IRQ(IRQ_LOW_VOLTAGE);
-
+#endif
   cleartime = millis();
 }
 
@@ -3733,10 +3735,13 @@ void isrCP() {
   }
 }  // ******** end of isr CP ********
 
+// TEESNY4 has no low voltage detector
+#ifndef USING_TEENSY4
 void low_voltage_isr(void) {
   EEPROM.update(1000, uint8_t(SOC));
 
   PMC_LVDSC2 |= PMC_LVDSC2_LVWACK;  // clear if we can
   PMC_LVDSC1 |= PMC_LVDSC1_LVDACK;
 }
+#endif
 ////////END///////////
