@@ -952,7 +952,7 @@ void loop() {
     cleartime = millis();
   }
 
-  if (millis() - looptime1 > settings.chargerspd) {
+  if (millis() - looptime1 > (unsigned int)settings.chargerspd) {
     looptime1 = millis();
     if (settings.ESSmode == 1) {
       chargercomms();
@@ -2814,7 +2814,7 @@ void menu() {
     }
   }
 
-  if (incomingByte == 115 & menuload == 0) {
+  if ((incomingByte == 115) && (menuload == 0)) {
     SERIALCONSOLE.println();
     SERIALCONSOLE.println("MENU");
     SERIALCONSOLE.println("Debugging Paused");
@@ -2835,7 +2835,7 @@ void menu() {
 
 void canread() {
 #ifdef USING_TEENSY4
-  if (Can0.read(inMsg) = 0) {
+  if (Can0.read(inMsg) == 0) {
     return;
   }
 #else
@@ -2954,8 +2954,8 @@ void CAB300() {
     inbox = (inbox << 8) | inMsg.buf[i];
   }
   CANmilliamps = inbox;
-  if (CANmilliamps > 0x80000000) {
-    CANmilliamps -= 0x80000000;
+  if (CANmilliamps > (long int)0x80000000) {
+    CANmilliamps -= (long int)0x80000000;
   } else {
     CANmilliamps = (0x80000000 - CANmilliamps) * -1;
   }
