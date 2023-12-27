@@ -18,6 +18,14 @@
   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+/********************************
+ Port notes:
+Clone those libraries:
+https://github.com/JonHub/Filters
+https://github.com/tonton81/FlexCAN_T4
+https://github.com/tonton81/WDT_T4
+in ~/Arduino/libraries
+ ********************************/
 #include "config.h"
 #include "BMSModuleManager.h"
 #include <Arduino.h>
