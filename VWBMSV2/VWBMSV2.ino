@@ -55,7 +55,7 @@ SerialConsole console;
 EEPROMSettings settings;
 
 /////Version Identifier/////////
-int firmver = 230511;
+int firmver = 230920;
 
 //Curent filter//
 float filterFrequency = 5.0;
@@ -477,6 +477,10 @@ void setup() {
     }
   }
 
+  SERIALCONSOLE.println("Recovery SOC: ");
+  SERIALCONSOLE.print(SOC);
+
+
   ////Calculate fixed numbers
   pwmcurmin = (pwmcurmid / 50 * pwmcurmax * -1);
   ////
@@ -499,6 +503,7 @@ void setup() {
 #ifndef USING_TEENSY4
   PMC_LVDSC1 = PMC_LVDSC1_LVDV(1);                     // enable hi v
   PMC_LVDSC2 = PMC_LVDSC2_LVWIE | PMC_LVDSC2_LVWV(3);  // 2.92-3.08v
+  attachInterruptVector(IRQ_LOW_VOLTAGE, low_voltage_isr);
   NVIC_ENABLE_IRQ(IRQ_LOW_VOLTAGE);
 #endif
   cleartime = millis();
@@ -3752,6 +3757,9 @@ void low_voltage_isr(void) {
 
   PMC_LVDSC2 |= PMC_LVDSC2_LVWACK;  // clear if we can
   PMC_LVDSC1 |= PMC_LVDSC1_LVDACK;
+
+  Serial.println();
+  Serial.println("GoodBye");
 }
 #endif
 ////////END///////////

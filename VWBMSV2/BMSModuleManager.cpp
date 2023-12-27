@@ -724,7 +724,7 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
     }
     if (CMU > 0 && CMU < 64)
     {
-      if (Id < 3)
+      if (Id < 2)
       {
         if (msg.buf[2] != 0xFF && msg.buf[5] != 0xFF && msg.buf[7] != 0xFF) //Check module is not initializing OR a "spoof module"
         {
