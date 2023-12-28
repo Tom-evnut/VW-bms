@@ -4,7 +4,7 @@
 #include "Logger.h"
 
 #ifdef USING_TEENSY4
-extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can0;
+extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
 #endif //USING_TEENSY4
 extern EEPROMSettings settings;
 CAN_message_t OUTmsg;
