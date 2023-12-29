@@ -322,7 +322,7 @@ CAN_message_t inMsg;
 CAN_filter_t filter;
 #else
 void myCallback() {
-  Serial.println("FEED THE DOG SOON, OR RESET!");
+  SERIALCONSOLE.println("FEED THE DOG SOON, OR RESET!");
 }
 #endif
 
@@ -410,24 +410,24 @@ void setup() {
   Serial2.begin(115200);
 
   // Display reason the Teensy was last reset
-  Serial.println();
-  Serial.println("Reason for last Reset: ");
+  SERIALCONSOLE.println();
+  SERIALCONSOLE.println("Reason for last Reset: ");
 #ifdef USING_TEENSY4
   // Reset cause regisgter not avialable on Teensy 4
-  Serial.println("Reset cause regisgter not avialable on Teensy 4");
+  SERIALCONSOLE.println("Reset cause regisgter not avialable on Teensy 4");
 #else
-  if (RCM_SRS1 & RCM_SRS1_SACKERR) Serial.println("Stop Mode Acknowledge Error Reset");
-  if (RCM_SRS1 & RCM_SRS1_MDM_AP) Serial.println("MDM-AP Reset");
-  if (RCM_SRS1 & RCM_SRS1_SW) Serial.println("Software Reset");  // reboot with SCB_AIRCR = 0x05FA0004
-  if (RCM_SRS1 & RCM_SRS1_LOCKUP) Serial.println("Core Lockup Event Reset");
-  if (RCM_SRS0 & RCM_SRS0_POR) Serial.println("Power-on Reset");        // removed / applied power
-  if (RCM_SRS0 & RCM_SRS0_PIN) Serial.println("External Pin Reset");    // Reboot with software download
-  if (RCM_SRS0 & RCM_SRS0_WDOG) Serial.println("Watchdog(COP) Reset");  // WDT timed out
-  if (RCM_SRS0 & RCM_SRS0_LOC) Serial.println("Loss of External Clock Reset");
-  if (RCM_SRS0 & RCM_SRS0_LOL) Serial.println("Loss of Lock in PLL Reset");
-  if (RCM_SRS0 & RCM_SRS0_LVD) Serial.println("Low-voltage Detect Reset");
+  if (RCM_SRS1 & RCM_SRS1_SACKERR) SERIALCONSOLE.println("Stop Mode Acknowledge Error Reset");
+  if (RCM_SRS1 & RCM_SRS1_MDM_AP) SERIALCONSOLE.println("MDM-AP Reset");
+  if (RCM_SRS1 & RCM_SRS1_SW) SERIALCONSOLE.println("Software Reset");  // reboot with SCB_AIRCR = 0x05FA0004
+  if (RCM_SRS1 & RCM_SRS1_LOCKUP) SERIALCONSOLE.println("Core Lockup Event Reset");
+  if (RCM_SRS0 & RCM_SRS0_POR) SERIALCONSOLE.println("Power-on Reset");        // removed / applied power
+  if (RCM_SRS0 & RCM_SRS0_PIN) SERIALCONSOLE.println("External Pin Reset");    // Reboot with software download
+  if (RCM_SRS0 & RCM_SRS0_WDOG) SERIALCONSOLE.println("Watchdog(COP) Reset");  // WDT timed out
+  if (RCM_SRS0 & RCM_SRS0_LOC) SERIALCONSOLE.println("Loss of External Clock Reset");
+  if (RCM_SRS0 & RCM_SRS0_LOL) SERIALCONSOLE.println("Loss of Lock in PLL Reset");
+  if (RCM_SRS0 & RCM_SRS0_LVD) SERIALCONSOLE.println("Low-voltage Detect Reset");
 #endif
-  Serial.println();
+  SERIALCONSOLE.println();
   ///////////////////
 
 #ifdef USING_TEENSY4
@@ -461,7 +461,7 @@ void setup() {
 
   EEPROM.get(0, settings);
   if (settings.version != EEPROM_VERSION) {
-    Serial.println();
+    SERIALCONSOLE.println();
     loadSettings();
   }
 
@@ -542,17 +542,17 @@ void loop() {
             if (digitalRead(OUT2) == LOW && digitalRead(OUT4) == LOW) {
               mainconttimer = millis();
               digitalWrite(OUT4, HIGH);  //Precharge start
-              Serial.println();
-              Serial.println("Precharge!!!");
-              Serial.println(mainconttimer);
-              Serial.println();
+              SERIALCONSOLE.println();
+              SERIALCONSOLE.println("Precharge!!!");
+              SERIALCONSOLE.println(mainconttimer);
+              SERIALCONSOLE.println();
             }
             if (mainconttimer + settings.Pretime < millis() && digitalRead(OUT2) == LOW && abs(currentact) < settings.Precurrent) {
               digitalWrite(OUT2, HIGH);  //turn on contactor
               contctrl = contctrl | 2;   //turn on contactor
-              Serial.println();
-              Serial.println("Main On!!!");
-              Serial.println();
+              SERIALCONSOLE.println();
+              SERIALCONSOLE.println("Main On!!!");
+              SERIALCONSOLE.println();
               mainconttimer = millis() + settings.Pretime;
             }
             if (mainconttimer + settings.Pretime + 1000 < millis()) {
@@ -617,8 +617,8 @@ void loop() {
           if (bms.getHighCellVolt() > settings.OverVSetpoint || bms.getHighCellVolt() > settings.ChargeVsetpoint || chargecurrent == 0) {
             if ((millis() - overtriptimer) > settings.triptime) {
               if (digitalRead(OUT3) == 1) {
-                Serial.println();
-                Serial.println("Over Voltage Trip");
+                SERIALCONSOLE.println();
+                SERIALCONSOLE.println("Over Voltage Trip");
                 digitalWrite(OUT3, LOW);  //turn off charger
                 // contctrl = contctrl & 253;
                 //Pretimer = millis();
@@ -632,31 +632,31 @@ void loop() {
 
               if (bms.getHighCellVolt() < (settings.ChargeVsetpoint - settings.ChargeHys)) {
                 if (digitalRead(OUT3) == 0) {
-                  Serial.println();
-                  Serial.println("Reset Over Voltage Trip Not Charged");
+                  SERIALCONSOLE.println();
+                  SERIALCONSOLE.println("Reset Over Voltage Trip Not Charged");
                   Charged = 0;
                   digitalWrite(OUT3, HIGH);  //turn on charger
                 }
                 /*
                   if (Pretimer + settings.Pretime < millis())
                   {
-                  // Serial.println();
-                  //Serial.print(Pretimer);
+                  // SERIALCONSOLE.println();
+                  //SERIALCONSOLE.print(Pretimer);
                   contctrl = contctrl | 2;
                   }*/
               }
 
             } else {
               if (digitalRead(OUT3) == 0) {
-                Serial.println();
-                Serial.println("Reset Over Voltage Trip Not Charged");
+                SERIALCONSOLE.println();
+                SERIALCONSOLE.println("Reset Over Voltage Trip Not Charged");
                 digitalWrite(OUT3, HIGH);  //turn on charger
               }
               /*
                 if (Pretimer + settings.Pretime < millis())
                 {
-                // Serial.println();
-                //Serial.print(Pretimer);
+                // SERIALCONSOLE.println();
+                //SERIALCONSOLE.print(Pretimer);
                 contctrl = contctrl | 2;
                 }*/
             }
@@ -667,8 +667,8 @@ void loop() {
           if (digitalRead(OUT1) == 1) {
 
             if ((millis() - undertriptimer) > settings.triptime) {
-              Serial.println();
-              Serial.println("Under Voltage Trip");
+              SERIALCONSOLE.println();
+              SERIALCONSOLE.println("Under Voltage Trip");
               digitalWrite(OUT1, LOW);  //turn off discharge
               // contctrl = contctrl & 254;
               // Pretimer1 = millis();
@@ -679,8 +679,8 @@ void loop() {
 
           if (bms.getLowCellVolt() > settings.DischVsetpoint + settings.DischHys) {
             if (digitalRead(OUT1) == 0) {
-              Serial.println();
-              Serial.println("Reset Under Voltage Trip");
+              SERIALCONSOLE.println();
+              SERIALCONSOLE.println("Reset Under Voltage Trip");
               digitalWrite(OUT1, HIGH);  //turn on discharge
             }
             /*
@@ -1444,8 +1444,8 @@ void contcon() {
     if ((contctrl & 2) == 2) {
       if ((contstat & 2) != 2) {
         if (conttimer2 == 0) {
-          Serial.println();
-          Serial.println("pull in OUT6");
+          SERIALCONSOLE.println();
+          SERIALCONSOLE.println("pull in OUT6");
           analogWrite(OUT6, 255);
           conttimer2 = millis() + pulltime;
         }
@@ -1459,8 +1459,8 @@ void contcon() {
     if ((contctrl & 4) == 4) {
       if ((contstat & 4) != 4) {
         if (conttimer3 == 0) {
-          Serial.println();
-          Serial.println("pull in OUT7");
+          SERIALCONSOLE.println();
+          SERIALCONSOLE.println("pull in OUT7");
           analogWrite(OUT7, 255);
           conttimer3 = millis() + pulltime;
         }
@@ -1814,20 +1814,67 @@ void BMVmessage()  //communication with the Victron Color Control System over VE
 */
 void clear_serial_buffer()
 {
-  while (Serial.available())
+  while (SERIALCONSOLE.available())
   {
-    Serial.read();
+    SERIALCONSOLE.read();
   }
 }
 
+size_t csize = 128;
+char g_serial_buffer[128];
+int  g_serial_index = 0;
+
+/**
+** Add the data to a buffer until CR or LF is found
+*/
+bool read_new_line()
+{
+  size_t index = 0;
+  int inputbyte;
+
+  inputbyte = SERIALCONSOLE.read();
+  if (inputbyte != -1)
+  {
+    g_serial_buffer[g_serial_index++] = inputbyte;
+    g_serial_buffer[g_serial_index] = '\0';
+  }
+  if (index >= csize - 1)
+  {
+    index = 0;
+  }
+  return (inputbyte == 10 || inputbyte == 13);
+}
+
+int getint(char *pbuffer, int size)
+{
+  if (size)
+  {
+    return atoi(pbuffer); 
+  }
+  return 0;
+}
+
+#define PARSEINT getint(input_line, input_size - 1)
+//#define PARSEINT SERIALCONSOLE.parseInt()
+
 // Settings menu
 void menu() {
+  char input_line[128];
+  int  input_size;
 
-  incomingByte = Serial.read();  // read the incoming byte:
-  SERIALCONSOLE.print("Recieved: \"");
-  SERIALCONSOLE.print((char)incomingByte);
-  SERIALCONSOLE.print("\" ");
-  SERIALCONSOLE.println(incomingByte, HEX);
+  //incomingByte = SERIALCONSOLE.read();  // read the incoming byte:
+  bool bnewline = read_new_line();
+  if (!bnewline)
+  {
+    return ;
+  }
+  incomingByte = g_serial_buffer[0];
+  input_size = g_serial_index;
+  g_serial_index = 0;
+  memcpy(input_line, &g_serial_buffer[1], input_size);
+
+  SERIALCONSOLE.print("Recieved: ");
+  SERIALCONSOLE.println(input_line);
 
   if (menuload == d_Debug_Settings) {
     switch (incomingByte) {
@@ -1889,8 +1936,8 @@ void menu() {
 
       case '9':
         menuload = s_main_menu;
-        if (Serial.available() > 0) {
-          debugdigits = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          debugdigits = PARSEINT;
         }
         if (debugdigits > 4) {
           debugdigits = 2;
@@ -1941,8 +1988,8 @@ void menu() {
 
       case '3':
         menuload = s_main_menu;
-        if (Serial.available() > 0) {
-          settings.ncur = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.ncur = PARSEINT;
         }
         menuload = s_main_menu;
         incomingByte = 'c';
@@ -1950,32 +1997,32 @@ void menu() {
 
       case '4':
         menuload = s_main_menu;
-        if (Serial.available() > 0) {
-          settings.convlow = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.convlow = PARSEINT;
         }
         incomingByte = 'c';
         break;
 
       case '5':
         menuload = s_main_menu;
-        if (Serial.available() > 0) {
-          settings.convhigh = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.convhigh = PARSEINT;
         }
         incomingByte = 'c';
         break;
 
       case '6':
         menuload = s_main_menu;
-        if (Serial.available() > 0) {
-          settings.CurDead = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.CurDead = PARSEINT;
         }
         incomingByte = 'c';
         break;
 
       case '8':
         menuload = s_main_menu;
-        if (Serial.available() > 0) {
-          settings.changecur = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.changecur = PARSEINT;
         }
         menuload = s_main_menu;
         incomingByte = 'c';
@@ -2031,8 +2078,8 @@ void menu() {
   if (menuload == i_Ignore_Value_Settings) {
     switch (incomingByte) {
       case '1':  //e dispaly settings
-        if (Serial.available() > 0) {
-          settings.IgnoreTemp = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.IgnoreTemp = PARSEINT;
         }
         if (settings.IgnoreTemp > 3) {
           settings.IgnoreTemp = 0;
@@ -2043,11 +2090,11 @@ void menu() {
         break;
 
       case '2':
-        if (Serial.available() > 0) {
-          settings.IgnoreVolt = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.IgnoreVolt = PARSEINT;
           settings.IgnoreVolt = settings.IgnoreVolt * 0.001;
           bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
-          // Serial.println(settings.IgnoreVolt);
+          // SERIALCONSOLE.println(settings.IgnoreVolt);
           menuload = s_main_menu;
           incomingByte = 'i';
         }
@@ -2061,13 +2108,11 @@ void menu() {
     }
   }
 
-
-
   if (menuload == a_Alarm_and_Warning_Settings) {
     switch (incomingByte) {
       case '1':
-        if (Serial.available() > 0) {
-          settings.WarnOff = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.WarnOff = PARSEINT;
           settings.WarnOff = settings.WarnOff * 0.001;
           menuload = s_main_menu;
           incomingByte = 'a';
@@ -2075,8 +2120,8 @@ void menu() {
         break;
 
       case '2':
-        if (Serial.available() > 0) {
-          settings.CellGap = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.CellGap = PARSEINT;
           settings.CellGap = settings.CellGap * 0.001;
           menuload = s_main_menu;
           incomingByte = 'a';
@@ -2084,16 +2129,16 @@ void menu() {
         break;
 
       case '3':
-        if (Serial.available() > 0) {
-          settings.WarnToff = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.WarnToff = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'a';
         }
         break;
 
       case '4':
-        if (Serial.available() > 0) {
-          settings.triptime = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.triptime = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'a';
         }
@@ -2117,37 +2162,34 @@ void menu() {
         break;
 
       case '1':
-        if (Serial.available() > 0) {
-          settings.ChargeVsetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.ChargeVsetpoint = PARSEINT;
           settings.ChargeVsetpoint = settings.ChargeVsetpoint / 1000;
           menuload = s_main_menu;
           incomingByte = 'e';
         }
         break;
 
-
       case '2':
-        if (Serial.available() > 0) {
-          settings.ChargeHys = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.ChargeHys = PARSEINT;
           settings.ChargeHys = settings.ChargeHys / 1000;
           menuload = s_main_menu;
           incomingByte = 'e';
         }
         break;
 
-
       case '4':
-        if (Serial.available() > 0) {
-          settings.chargecurrentend = Serial.parseInt() * 10;
+        if (SERIALCONSOLE.available() > 0) {
+          settings.chargecurrentend = PARSEINT * 10;
           menuload = s_main_menu;
           incomingByte = 'e';
         }
         break;
 
-
       case '3':
-        if (Serial.available() > 0) {
-          settings.chargecurrentmax = Serial.parseInt() * 10;
+        if (SERIALCONSOLE.available() > 0) {
+          settings.chargecurrentmax = PARSEINT * 10;
           menuload = s_main_menu;
           incomingByte = 'e';
         }
@@ -2163,8 +2205,8 @@ void menu() {
         break;
 
       case '6':
-        if (Serial.available() > 0) {
-          settings.chargerspd = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.chargerspd = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'e';
         }
@@ -2181,8 +2223,8 @@ void menu() {
         break;
 
       case '9':
-        if (Serial.available() > 0) {
-          settings.ChargeTSetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.ChargeTSetpoint = PARSEINT;
           if (settings.ChargeTSetpoint < settings.UnderTSetpoint) {
             settings.ChargeTSetpoint = settings.UnderTSetpoint;
           }
@@ -2191,8 +2233,8 @@ void menu() {
         }
         break;
       case '0':
-        if (Serial.available() > 0) {
-          settings.chargecurrentcold = Serial.parseInt() * 10;
+        if (SERIALCONSOLE.available() > 0) {
+          settings.chargecurrentcold = PARSEINT * 10;
           if (settings.chargecurrentcold > settings.chargecurrentmax) {
             settings.chargecurrentcold = settings.chargecurrentmax;
           }
@@ -2205,32 +2247,32 @@ void menu() {
   if (menuload == k_Contactor_and_Gauge_Settings) {
     switch (incomingByte) {
       case '1':
-        if (Serial.available() > 0) {
-          settings.Pretime = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.Pretime = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'k';
         }
         break;
 
       case '2':
-        if (Serial.available() > 0) {
-          settings.Precurrent = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.Precurrent = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'k';
         }
         break;
 
       case '3':
-        if (Serial.available() > 0) {
-          settings.conthold = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.conthold = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'k';
         }
         break;
 
       case '4':
-        if (Serial.available() > 0) {
-          settings.gaugelow = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.gaugelow = PARSEINT;
           gaugedebug = 2;
           gaugeupdate();
           menuload = s_main_menu;
@@ -2239,8 +2281,8 @@ void menu() {
         break;
 
       case '5':
-        if (Serial.available() > 0) {
-          settings.gaugehigh = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.gaugehigh = PARSEINT;
           gaugedebug = 3;
           gaugeupdate();
           menuload = s_main_menu;
@@ -2293,8 +2335,8 @@ void menu() {
         break;
 
       case '1':  //1 Over Voltage Setpoint
-        if (Serial.available() > 0) {
-          settings.OverVSetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.OverVSetpoint = PARSEINT;
           settings.OverVSetpoint = settings.OverVSetpoint / 1000;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2302,57 +2344,56 @@ void menu() {
         break;
 
       case 'g':
-        if (Serial.available() > 0) {
-          settings.StoreVsetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.StoreVsetpoint = PARSEINT;
           settings.StoreVsetpoint = settings.StoreVsetpoint / 1000;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
 
       case 'h':
-        if (Serial.available() > 0) {
-          settings.DisTaper = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.DisTaper = PARSEINT;
           settings.DisTaper = settings.DisTaper / 1000;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
 
       case 'b':
-        if (Serial.available() > 0) {
-          settings.socvolt[0] = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.socvolt[0] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
-
       case 'c':
-        if (Serial.available() > 0) {
-          settings.socvolt[1] = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.socvolt[1] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case 'd':
-        if (Serial.available() > 0) {
-          settings.socvolt[2] = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.socvolt[2] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case 'e':
-        if (Serial.available() > 0) {
-          settings.socvolt[3] = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.socvolt[3] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case 'k':  //Discharge Voltage hysteresis
-        if (Serial.available() > 0) {
-          settings.DischHys = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.DischHys = PARSEINT;
           settings.DischHys = settings.DischHys / 1000;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2360,16 +2401,16 @@ void menu() {
         break;
 
       case 'j':
-        if (Serial.available() > 0) {
-          settings.DisTSetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.DisTSetpoint = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case '9':  //Discharge Voltage Setpoint
-        if (Serial.available() > 0) {
-          settings.DischVsetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.DischVsetpoint = PARSEINT;
           settings.DischVsetpoint = settings.DischVsetpoint / 1000;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2377,13 +2418,11 @@ void menu() {
         break;
 
       case '0':  //c Pstrings
-        if (Serial.available() > 0) {
-          settings.Pstrings = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.Pstrings = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
           bms.setPstrings(settings.Pstrings);
-          SERIALCONSOLE.print("Reading Pstring: ");
-          SERIALCONSOLE.println(settings.Pstrings);
         }
         else
         {
@@ -2392,16 +2431,16 @@ void menu() {
         break;
 
       case 'a':  //
-        if (Serial.available() > 0) {
-          settings.Scells = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.Scells = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case '2':  //2 Under Voltage Setpoint
-        if (Serial.available() > 0) {
-          settings.UnderVSetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.UnderVSetpoint = PARSEINT;
           settings.UnderVSetpoint = settings.UnderVSetpoint / 1000;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2409,24 +2448,24 @@ void menu() {
         break;
 
       case '3':  //3 Over Temperature Setpoint
-        if (Serial.available() > 0) {
-          settings.OverTSetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.OverTSetpoint = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case '4':  //4 Udner Temperature Setpoint
-        if (Serial.available() > 0) {
-          settings.UnderTSetpoint = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.UnderTSetpoint = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case '5':  //5 Balance Voltage Setpoint
-        if (Serial.available() > 0) {
-          settings.balanceVoltage = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.balanceVoltage = PARSEINT;
           settings.balanceVoltage = settings.balanceVoltage / 1000;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2434,8 +2473,8 @@ void menu() {
         break;
 
       case '6':  //6 Balance Voltage Hystersis
-        if (Serial.available() > 0) {
-          settings.balanceHyst = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.balanceHyst = PARSEINT;
           settings.balanceHyst = settings.balanceHyst / 1000;
           menuload = s_main_menu;
           bms.setBalanceHyst(settings.balanceHyst);
@@ -2444,16 +2483,16 @@ void menu() {
         break;
 
       case '7':  //7 Battery Capacity inAh
-        if (Serial.available() > 0) {
-          settings.CAP = Serial.parseInt();
+        if (SERIALCONSOLE.available() > 0) {
+          settings.CAP = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
         break;
 
       case '8':  // discurrent in A
-        if (Serial.available() > 0) {
-          settings.discurrentmax = Serial.parseInt() * 10;
+        if (SERIALCONSOLE.available() > 0) {
+          settings.discurrentmax = PARSEINT * 10;
           menuload = s_main_menu;
           incomingByte = 'b';
         }
@@ -2946,25 +2985,25 @@ void canread() {
   }
 
   if (candebug == 1) {
-    Serial.print(millis());
+    SERIALCONSOLE.print(millis());
     if ((inMsg.id & 0x80000000) == 0x80000000)  // Determine if ID is standard (11 bits) or extended (29 bits)
       sprintf(msgString, "Extended ID: 0x%.8lX  DLC: %1d  Data:", (inMsg.id & 0x1FFFFFFF), inMsg.len);
     else
       sprintf(msgString, ",0x%.3lX,false,%1d", inMsg.id, inMsg.len);
 
-    Serial.print(msgString);
+    SERIALCONSOLE.print(msgString);
 
     if ((inMsg.id & 0x40000000) == 0x40000000) {  // Determine if message is a remote request frame.
       sprintf(msgString, " REMOTE REQUEST FRAME");
-      Serial.print(msgString);
+      SERIALCONSOLE.print(msgString);
     } else {
       for (byte i = 0; i < inMsg.len; i++) {
         sprintf(msgString, ", 0x%.2X", inMsg.buf[i]);
-        Serial.print(msgString);
+        SERIALCONSOLE.print(msgString);
       }
     }
 
-    Serial.println();
+    SERIALCONSOLE.println();
   }
 }
 
@@ -2983,9 +3022,9 @@ void CAB300() {
     getcurrent();
   }
   if (candebug == 1) {
-    Serial.println();
-    Serial.print(CANmilliamps);
-    Serial.print("mA ");
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.print(CANmilliamps);
+    SERIALCONSOLE.print("mA ");
   }
 }
 
@@ -2996,8 +3035,8 @@ void CAB500() {
   }
   CANmilliamps = inbox;
   if (candebug == 1) {
-    Serial.println();
-    Serial.print(CANmilliamps, HEX);
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.print(CANmilliamps, HEX);
   }
   if (CANmilliamps > 0x800000) {
     CANmilliamps -= 0x800000;
@@ -3009,9 +3048,9 @@ void CAB500() {
     getcurrent();
   }
   if (candebug == 1) {
-    Serial.println();
-    Serial.print(CANmilliamps);
-    Serial.print("mA ");
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.print(CANmilliamps);
+    SERIALCONSOLE.print("mA ");
   }
 }
 
@@ -3025,9 +3064,9 @@ void handleVictronLynx() {
     getcurrent();
   }
   if (candebug == 1) {
-    Serial.println();
-    Serial.print(CANmilliamps);
-    Serial.print("mA ");
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.print(CANmilliamps);
+    SERIALCONSOLE.print("mA ");
   }
 }
 
@@ -3115,29 +3154,29 @@ void currentlimit() {
 
 
 void inputdebug() {
-  Serial.println();
-  Serial.print("Input: ");
+  SERIALCONSOLE.println();
+  SERIALCONSOLE.print("Input: ");
   if (digitalRead(IN1)) {
-    Serial.print("1 ON  ");
+    SERIALCONSOLE.print("1 ON  ");
   } else {
-    Serial.print("1 OFF ");
+    SERIALCONSOLE.print("1 OFF ");
   }
   if (digitalRead(IN3)) {
-    Serial.print("2 ON  ");
+    SERIALCONSOLE.print("2 ON  ");
   } else {
-    Serial.print("2 OFF ");
+    SERIALCONSOLE.print("2 OFF ");
   }
   if (digitalRead(IN3)) {
-    Serial.print("3 ON  ");
+    SERIALCONSOLE.print("3 ON  ");
   } else {
-    Serial.print("3 OFF ");
+    SERIALCONSOLE.print("3 OFF ");
   }
   if (digitalRead(IN4)) {
-    Serial.print("4 ON  ");
+    SERIALCONSOLE.print("4 ON  ");
   } else {
-    Serial.print("4 OFF ");
+    SERIALCONSOLE.print("4 OFF ");
   }
-  Serial.println();
+  SERIALCONSOLE.println();
 }
 
 void outputdebug() {
@@ -3363,9 +3402,9 @@ void pwmcomms() {
   p = map((currentact * 0.001), pwmcurmin, pwmcurmax, 50, 255);
   analogWrite(OUT7, p);
   /*
-    Serial.println();
-      Serial.print(p*100/255);
-      Serial.print(" OUT8 ");
+    SERIALCONSOLE.println();
+      SERIALCONSOLE.print(p*100/255);
+      SERIALCONSOLE.print(" OUT8 ");
   */
   if (bms.getLowCellVolt() < settings.UnderVSetpoint) {
     analogWrite(OUT8, 224);  //12V to 10V converter 1.5V
@@ -3374,9 +3413,9 @@ void pwmcomms() {
     analogWrite(OUT8, p);  //2V to 10V converter 1.5-10V
   }
   /*
-      Serial.println();
-      Serial.print(p*100/255);
-      Serial.print(" OUT7 ");
+      SERIALCONSOLE.println();
+      SERIALCONSOLE.print(p*100/255);
+      SERIALCONSOLE.print(" OUT7 ");
   */
 }
 
@@ -3492,25 +3531,25 @@ void dashupdate() {
 void Serialexp() {
   /*
     incomingByte = SERIALBMS.read(); // read the incoming byte:
-    Serial.println();
-    Serial.print(incomingByte);
-    Serial.print("|");
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.print(incomingByte);
+    SERIALCONSOLE.print("|");
 
     incomingByte = SERIALBMS.read(); // read the incoming byte:
     if (incomingByte == 0xFF)
     {
-    Serial.println();
-    Serial.print(incomingByte);
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.print(incomingByte);
     incomingByte = SERIALBMS.read(); // read the incoming byte:
-    Serial.print("|");
-    Serial.print(incomingByte);
-    Serial.print("|");
-    Serial.print(incomingByte);
+    SERIALCONSOLE.print("|");
+    SERIALCONSOLE.print(incomingByte);
+    SERIALCONSOLE.print("|");
+    SERIALCONSOLE.print(incomingByte);
     if (settings.Serialexp == 1) //Do Serial Master Things
     {
-    Serial.print(SERIALBMS.read(), HEX);
-    Serial.print("|");
-    Serial.print(SERIALBMS.read(), HEX);
+    SERIALCONSOLE.print(SERIALBMS.read(), HEX);
+    SERIALCONSOLE.print("|");
+    SERIALCONSOLE.print(SERIALBMS.read(), HEX);
     }
     if (settings.Serialexp == 2) //Do Serial Slave Things
     {
@@ -3523,8 +3562,8 @@ void Serialexp() {
       SERIALBMS.write(0x01); //response is 1 higher than sent id
       SERIALBMS.write(SerialID);
 
-      Serial.print("New ID : ");
-      Serial.print(SerialID);
+      SERIALCONSOLE.print("New ID : ");
+      SERIALCONSOLE.print(SerialID);
     }
     else
     {
@@ -3555,16 +3594,16 @@ void Serialslaveinit() {
       SERIALBMS.write(0xFF);
       SERIALBMS.write(0x00);
       SERIALBMS.write(I);
-      Serial.write(" | ");
+      SERIALCONSOLE.write(" | ");
       delay(2);
       if (SERIALBMS.available() > 0)
       {
         for (int x = 0; x < 4; x++)
         {
           buff[x] = SERIALBMS.read();
-          Serial.write(buff[0]);
-          Serial.write(buff[1]);
-          Serial.write(buff[2]);
+          SERIALCONSOLE.write(buff[0]);
+          SERIALCONSOLE.write(buff[1]);
+          SERIALCONSOLE.write(buff[2]);
         }
         if (buff[0] = 0xFF)
         {
@@ -3576,7 +3615,7 @@ void Serialslaveinit() {
       }
       else
       {
-        Serial.write("No Serial Slaves Found");
+        SERIALCONSOLE.write("No Serial Slaves Found");
         break;
       }
 
@@ -3772,8 +3811,8 @@ void low_voltage_isr(void) {
   PMC_LVDSC2 |= PMC_LVDSC2_LVWACK;  // clear if we can
   PMC_LVDSC1 |= PMC_LVDSC1_LVDACK;
 
-  Serial.println();
-  Serial.println("GoodBye");
+  SERIALCONSOLE.println();
+  SERIALCONSOLE.println("GoodBye");
 }
 #endif
 ////////END///////////

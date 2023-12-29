@@ -201,14 +201,14 @@ void SerialConsole::handleShortCmd()
       break; 
                 
       case '0': //Send all boards into Sleep state
-       Serial.println();
-       Serial.println("Sleep Mode");
+       SERIALCONSOLE.println();
+       SERIALCONSOLE.println("Sleep Mode");
        sleepBoards();
       break;
 
       case '9'://Pull all boards out of Sleep state
-       Serial.println();
-       Serial.println("Wake Boards");
+       SERIALCONSOLE.println();
+       SERIALCONSOLE.println("Wake Boards");
        wakeBoards();
       break;          
                       
