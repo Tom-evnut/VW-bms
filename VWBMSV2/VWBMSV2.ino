@@ -1873,8 +1873,8 @@ void menu() {
   g_serial_index = 0;
   memcpy(input_line, &g_serial_buffer[1], input_size);
 
-  SERIALCONSOLE.print("Recieved: ");
-  SERIALCONSOLE.println(input_line);
+  //SERIALCONSOLE.print("Recieved: ");
+  //SERIALCONSOLE.println(input_line);
 
   if (menuload == d_Debug_Settings) {
     switch (incomingByte) {
@@ -1936,7 +1936,7 @@ void menu() {
 
       case '9':
         menuload = s_main_menu;
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           debugdigits = PARSEINT;
         }
         if (debugdigits > 4) {
@@ -1988,7 +1988,7 @@ void menu() {
 
       case '3':
         menuload = s_main_menu;
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.ncur = PARSEINT;
         }
         menuload = s_main_menu;
@@ -1997,7 +1997,7 @@ void menu() {
 
       case '4':
         menuload = s_main_menu;
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.convlow = PARSEINT;
         }
         incomingByte = 'c';
@@ -2005,7 +2005,7 @@ void menu() {
 
       case '5':
         menuload = s_main_menu;
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.convhigh = PARSEINT;
         }
         incomingByte = 'c';
@@ -2013,7 +2013,7 @@ void menu() {
 
       case '6':
         menuload = s_main_menu;
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.CurDead = PARSEINT;
         }
         incomingByte = 'c';
@@ -2021,7 +2021,7 @@ void menu() {
 
       case '8':
         menuload = s_main_menu;
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.changecur = PARSEINT;
         }
         menuload = s_main_menu;
@@ -2090,7 +2090,7 @@ void menu() {
         break;
 
       case '2':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.IgnoreVolt = PARSEINT;
           settings.IgnoreVolt = settings.IgnoreVolt * 0.001;
           bms.setSensors(settings.IgnoreTemp, settings.IgnoreVolt, settings.DeltaVolt);
@@ -2111,7 +2111,7 @@ void menu() {
   if (menuload == a_Alarm_and_Warning_Settings) {
     switch (incomingByte) {
       case '1':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.WarnOff = PARSEINT;
           settings.WarnOff = settings.WarnOff * 0.001;
           menuload = s_main_menu;
@@ -2120,7 +2120,7 @@ void menu() {
         break;
 
       case '2':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.CellGap = PARSEINT;
           settings.CellGap = settings.CellGap * 0.001;
           menuload = s_main_menu;
@@ -2129,7 +2129,7 @@ void menu() {
         break;
 
       case '3':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.WarnToff = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'a';
@@ -2137,7 +2137,7 @@ void menu() {
         break;
 
       case '4':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.triptime = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'a';
@@ -2162,7 +2162,7 @@ void menu() {
         break;
 
       case '1':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.ChargeVsetpoint = PARSEINT;
           settings.ChargeVsetpoint = settings.ChargeVsetpoint / 1000;
           menuload = s_main_menu;
@@ -2171,7 +2171,7 @@ void menu() {
         break;
 
       case '2':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.ChargeHys = PARSEINT;
           settings.ChargeHys = settings.ChargeHys / 1000;
           menuload = s_main_menu;
@@ -2180,7 +2180,7 @@ void menu() {
         break;
 
       case '4':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.chargecurrentend = PARSEINT * 10;
           menuload = s_main_menu;
           incomingByte = 'e';
@@ -2188,7 +2188,7 @@ void menu() {
         break;
 
       case '3':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.chargecurrentmax = PARSEINT * 10;
           menuload = s_main_menu;
           incomingByte = 'e';
@@ -2205,7 +2205,7 @@ void menu() {
         break;
 
       case '6':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.chargerspd = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'e';
@@ -2223,7 +2223,7 @@ void menu() {
         break;
 
       case '9':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.ChargeTSetpoint = PARSEINT;
           if (settings.ChargeTSetpoint < settings.UnderTSetpoint) {
             settings.ChargeTSetpoint = settings.UnderTSetpoint;
@@ -2233,7 +2233,7 @@ void menu() {
         }
         break;
       case '0':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.chargecurrentcold = PARSEINT * 10;
           if (settings.chargecurrentcold > settings.chargecurrentmax) {
             settings.chargecurrentcold = settings.chargecurrentmax;
@@ -2247,7 +2247,7 @@ void menu() {
   if (menuload == k_Contactor_and_Gauge_Settings) {
     switch (incomingByte) {
       case '1':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.Pretime = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'k';
@@ -2255,7 +2255,7 @@ void menu() {
         break;
 
       case '2':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.Precurrent = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'k';
@@ -2263,7 +2263,7 @@ void menu() {
         break;
 
       case '3':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.conthold = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'k';
@@ -2271,7 +2271,7 @@ void menu() {
         break;
 
       case '4':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.gaugelow = PARSEINT;
           gaugedebug = 2;
           gaugeupdate();
@@ -2281,7 +2281,7 @@ void menu() {
         break;
 
       case '5':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.gaugehigh = PARSEINT;
           gaugedebug = 3;
           gaugeupdate();
@@ -2335,7 +2335,7 @@ void menu() {
         break;
 
       case '1':  //1 Over Voltage Setpoint
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.OverVSetpoint = PARSEINT;
           settings.OverVSetpoint = settings.OverVSetpoint / 1000;
           menuload = s_main_menu;
@@ -2344,7 +2344,7 @@ void menu() {
         break;
 
       case 'g':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.StoreVsetpoint = PARSEINT;
           settings.StoreVsetpoint = settings.StoreVsetpoint / 1000;
           menuload = s_main_menu;
@@ -2352,7 +2352,7 @@ void menu() {
         }
 
       case 'h':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.DisTaper = PARSEINT;
           settings.DisTaper = settings.DisTaper / 1000;
           menuload = s_main_menu;
@@ -2360,7 +2360,7 @@ void menu() {
         }
 
       case 'b':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.socvolt[0] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2368,7 +2368,7 @@ void menu() {
         break;
 
       case 'c':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.socvolt[1] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2376,7 +2376,7 @@ void menu() {
         break;
 
       case 'd':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.socvolt[2] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2384,7 +2384,7 @@ void menu() {
         break;
 
       case 'e':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.socvolt[3] = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2392,7 +2392,7 @@ void menu() {
         break;
 
       case 'k':  //Discharge Voltage hysteresis
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.DischHys = PARSEINT;
           settings.DischHys = settings.DischHys / 1000;
           menuload = s_main_menu;
@@ -2401,7 +2401,7 @@ void menu() {
         break;
 
       case 'j':
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.DisTSetpoint = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2409,7 +2409,7 @@ void menu() {
         break;
 
       case '9':  //Discharge Voltage Setpoint
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.DischVsetpoint = PARSEINT;
           settings.DischVsetpoint = settings.DischVsetpoint / 1000;
           menuload = s_main_menu;
@@ -2418,7 +2418,7 @@ void menu() {
         break;
 
       case '0':  //c Pstrings
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.Pstrings = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2431,7 +2431,7 @@ void menu() {
         break;
 
       case 'a':  //
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.Scells = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2439,7 +2439,7 @@ void menu() {
         break;
 
       case '2':  //2 Under Voltage Setpoint
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.UnderVSetpoint = PARSEINT;
           settings.UnderVSetpoint = settings.UnderVSetpoint / 1000;
           menuload = s_main_menu;
@@ -2448,7 +2448,7 @@ void menu() {
         break;
 
       case '3':  //3 Over Temperature Setpoint
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.OverTSetpoint = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2456,7 +2456,7 @@ void menu() {
         break;
 
       case '4':  //4 Udner Temperature Setpoint
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.UnderTSetpoint = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2464,7 +2464,7 @@ void menu() {
         break;
 
       case '5':  //5 Balance Voltage Setpoint
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.balanceVoltage = PARSEINT;
           settings.balanceVoltage = settings.balanceVoltage / 1000;
           menuload = s_main_menu;
@@ -2473,7 +2473,7 @@ void menu() {
         break;
 
       case '6':  //6 Balance Voltage Hystersis
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.balanceHyst = PARSEINT;
           settings.balanceHyst = settings.balanceHyst / 1000;
           menuload = s_main_menu;
@@ -2483,7 +2483,7 @@ void menu() {
         break;
 
       case '7':  //7 Battery Capacity inAh
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.CAP = PARSEINT;
           menuload = s_main_menu;
           incomingByte = 'b';
@@ -2491,7 +2491,7 @@ void menu() {
         break;
 
       case '8':  // discurrent in A
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.discurrentmax = PARSEINT * 10;
           menuload = s_main_menu;
           incomingByte = 'b';
