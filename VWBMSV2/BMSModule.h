@@ -4,6 +4,22 @@
 #else
 #include <FlexCAN.h>
 #endif
+
+#define MAIN_MENU_KEY 's'
+
+enum en_menus
+{
+  q_exit_menu = 0,
+  s_main_menu,
+  c_Current_Sensor_Calibration,
+  b_Battery_Settings,
+  d_Debug_Settings,
+  k_Contactor_and_Gauge_Settings,
+  e_Charging_Settings,
+  a_Alarm_and_Warning_Settings,
+  i_Ignore_Value_Settings
+};
+
 class BMSModule
 {
   public:

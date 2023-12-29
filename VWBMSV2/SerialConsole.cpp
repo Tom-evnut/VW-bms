@@ -98,7 +98,8 @@ void SerialConsole::serialEvent() {
     if (incoming == -1) { //false alarm....
         return;
     }
-
+    // Line feed and carriage return chars
+    //              LF                CR
     if (incoming == 10 || incoming == 13) { //command done. Parse it.
         handleConsoleCmd();
         ptrBuffer = 0; //reset line counter once the line has been processed
