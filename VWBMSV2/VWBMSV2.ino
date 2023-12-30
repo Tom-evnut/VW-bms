@@ -255,6 +255,32 @@ int debugdigits = 2;  //amount of digits behind decimal for voltage reading
 
 ADC* adc = new ADC();  // adc object
 
+/**
+*   Prints the ErrorReason bits in readable form
+*/
+void serial_print_ErrorReason(int reason)
+{
+  const char* pErrorStr[] = {
+    "0x01-\"Undervoltage Fault\" ",
+    "0x02-\"unknown\"",
+    "0x04-\"Series Cells Fault\" ",
+    "0x08-\"Missing Module\""
+  };
+
+  if (reason != 0)
+  {
+    SERIALCONSOLE.print(" (");
+    for (int i = 0; i < 4; i++)
+    {
+      if (reason & (1 << i))
+      {
+        SERIALCONSOLE.print(pErrorStr[i]);
+      }
+    }
+    SERIALCONSOLE.print(") ");
+  }
+}
+
 void loadSettings() {
   Logger::console("Resetting to factory defaults");
   settings.version = EEPROM_VERSION;
@@ -1087,6 +1113,7 @@ void printbmsstat() {
     }
     SERIALCONSOLE.print("ErrSt: ");
     SERIALCONSOLE.print(ErrorReason);
+    serial_print_ErrorReason(ErrorReason);
   } else {
     SERIALCONSOLE.print(bmsstatus);
     switch (bmsstatus) {
@@ -1125,7 +1152,7 @@ void printbmsstat() {
   if (balancecells == 1) {
     SERIALCONSOLE.print("|Balancing Active");
   }
-  SERIALCONSOLE.print("  ");
+  SERIALCONSOLE.print("  cells:");
   SERIALCONSOLE.print(cellspresent);
   SERIALCONSOLE.println();
   SERIALCONSOLE.print("Out:");
@@ -2078,7 +2105,7 @@ void menu() {
   if (menuload == i_Ignore_Value_Settings) {
     switch (incomingByte) {
       case '1':  //e dispaly settings
-        if (SERIALCONSOLE.available() > 0) {
+        if (input_size > 0) {
           settings.IgnoreTemp = PARSEINT;
         }
         if (settings.IgnoreTemp > 3) {
@@ -2541,11 +2568,11 @@ void menu() {
           SERIALCONSOLE.print("3 - Pack Max Charge Current: ");
           SERIALCONSOLE.print(settings.chargecurrentmax * 0.1);
           SERIALCONSOLE.println("A");
-          SERIALCONSOLE.print("4- Pack End of Charge Current: ");
+          SERIALCONSOLE.print("4 - Pack End of Charge Current: ");
           SERIALCONSOLE.print(settings.chargecurrentend * 0.1);
           SERIALCONSOLE.println("A");
         }
-        SERIALCONSOLE.print("5- Charger Type: ");
+        SERIALCONSOLE.print("5 - Charger Type: ");
         switch (settings.chargertype) {
           case 0:
             SERIALCONSOLE.print("Relay Control");
@@ -2577,10 +2604,9 @@ void menu() {
         }
         SERIALCONSOLE.println();
         if (settings.chargertype > 0) {
-          SERIALCONSOLE.print("6- Charger Can Msg Spd: ");
+          SERIALCONSOLE.print("6 - Charger Can Msg Spd: ");
           SERIALCONSOLE.print(settings.chargerspd);
           SERIALCONSOLE.println("mS");
-          SERIALCONSOLE.println();
         }
         /*
           SERIALCONSOLE.print("7- Can Speed:");
@@ -2759,7 +2785,7 @@ void menu() {
           SERIALCONSOLE.println(" A");
         }
         if (settings.cursens == Canbus) {
-          SERIALCONSOLE.print("7 -Can Current Sensor :");
+          SERIALCONSOLE.print("7 - Can Current Sensor :");
           if (settings.curcan == LemCAB300) {
             SERIALCONSOLE.println(" LEM CAB300/500 series ");
           } else if (settings.curcan == LemCAB500) {
