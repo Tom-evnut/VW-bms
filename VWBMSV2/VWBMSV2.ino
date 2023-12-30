@@ -72,7 +72,7 @@ FilterOnePole lowpassFilter(LOWPASS, filterFrequency);
 
 //Simple BMS V2 wiring//
 #ifdef USING_TEENSY4
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can0;
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
 
 // A0 and A1 are needed for serial3 used on the Tesla BMS
 // Take them on IN1 and IN2
@@ -400,7 +400,6 @@ void setup() {
     Can0.setMB(static_cast<FLEXCAN_MAILBOX>(i), RX, EXT);
   }
   // MB 14 and 15 are TX
-
   Can0.mailboxStatus();
 #else
   Can0.begin(500000);
