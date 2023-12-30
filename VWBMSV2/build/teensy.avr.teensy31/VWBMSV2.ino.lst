@@ -1825,15 +1825,15 @@ BMSModuleManager::BMSModuleManager()
      e1a:	f8df 8294 	ldr.w	r8, [pc, #660]	; 10b0 <BMSModuleManager::balanceCells(int)+0x2ac>
           for (int i = 0; i < 8; i++)
      e1e:	2301      	movs	r3, #1
-  OUTmsg.flags.extended = 0;
+  OUTmsg.ext = 0;
      e20:	f898 2006 	ldrb.w	r2, [r8, #6]
   balcnt++;
      e24:	9901      	ldr	r1, [sp, #4]
-  OUTmsg.flags.extended = 0;
+  OUTmsg.ext = 0;
      e26:	f36f 0200 	bfc	r2, #0, #1
   balcnt++;
      e2a:	f881 3d3e 	strb.w	r3, [r1, #3390]	; 0xd3e
-  OUTmsg.flags.extended = 0;
+  OUTmsg.ext = 0;
      e2e:	f888 2006 	strb.w	r2, [r8, #6]
 }
      e32:	b003      	add	sp, #12
@@ -1949,12 +1949,12 @@ BMSModuleManager::BMSModuleManager()
               OUTmsg.id  = 0x1A5554AF;
      f24:	4b65      	ldr	r3, [pc, #404]	; (10bc <BMSModuleManager::balanceCells(int)+0x2b8>)
      f26:	f8c8 3000 	str.w	r3, [r8]
-          OUTmsg.flags.extended = 1;
+          OUTmsg.ext = 1;
      f2a:	f8b8 3006 	ldrh.w	r3, [r8, #6]
           Can0.write(OUTmsg);
      f2e:	4960      	ldr	r1, [pc, #384]	; (10b0 <BMSModuleManager::balanceCells(int)+0x2ac>)
      f30:	4863      	ldr	r0, [pc, #396]	; (10c0 <BMSModuleManager::balanceCells(int)+0x2bc>)
-          OUTmsg.flags.extended = 1;
+          OUTmsg.ext = 1;
      f32:	f003 03fe 	and.w	r3, r3, #254	; 0xfe
      f36:	f443 6300 	orr.w	r3, r3, #2048	; 0x800
      f3a:	f043 0301 	orr.w	r3, r3, #1
@@ -1995,18 +1995,18 @@ BMSModuleManager::BMSModuleManager()
               OUTmsg.id  = 0x1A5554B0;
      f88:	4b4f      	ldr	r3, [pc, #316]	; (10c8 <BMSModuleManager::balanceCells(int)+0x2c4>)
      f8a:	f8c8 3000 	str.w	r3, [r8]
-          OUTmsg.flags.extended = 1;
+          OUTmsg.ext = 1;
      f8e:	f8b8 3006 	ldrh.w	r3, [r8, #6]
           Can0.write(OUTmsg);
      f92:	4947      	ldr	r1, [pc, #284]	; (10b0 <BMSModuleManager::balanceCells(int)+0x2ac>)
      f94:	484a      	ldr	r0, [pc, #296]	; (10c0 <BMSModuleManager::balanceCells(int)+0x2bc>)
-          OUTmsg.flags.extended = 1;
+          OUTmsg.ext = 1;
      f96:	f003 03fe 	and.w	r3, r3, #254	; 0xfe
      f9a:	f443 6300 	orr.w	r3, r3, #2048	; 0x800
      f9e:	f043 0301 	orr.w	r3, r3, #1
       for (int y = 1; y < 63; y++)
      fa2:	3701      	adds	r7, #1
-          OUTmsg.flags.extended = 1;
+          OUTmsg.ext = 1;
      fa4:	f8a8 3006 	strh.w	r3, [r8, #6]
           Can0.write(OUTmsg);
      fa8:	f007 fb12 	bl	85d0 <FlexCAN::write(CAN_message_t const&)>
@@ -2193,11 +2193,11 @@ BMSModuleManager::BMSModuleManager()
     if (balcnt == 1)
     1130:	2c01      	cmp	r4, #1
     1132:	f47f ae91 	bne.w	e58 <BMSModuleManager::balanceCells(int)+0x54>
-      OUTmsg.flags.extended = 1;
+      OUTmsg.ext = 1;
     1136:	f8df 821c 	ldr.w	r8, [pc, #540]	; 1354 <BMSModuleManager::balanceCells(int)+0x550>
       Can0.write(OUTmsg);
     113a:	4887      	ldr	r0, [pc, #540]	; (1358 <BMSModuleManager::balanceCells(int)+0x554>)
-      OUTmsg.flags.extended = 1;
+      OUTmsg.ext = 1;
     113c:	f8b8 3006 	ldrh.w	r3, [r8, #6]
     1140:	f003 03fe 	and.w	r3, r3, #254	; 0xfe
     1144:	f443 6300 	orr.w	r3, r3, #2048	; 0x800
@@ -2206,7 +2206,7 @@ BMSModuleManager::BMSModuleManager()
     114c:	2500      	movs	r5, #0
       Can0.write(OUTmsg);
     114e:	4641      	mov	r1, r8
-      OUTmsg.flags.extended = 1;
+      OUTmsg.ext = 1;
     1150:	f8a8 3006 	strh.w	r3, [r8, #6]
       OUTmsg.id  = 0x1A55540A;
     1154:	4b81      	ldr	r3, [pc, #516]	; (135c <BMSModuleManager::balanceCells(int)+0x558>)
@@ -13430,35 +13430,19 @@ void chargercomms() {
     6c20:	1fff885c 	.word	0x1fff885c
     6c24:	1fffcf44 	.word	0x1fffcf44
     msg.id = 0x1806E5F4;  //broadcast to all Elteks
-<<<<<<< HEAD
-    6bd0:	4c23      	ldr	r4, [pc, #140]	; (6c60 <chargercomms()+0x37c>)
-    6bd2:	4a24      	ldr	r2, [pc, #144]	; (6c64 <chargercomms()+0x380>)
-    msg.flags.extended = 1;
-    6bd4:	88e3      	ldrh	r3, [r4, #6]
-=======
     6c28:	4c23      	ldr	r4, [pc, #140]	; (6cb8 <chargercomms()+0x37c>)
     6c2a:	4a24      	ldr	r2, [pc, #144]	; (6cbc <chargercomms()+0x380>)
     msg.ext = 1;
     6c2c:	88e3      	ldrh	r3, [r4, #6]
->>>>>>> master
     msg.buf[0] = highByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
     6c2e:	6d70      	ldr	r0, [r6, #84]	; 0x54
     msg.id = 0x1806E5F4;  //broadcast to all Elteks
-<<<<<<< HEAD
-    6bd8:	6022      	str	r2, [r4, #0]
-    msg.flags.extended = 1;
-    6bda:	f003 03fe 	and.w	r3, r3, #254	; 0xfe
-    6bde:	f443 6300 	orr.w	r3, r3, #2048	; 0x800
-    6be2:	f043 0301 	orr.w	r3, r3, #1
-    6be6:	80e3      	strh	r3, [r4, #6]
-=======
     6c30:	6022      	str	r2, [r4, #0]
     msg.ext = 1;
     6c32:	f003 03fe 	and.w	r3, r3, #254	; 0xfe
     6c36:	f443 6300 	orr.w	r3, r3, #2048	; 0x800
     6c3a:	f043 0301 	orr.w	r3, r3, #1
     6c3e:	80e3      	strh	r3, [r4, #6]
->>>>>>> master
     msg.buf[0] = highByte(uint16_t(settings.ChargeVsetpoint * settings.Scells * 10));
     6c40:	f006 f972 	bl	cf28 <__aeabi_i2f>
     6c44:	6971      	ldr	r1, [r6, #20]
@@ -13488,17 +13472,6 @@ void chargercomms() {
     msg.buf[4] = 0x00;
     6c6e:	60e7      	str	r7, [r4, #12]
     Can0.write(msg);
-<<<<<<< HEAD
-    6c18:	f001 fcb6 	bl	8588 <FlexCAN::write(CAN_message_t const&)>
-    msg.flags.extended = 0;
-    6c1c:	79a3      	ldrb	r3, [r4, #6]
-  if (settings.chargertype == Eltek) {
-    6c1e:	f8d6 50b8 	ldr.w	r5, [r6, #184]	; 0xb8
-    msg.flags.extended = 0;
-    6c22:	f367 0300 	bfi	r3, r7, #0, #1
-    6c26:	71a3      	strb	r3, [r4, #6]
-    6c28:	e663      	b.n	68f2 <chargercomms()+0xe>
-=======
     6c70:	f001 fcae 	bl	85d0 <FlexCAN::write(CAN_message_t const&)>
     msg.ext = 0;
     6c74:	79a3      	ldrb	r3, [r4, #6]
@@ -13508,7 +13481,6 @@ void chargercomms() {
     6c7a:	f367 0300 	bfi	r3, r7, #0, #1
     6c7e:	71a3      	strb	r3, [r4, #6]
     6c80:	e663      	b.n	694a <chargercomms()+0xe>
->>>>>>> master
       msg.buf[2] = highByte(uint16_t((settings.ChargeVsetpoint * settings.Scells) * 10));
     6c82:	490f      	ldr	r1, [pc, #60]	; (6cc0 <chargercomms()+0x384>)
     6c84:	4628      	mov	r0, r5
