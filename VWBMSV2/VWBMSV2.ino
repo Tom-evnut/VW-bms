@@ -63,7 +63,7 @@ SerialConsole console;
 EEPROMSettings settings;
 
 /////Version Identifier/////////
-int firmver = 230920;
+int firmver = 240101;
 
 //Curent filter//
 float filterFrequency = 5.0;
@@ -2902,7 +2902,9 @@ void menu() {
     SERIALCONSOLE.println("Debugging Paused");
     SERIALCONSOLE.print("Firmware Version : ");
     SERIALCONSOLE.print(firmver);
+    #ifdef USING_TEENSY4
     SERIALCONSOLE.println("_Teensy4.0_Port");
+    #endif
     SERIALCONSOLE.println("b - Battery Settings");
     SERIALCONSOLE.println("a - Alarm and Warning Settings");
     SERIALCONSOLE.println("e - Charging Settings");
