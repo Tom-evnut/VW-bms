@@ -1,7 +1,9 @@
 #pragma once
 #include "config.h"
 #include "BMSModule.h"
+#ifndef USING_TEENSY4
 #include <FlexCAN.h>
+#endif
 
 class BMSModuleManager
 {

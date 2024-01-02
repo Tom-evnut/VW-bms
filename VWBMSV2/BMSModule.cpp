@@ -422,6 +422,7 @@ float BMSModule::getLowTemp()
   {
     return temperatures[0];
   }
+  return 0.0f;
 }
 
 float BMSModule::getHighTemp()
@@ -494,16 +495,17 @@ float BMSModule::getAvgTemp()
   {
     return temperatures[0];
   }
+  return 0.0f;
 }
 
 float BMSModule::getModuleVoltage()
 {
   moduleVolt = 0;
-  for (int I; I < 13; I++)
+  for (int i = 0; i < 13; i++)
   {
-    if (cellVolt[I] > IgnoreCell && cellVolt[I] < 5.0)
+    if (cellVolt[i] > IgnoreCell && cellVolt[i] < 5.0)
     {
-      moduleVolt = moduleVolt + cellVolt[I];
+      moduleVolt = moduleVolt + cellVolt[i];
     }
   }
   return moduleVolt;
@@ -569,9 +571,9 @@ void BMSModule::setReset(bool ex)
 void BMSModule::setIgnoreCell(float Ignore)
 {
   IgnoreCell = Ignore;
-  Serial.println();
-  Serial.println();
-  Serial.println(Ignore);
-  Serial.println();
+  SERIALCONSOLE.println();
+  SERIALCONSOLE.println();
+  SERIALCONSOLE.println(Ignore);
+  SERIALCONSOLE.println();
 
 }

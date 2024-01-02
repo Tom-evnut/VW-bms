@@ -78,13 +78,14 @@ void SerialConsole::printMenu() {
     Logger::console("   d = Toggle output of pack details every 3 seconds");
   
     Logger::console("   LOGLEVEL=%i - set log level (0=debug, 1=info, 2=warn, 3=error, 4=off)", Logger::getLogLevel());
-
+/*
     float OverVSetpoint;
     float UnderVSetpoint;
     float OverTSetpoint;
     float UnderTSetpoint;
     float balanceVoltage;
     float balanceHyst;
+*/
 }
 
 /*	There is a help menu (press H or h or ?)
@@ -97,7 +98,8 @@ void SerialConsole::serialEvent() {
     if (incoming == -1) { //false alarm....
         return;
     }
-
+    // Line feed and carriage return chars
+    //              LF                CR
     if (incoming == 10 || incoming == 13) { //command done. Parse it.
         handleConsoleCmd();
         ptrBuffer = 0; //reset line counter once the line has been processed
@@ -121,8 +123,6 @@ void SerialConsole::handleConsoleCmd() {
 
 void SerialConsole::handleShortCmd() 
 {
-    uint8_t val;
-
     switch (cmdBuffer[0]) 
     {
     case 'h':
@@ -201,14 +201,14 @@ void SerialConsole::handleShortCmd()
       break; 
                 
       case '0': //Send all boards into Sleep state
-       Serial.println();
-       Serial.println("Sleep Mode");
+       SERIALCONSOLE.println();
+       SERIALCONSOLE.println("Sleep Mode");
        sleepBoards();
       break;
 
       case '9'://Pull all boards out of Sleep state
-       Serial.println();
-       Serial.println("Wake Boards");
+       SERIALCONSOLE.println();
+       SERIALCONSOLE.println("Wake Boards");
        wakeBoards();
       break;          
                       

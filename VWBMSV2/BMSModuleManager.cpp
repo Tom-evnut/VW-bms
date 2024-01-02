@@ -3,6 +3,9 @@
 #include "BMSUtil.h"
 #include "Logger.h"
 
+#ifdef USING_TEENSY4
+extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
+#endif //USING_TEENSY4
 extern EEPROMSettings settings;
 CAN_message_t OUTmsg;
 
@@ -52,8 +55,8 @@ bool BMSModuleManager::checkcomms()
 void BMSModuleManager::setBalanceHyst(float newVal)
 {
   BalHys = newVal;
-  //Serial.println();
-  //Serial.println(BalHys, 3);
+  //SERIALCONSOLE.println();
+  //SERIALCONSOLE.println(BalHys, 3);
 }
 
 void BMSModuleManager::balanceCells(int debug)
@@ -61,13 +64,13 @@ void BMSModuleManager::balanceCells(int debug)
 
 
   uint16_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
-  //Serial.println();
-  // Serial.println(LowCellVolt + BalHys, 3);
+  //SERIALCONSOLE.println();
+  // SERIALCONSOLE.println(LowCellVolt + BalHys, 3);
   /*
-    Serial.println();
-    Serial.println();
-    Serial.print("Balcnt:");
-    Serial.println(balcnt);
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.println();
+    SERIALCONSOLE.print("Balcnt:");
+    SERIALCONSOLE.println(balcnt);
   */
   if (balcnt > 60)
   {
@@ -94,8 +97,8 @@ void BMSModuleManager::balanceCells(int debug)
             /*
               else
               {
-              Serial.print(" | ");
-              Serial.print(i);
+              SERIALCONSOLE.print(" | ");
+              SERIALCONSOLE.print(i);
               }
             */
           }
@@ -105,11 +108,11 @@ void BMSModuleManager::balanceCells(int debug)
           }
           if (debug == 1)
           {
-            Serial.println();
-            Serial.print("Module ");
-            Serial.print(y);
-            Serial.print(" | ");
-            Serial.println(balance, HEX);
+            SERIALCONSOLE.println();
+            SERIALCONSOLE.print("Module ");
+            SERIALCONSOLE.print(y);
+            SERIALCONSOLE.print(" | ");
+            SERIALCONSOLE.println(balance, HEX);
 
           }
 
@@ -177,7 +180,7 @@ void BMSModuleManager::balanceCells(int debug)
               break;
           }
           OUTmsg.len = 8;
-          OUTmsg.ext = 1;
+          OUTmsg.flags.extended = 1;
           Can0.write(OUTmsg);
 
           delay(1);
@@ -241,7 +244,7 @@ void BMSModuleManager::balanceCells(int debug)
               break;
           }
           OUTmsg.len = 8;
-          OUTmsg.ext = 1;
+          OUTmsg.flags.extended = 1;
           Can0.write(OUTmsg);
         }
       }
@@ -266,7 +269,7 @@ void BMSModuleManager::balanceCells(int debug)
       OUTmsg.buf[7] = 0X00;
 
       OUTmsg.len = 8;
-      OUTmsg.ext = 1;
+      OUTmsg.flags.extended = 1;
 
       OUTmsg.id  = 0x1A55540A;
       Can0.write(OUTmsg);
@@ -379,10 +382,10 @@ void BMSModuleManager::balanceCells(int debug)
   }
   balcnt++;
   /*
-    Serial.print("Bal:");
-    Serial.print(balancing);
+    SERIALCONSOLE.print("Bal:");
+    SERIALCONSOLE.print(balancing);
   */
-  OUTmsg.ext = 0;
+  OUTmsg.flags.extended = 0;
 }
 
 
@@ -432,9 +435,9 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
       modules[CMU].decodetemp(msg, 1);
       if (debug == 1)
       {
-        Serial.println();
-        Serial.print(CMU);
-        Serial.print(" | Temp Found");
+        SERIALCONSOLE.println();
+        SERIALCONSOLE.print(CMU);
+        SERIALCONSOLE.print(" | Temp Found");
       }
     }
   }
@@ -451,9 +454,9 @@ void BMSModuleManager::decodetemp(CAN_message_t &msg, int debug, int type)
         modules[CMU].decodetemp(msg, 2);
         if (debug == 1)
         {
-          Serial.println();
-          Serial.print(CMU);
-          Serial.print("|  Temp Found");
+          SERIALCONSOLE.println();
+          SERIALCONSOLE.print(CMU);
+          SERIALCONSOLE.print("|  Temp Found");
         }
       }
     }
@@ -727,11 +730,11 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
         {
           if (debug == 1)
           {
-            Serial.println();
-            Serial.print(CMU);
-            Serial.print(",");
-            Serial.print(Id);
-            Serial.print(" | ");
+            SERIALCONSOLE.println();
+            SERIALCONSOLE.print(CMU);
+            SERIALCONSOLE.print(",");
+            SERIALCONSOLE.print(Id);
+            SERIALCONSOLE.print(" | ");
           }
           modules[CMU].setExists(true);
           modules[CMU].setReset(true);
@@ -744,11 +747,11 @@ void BMSModuleManager::decodecan(CAN_message_t &msg, int debug)
         {
           if (debug == 1)
           {
-            Serial.println();
-            Serial.print(CMU);
-            Serial.print(",");
-            Serial.print(Id);
-            Serial.print(" | ");
+            SERIALCONSOLE.println();
+            SERIALCONSOLE.print(CMU);
+            SERIALCONSOLE.print(",");
+            SERIALCONSOLE.print(Id);
+            SERIALCONSOLE.print(" | ");
           }
           modules[CMU].setExists(true);
           modules[CMU].setReset(true);
