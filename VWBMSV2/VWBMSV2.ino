@@ -38,7 +38,7 @@ EEPROMSettings settings;
 
 
 /////Version Identifier/////////
-int firmver = 230920;
+int firmver = 240318;
 
 //Curent filter//
 float filterFrequency = 5.0;
@@ -898,38 +898,55 @@ void alarmupdate() {
   alarm[0] = 0x00;
   if (settings.OverVSetpoint < bms.getHighCellVolt()) {
     alarm[0] = 0x04;
+  } else {
+    alarm[0] = 0x08;
   }
   if (bms.getLowCellVolt() < settings.UnderVSetpoint) {
     alarm[0] |= 0x10;
+  } else {
+    alarm[0] |= 0x20;
   }
   if (bms.getHighTemperature() > settings.OverTSetpoint) {
     alarm[0] |= 0x40;
+  } else {
+    alarm[0] |= 0x80;
   }
   alarm[1] = 0;
   if (bms.getLowTemperature() < settings.UnderTSetpoint) {
     alarm[1] = 0x01;
+  } else {
+    alarm[1] = 0x02;
   }
   alarm[3] = 0;
   if ((bms.getHighCellVolt() - bms.getLowCellVolt()) > settings.CellGap) {
     alarm[3] = 0x01;
+  } else {
+    alarm[3] = 0x02;
   }
-
   ///warnings///
   warning[0] = 0;
 
   if (bms.getHighCellVolt() > (settings.OverVSetpoint - settings.WarnOff)) {
     warning[0] = 0x04;
+  } else {
+    warning[0] = 0x08;
   }
   if (bms.getLowCellVolt() < (settings.UnderVSetpoint + settings.WarnOff)) {
     warning[0] |= 0x10;
+  } else {
+    warning[0] |= 0x20;
   }
 
   if (bms.getHighTemperature() > (settings.OverTSetpoint - settings.WarnToff)) {
     warning[0] |= 0x40;
+  } else {
+    warning[0] |= 0x80;
   }
   warning[1] = 0;
   if (bms.getLowTemperature() < (settings.UnderTSetpoint + settings.WarnToff)) {
     warning[1] = 0x01;
+  } else {
+    warning[1] = 0x02;
   }
 }
 
