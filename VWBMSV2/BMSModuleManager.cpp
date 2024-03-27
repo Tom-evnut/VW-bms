@@ -193,7 +193,6 @@ void BMSModuleManager::balanceCells(int debug)
               OUTmsg.buf[i - 8] = 0x00;
             }
           }
-          OUTmsg.buf[4] = 0xFE;
           OUTmsg.buf[5] = 0xFE;
           OUTmsg.buf[6] = 0xFE;
           OUTmsg.buf[7] = 0xFE;
