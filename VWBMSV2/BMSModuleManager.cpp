@@ -85,7 +85,7 @@ void BMSModuleManager::balanceCells(int debug)
         if (modules[y].isExisting() == 1)
         {
           balance = 0;
-          for (int i = 0; i < 12; i++)
+          for (int i = 0; i < 13; i++)
           {
             if ((LowCellVolt + BalHys) < modules[y].getCellVoltage(i))
             {
